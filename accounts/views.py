@@ -40,18 +40,27 @@ def register_view(request):
 
 # --- Login View ---
 def login_view(request):
-    if request.method == 'POST':
-        form = AuthenticationForm(request, data=request.POST)
-        if form.is_valid():
-            username = form.cleaned_data.get('username')
-            password = form.cleaned_data.get('password')
-            user = authenticate(username=username, password=password)
-            if user is not None:
-                login(request, user)   # Log the user in
-                return redirect('dashboard:dashboard')  # Redirect to dashboard
-    else:
-        form = AuthenticationForm()
-    return render(request, 'accounts/login.html', {'form': form})
+    if request.method == "POST":
+        username = request.POST.get("username")
+        password = request.POST.get("password")
+
+        # Check if username exists
+        if not User.objects.filter(username=username).exists():
+            messages.error(request, "Username does not exist.")
+            return redirect("accounts:login")
+
+        # Authenticate user
+        user = authenticate(username=username, password=password)
+        if user is not None:
+            login(request, user)  # Log the user in
+            messages.success(request, f"Welcome back, {username}!")
+            return redirect("dashboard:dashboard")
+        else:
+            messages.error(request, "Invalid username or password.")
+            return redirect("accounts:login")
+
+    return render(request, "accounts/login.html")
+
 
 
 
