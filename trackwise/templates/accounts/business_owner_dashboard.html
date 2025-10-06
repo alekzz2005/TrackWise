@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Business Owner Dashboard - TrackWise</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+    <div class="dashboard-container">
+        <div class="dashboard-header">
+            <div>
+                <h1>Business Owner Dashboard</h1>
+                <p>{{ profile.company.name }} - Intelligent Inventory Management</p>
+            </div>
+            <div style="margin-left: auto;">
+                <a href="{% url 'logout' %}" class="btn btn-outline-logout" style="width: auto;">Logout</a>
+            </div>
+        </div>
+        
+        <div class="dashboard-nav">
+            <nav style="display: flex; gap: 1rem;">
+                <a href="#" class="nav-active">Dashboard</a>
+                <a href="{% url 'inventory_list' %}" class="nav-inactive">Inventory</a>
+                <a href="#" class="nav-inactive">Reports</a>
+                <a href="#" class="nav-inactive">Staff Management</a>
+                <a href="#" class="nav-inactive">Company Settings</a>
+            </nav>
+        </div>
+        
+        <div class="dashboard-content">
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+            
+            <div class="welcome-card">
+                <h2>Welcome, {{ request.user.first_name }}!</h2>
+                <p>You are managing <strong>{{ profile.company.name }}</strong></p>
+            </div>
+            
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <h3>Total Products</h3>
+                    <p class="stat-number-primary">0</p>
+                    <p class="stat-description">Currently in inventory</p>
+                </div>
+                
+                <div class="stat-card">
+                    <h3>Low Stock</h3>
+                    <p class="stat-number-warning">0</p>
+                    <p class="stat-description">Items need restocking</p>
+                </div>
+                
+                <div class="stat-card">
+                    <h3>Out of Stock</h3>
+                    <p class="stat-number-danger">0</p>
+                    <p class="stat-description">Items unavailable</p>
+                </div>
+                
+                <div class="stat-card">
+                    <h3>Total Staff</h3>
+                    <p class="stat-number-success">0</p>
+                    <p class="stat-description">Active staff members</p>
+                </div>
+            </div>
+            
+            <!-- <div class="content-card">
+                <h3>Business Owner Actions</h3>
+                <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                    <button class="btn btn-primary" style="width: auto;">Manage Inventory</button>
+                    <button class="btn btn-primary" style="width: auto;">View Analytics</button>
+                    <button class="btn btn-secondary" style="width: auto;">Manage Staff</button>
+                    <button class="btn btn-secondary" style="width: auto;">Financial Reports</button>
+                    <button class="btn btn-outline" style="width: auto;">Company Settings</button>
+                </div>
+            </div> -->
+            
+            <div class="content-card">
+                <h3>Recent Activity</h3>
+                <p style="color: var(--secondary-color); text-align: center; padding: 2rem;">
+                    No recent activity. Inventory management features coming soon.
+                </p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

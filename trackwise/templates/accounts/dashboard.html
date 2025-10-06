@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - TrackWise</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+    <div class="dashboard-container">
+        <div class="dashboard-header">
+            <div>
+                <h1>TrackWise Dashboard</h1>
+                <p>Intelligent Inventory Management</p>
+            </div>
+            <div style="margin-left: auto;">
+                <a href="{% url 'logout' %}" class="btn btn-outline-logout" style="width: auto;">Logout</a>
+            </div>
+        </div>
+        
+        <div class="dashboard-nav">
+            <nav style="display: flex; gap: 1rem;">
+                <a href="#" style="color: var(--primary-color); text-decoration: none; font-weight: 500;">Dashboard</a>
+                <a href="#" style="color: var(--secondary-color); text-decoration: none;">Inventory</a>
+                <a href="#" style="color: var(--secondary-color); text-decoration: none;">Reports</a>
+                <a href="#" style="color: var(--secondary-color); text-decoration: none;">Settings</a>
+            </nav>
+        </div>
+        
+        <div class="dashboard-content">
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+            
+            <div class="welcome-card">
+                <h2>Welcome, {{ request.user.first_name }}!</h2>
+                <p>You are logged in as {{ request.user.userprofile.get_role_display }}</p>
+            </div>
+            
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <h3>Total Products</h3>
+                    <p style="font-size: 2rem; font-weight: bold; color: var(--primary-color);">0</p>
+                    <p style="color: var(--secondary-color); font-size: 0.9rem;">Currently in inventory</p>
+                </div>
+                
+                <div class="stat-card">
+                    <h3>Low Stock</h3>
+                    <p style="font-size: 2rem; font-weight: bold; color: var(--warning-color);">0</p>
+                    <p style="color: var(--secondary-color); font-size: 0.9rem;">Items need restocking</p>
+                </div>
+                
+                <div class="stat-card">
+                    <h3>Out of Stock</h3>
+                    <p style="font-size: 2rem; font-weight: bold; color: var(--danger-color);">0</p>
+                    <p style="color: var(--secondary-color); font-size: 0.9rem;">Items unavailable</p>
+                </div>
+                
+                <div class="stat-card">
+                    <h3>Recent Activity</h3>
+                    <p style="font-size: 2rem; font-weight: bold; color: var(--success-color);">0</p>
+                    <p style="color: var(--secondary-color); font-size: 0.9rem;">Updates today</p>
+                </div>
+            </div>
+            
+            <div style="background: white; padding: 1.5rem; border-radius: 12px; box-shadow: var(--shadow);">
+                <h3 style="margin-bottom: 1rem;">Quick Actions</h3>
+                <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                    <button class="btn btn-primary" style="width: auto;">Add New Product</button>
+                    <button class="btn btn-secondary" style="width: auto;">View Inventory</button>
+                    <button class="btn btn-outline" style="width: auto;">Generate Report</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

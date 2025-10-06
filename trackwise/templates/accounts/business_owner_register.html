@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Business Owner Registration - TrackWise</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+    <div class="auth-container">
+        <div class="auth-header">
+            <h1>TrackWise</h1>
+            <p>Business Owner Registration</p>
+        </div>
+        
+        <div class="auth-body">
+            <h2 style="text-align: center; margin-bottom: 1.5rem; color: var(--dark-color);">Create Business Account</h2>
+            
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert {% if message.tags == 'error' %}alert-error{% else %}alert-{{ message.tags }}{% endif %}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+            
+            <form method="post" novalidate>
+                {% csrf_token %}
+                
+                {% if form.non_field_errors %}
+                    <div class="alert alert-error">
+                        {% for error in form.non_field_errors %}
+                            {{ error }}
+                        {% endfor %}
+                    </div>
+                {% endif %}
+                
+                <!-- Personal Information -->
+                <div style="margin-bottom: 2rem;">
+                    <h3 style="color: var(--dark-color); margin-bottom: 1rem;">Personal Information</h3>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Username</label>
+                        {{ form.username }}
+                        {% if form.username.errors %}
+                            <div class="errorlist">
+                                {% for error in form.username.errors %}
+                                    <div>{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Email Address</label>
+                        {{ form.email }}
+                        {% if form.email.errors %}
+                            <div class="errorlist">
+                                {% for error in form.email.errors %}
+                                    <div>{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">First Name</label>
+                        {{ form.first_name }}
+                        {% if form.first_name.errors %}
+                            <div class="errorlist">
+                                {% for error in form.first_name.errors %}
+                                    <div>{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Last Name</label>
+                        {{ form.last_name }}
+                        {% if form.last_name.errors %}
+                            <div class="errorlist">
+                                {% for error in form.last_name.errors %}
+                                    <div>{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <!-- Company Information -->
+                <div style="margin-bottom: 2rem;">
+                    <h3 style="color: var(--dark-color); margin-bottom: 1rem;">Company Information</h3>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Company Option</label>
+                        <div style="display: flex; gap: 2rem;">
+                            {% for choice in form.company_choice %}
+                                <label style="display: flex; align-items: center; gap: 0.5rem;">
+                                    {{ choice.tag }}
+                                    <span>{{ choice.choice_label }}</span>
+                                </label>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    
+                    <!-- New Company Fields -->
+                    <div id="new-company-fields" style="display: none;">
+                        <div class="form-group">
+                            <label class="form-label">Company Name</label>
+                            {{ form.new_company_name }}
+                            {% if form.new_company_name.errors %}
+                                <div class="errorlist">
+                                    {% for error in form.new_company_name.errors %}
+                                        <div>{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Company Address</label>
+                            {{ form.company_address }}
+                            {% if form.company_address.errors %}
+                                <div class="errorlist">
+                                    {% for error in form.company_address.errors %}
+                                        <div>{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Contact Information</label>
+                            {{ form.company_contact }}
+                            {% if form.company_contact.errors %}
+                                <div class="errorlist">
+                                    {% for error in form.company_contact.errors %}
+                                        <div>{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <!-- Existing Company Field -->
+                    <div id="existing-company-field" style="display: none;">
+                        <div class="form-group">
+                            <label class="form-label">Select Company</label>
+                            {{ form.existing_company }}
+                            {% if form.existing_company.errors %}
+                                <div class="errorlist">
+                                    {% for error in form.existing_company.errors %}
+                                        <div>{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Password -->
+                <div style="margin-bottom: 2rem;">
+                    <h3 style="color: var(--dark-color); margin-bottom: 1rem;">Security</h3>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Password</label>
+                        {{ form.password1 }}
+                        {% if form.password1.errors %}
+                            <div class="errorlist">
+                                {% for error in form.password1.errors %}
+                                    <div>{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Confirm Password</label>
+                        {{ form.password2 }}
+                        {% if form.password2.errors %}
+                            <div class="errorlist">
+                                {% for error in form.password2.errors %}
+                                    <div>{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <button type="submit" class="btn btn-primary">Create Business Account</button>
+            </form>
+            
+            <div class="auth-link">
+                <p>Already have an account? <a href="{% url 'login' %}">Sign in here</a></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const companyChoiceRadios = document.querySelectorAll('input[name="company_choice"]');
+            const newCompanyFields = document.getElementById('new-company-fields');
+            const existingCompanyField = document.getElementById('existing-company-field');
+            
+            function toggleCompanyFields() {
+                const selectedValue = document.querySelector('input[name="company_choice"]:checked').value;
+                
+                if (selectedValue === 'new') {
+                    newCompanyFields.style.display = 'block';
+                    existingCompanyField.style.display = 'none';
+                } else {
+                    newCompanyFields.style.display = 'none';
+                    existingCompanyField.style.display = 'block';
+                }
+            }
+            
+            // Initial toggle
+            toggleCompanyFields();
+            
+            // Add event listeners
+            companyChoiceRadios.forEach(radio => {
+                radio.addEventListener('change', toggleCompanyFields);
+            });
+        });
+    </script>
+</body>
+</html>
