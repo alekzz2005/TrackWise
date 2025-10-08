@@ -93,7 +93,6 @@ def dashboard_view(request):
         profile = request.user.userprofile
     except UserProfile.DoesNotExist:
         # Create a default profile if it doesn't exist
-        # Use the imported Company model directly
         company = Company.objects.first()
         if not company:
             company = Company.objects.create(name="Default Company")
@@ -133,9 +132,34 @@ def dashboard_view(request):
         }
         template = 'accounts/business_owner_dashboard.html'
     else:
-        # Staff dashboard context
+        # Staff dashboard - calculate similar statistics but for staff view
+        products = Product.objects.filter(company=profile.company)
+        
+        # Calculate statistics for staff
+        total_products = products.count()
+        low_stock = products.filter(quantity__gt=0, quantity__lte=10).count()
+        out_of_stock = products.filter(quantity=0).count()
+        
+        # Get recent products (last 5 added)
+        recent_products = products.order_by('-created_at')[:5]
+        
+        # Get recently updated products for activity feed
+        recent_activity = products.order_by('-updated_at')[:10]
+        
+        # Count today's updates (products updated today)
+        from django.utils import timezone
+        from datetime import timedelta
+        today = timezone.now().date()
+        recent_updates = products.filter(updated_at__date=today).count()
+        
         context = {
             'profile': profile,
+            'total_products': total_products,
+            'low_stock': low_stock,
+            'out_of_stock': out_of_stock,
+            'recent_updates': recent_updates,
+            'recent_products': recent_products,
+            'recent_activity': recent_activity,
         }
         template = 'accounts/staff_dashboard.html'
     
