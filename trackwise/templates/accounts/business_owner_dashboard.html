@@ -41,7 +41,8 @@
             <div class="welcome-card">
                 <h2>Welcome, {{ request.user.first_name }}!</h2>
                 <p>You are managing <strong>{{ profile.company.name }}</strong></p>
-                <p style="margin-top: 0.5rem; opacity: 0.9;">Total Inventory Value: <strong>₱{{ total_inventory_value|floatformat:2 }}</strong></p>
+                {% comment %} <p style="margin-top: 0.5rem; opacity: 0.9;">Total Inventory Value: <strong>₱{{ total_inventory_value|floatformat:2 }}</strong></p> {% endcomment %}
+                {% comment %} should be in reports {% endcomment %}
             </div>
             
             <div class="stats-grid">
@@ -93,7 +94,7 @@
                 <div class="content-card">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
                         <h3 style="margin: 0; color: var(--dark-color);">Recent Products</h3>
-                        <a href="{% url 'inventory_list' %}" class="btn btn-outline-header" style="width: auto; padding: 0.5rem 1rem;">
+                        <a href="{% url 'inventory_list' %}" class="btn btn-outline" style="width: auto; padding: 0.5rem 1rem;">
                             View All
                         </a>
                     </div>
