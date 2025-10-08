@@ -4,7 +4,8 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 import time
 from .forms import BusinessOwnerRegistrationForm, StaffRegistrationForm, CustomAuthenticationForm
-from .models import UserProfile
+from .models import UserProfile, Company  # Import both models here
+from inventory.models import Product
 
 def role_selection(request):
     if request.user.is_authenticated:
@@ -92,16 +93,50 @@ def dashboard_view(request):
         profile = request.user.userprofile
     except UserProfile.DoesNotExist:
         # Create a default profile if it doesn't exist
-        from .models import UserProfile, Company
+        # Use the imported Company model directly
         company = Company.objects.first()
         if not company:
             company = Company.objects.create(name="Default Company")
         profile = UserProfile.objects.create(user=request.user, role='staff', company=company)
     
-    # Render different dashboards based on role
+    # Calculate dashboard statistics
     if profile.role == 'business_owner':
+        # Get products for this company
+        products = Product.objects.filter(company=profile.company)
+        
+        # Calculate statistics
+        total_products = products.count()
+        low_stock = products.filter(quantity__gt=0, quantity__lte=10).count()  # 10 or less is low stock
+        out_of_stock = products.filter(quantity=0).count()
+        
+        # Get total staff count (users in the same company with staff role)
+        total_staff = UserProfile.objects.filter(company=profile.company, role='staff').count()
+        
+        # Get recent products (last 5 added)
+        recent_products = products.order_by('-created_at')[:5]
+        
+        # Calculate total inventory value
+        total_inventory_value = sum(product.total_value for product in products)
+        
+        # Get recently updated products for activity feed
+        recent_activity = products.order_by('-updated_at')[:10]
+        
+        context = {
+            'profile': profile,
+            'total_products': total_products,
+            'low_stock': low_stock,
+            'out_of_stock': out_of_stock,
+            'total_staff': total_staff,
+            'recent_products': recent_products,
+            'recent_activity': recent_activity,
+            'total_inventory_value': total_inventory_value,
+        }
         template = 'accounts/business_owner_dashboard.html'
     else:
+        # Staff dashboard context
+        context = {
+            'profile': profile,
+        }
         template = 'accounts/staff_dashboard.html'
     
-    return render(request, template, {'profile': profile})
+    return render(request, template, context)
