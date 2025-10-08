@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Join TrackWise</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+    <div class="auth-container">
+        <div class="auth-header">
+            <h1>TrackWise</h1>
+            <p>Intelligent Inventory Management System</p>
+        </div>
+        
+        <div class="auth-body">
+            <h2 style="text-align: center; margin-bottom: 2rem; color: var(--dark-color);">Join as...</h2>
+            
+            <div style="display: flex; flex-direction: column; gap: 1rem;">
+                <a href="{% url 'business_owner_register' %}" class="btn btn-primary" style="text-align: center;">
+                    Business Owner
+                </a>
+                <a href="{% url 'staff_register' %}" class="btn btn-secondary" style="text-align: center;">
+                    Staff Member
+                </a>
+            </div>
+            
+            <div class="auth-link">
+                <p>Already have an account? <a href="{% url 'login' %}">Sign in here</a></p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
