@@ -135,3 +135,4 @@ def add_staff(request):
         'company': company,
     }
     return render(request, 'staff_management/add_staff.html', context)
+
