@@ -15,11 +15,7 @@ def inventory_list(request):
         messages.error(request, 'User profile not found.')
         return redirect('dashboard')
     
-    # Only business owners can access inventory management
-    if profile.role != 'business_owner':
-        messages.error(request, 'Access denied. Only business owners can manage inventory.')
-        return redirect('dashboard')
-    
+    # Both business owners and staff can access inventory, but with different permissions
     products = Product.objects.filter(company=profile.company)
     
     # Search functionality
@@ -47,7 +43,12 @@ def inventory_list(request):
         'profile': profile,
         'total_inventory_value': total_inventory_value
     }
-    return render(request, 'inventory/inventory_list.html', context)
+    
+    # Use different templates for owner vs staff
+    if profile.role == 'business_owner':
+        return render(request, 'inventory/inventory_list.html', context)
+    else:
+        return render(request, 'inventory/inventory_list_staff.html', context)
 
 @login_required
 def product_detail(request, pk):
@@ -57,13 +58,15 @@ def product_detail(request, pk):
         messages.error(request, 'User profile not found.')
         return redirect('dashboard')
     
-    if profile.role != 'business_owner':
-        messages.error(request, 'Access denied. Only business owners can manage products.')
-        return redirect('dashboard')
-    
+    # Both owners and staff can view product details
     product = get_object_or_404(Product, pk=pk, company=profile.company)
     
+    # Only business owners can edit products
     if request.method == 'POST':
+        if profile.role != 'business_owner':
+            messages.error(request, 'Access denied. Only business owners can edit products.')
+            return redirect('inventory_list')
+        
         form = ProductForm(request.POST, request.FILES, instance=product)
         if form.is_valid():
             form.save()
@@ -77,7 +80,12 @@ def product_detail(request, pk):
         'product': product,
         'profile': profile
     }
-    return render(request, 'inventory/product_detail.html', context)
+    
+    # Use different templates for owner vs staff
+    if profile.role == 'business_owner':
+        return render(request, 'inventory/product_detail.html', context)
+    else:
+        return render(request, 'inventory/product_detail_staff.html', context)
 
 @login_required
 def product_add(request):
@@ -87,10 +95,7 @@ def product_add(request):
         messages.error(request, 'User profile not found.')
         return redirect('dashboard')
     
-    if profile.role != 'business_owner':
-        messages.error(request, 'Access denied. Only business owners can add products.')
-        return redirect('dashboard')
-    
+    # Both owners and staff can add products
     if request.method == 'POST':
         form = ProductForm(request.POST, request.FILES)
         if form.is_valid():
@@ -150,6 +155,12 @@ def product_delete(request, pk):
     try:
         profile = request.user.userprofile
         product = Product.objects.get(pk=pk, company=profile.company)
+        
+        # Only business owners can delete products
+        if profile.role != 'business_owner':
+            messages.error(request, 'Access denied. Only business owners can delete products.')
+            return redirect('inventory_list')
+        
         if request.method == 'POST':
             product_name = product.item_name
             product.delete()
