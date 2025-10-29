@@ -1,9 +1,11 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+from django.contrib.auth.models import User
 from django.db.models import Q
 from accounts.models import UserProfile, Company
 from django.core.paginator import Paginator
+from .forms import StaffAddForm
 
 @login_required
 def staff_list(request):
@@ -79,3 +81,57 @@ def staff_detail(request, staff_id):
         'staff': staff_profile,
     }
     return render(request, 'staff_management/staff_detail.html', context)
+
+@login_required
+def add_staff(request):
+    """Add new staff member"""
+    # Check if user is business owner
+    try:
+        if request.user.userprofile.role != 'business_owner':
+            messages.error(request, 'You do not have permission to add staff members.')
+            return redirect('staff_management:staff_list')
+    except UserProfile.DoesNotExist:
+        messages.error(request, 'User profile not found.')
+        return redirect('dashboard')
+    
+    company = request.user.userprofile.company
+    
+    if request.method == 'POST':
+        form = StaffAddForm(request.POST)
+        if form.is_valid():
+            try:
+                # Create User
+                user = User.objects.create_user(
+                    username=form.cleaned_data['username'],
+                    email=form.cleaned_data['email'],
+                    password=form.cleaned_data['password'],
+                    first_name=form.cleaned_data['first_name'],
+                    last_name=form.cleaned_data['last_name']
+                )
+                
+                # Create UserProfile
+                user_profile = UserProfile.objects.create(
+                    user=user,
+                    role='staff',
+                    company=company,
+                    department=form.cleaned_data['department'],
+                    position=form.cleaned_data['position'],
+                    phone_number=form.cleaned_data.get('phone_number', ''),
+                    assigned_location=form.cleaned_data.get('assigned_location', ''),
+                    notes=form.cleaned_data.get('notes', ''),
+                    is_active=True
+                )
+                
+                messages.success(request, f'Staff member {user.get_full_name()} added successfully!')
+                return redirect('staff_management:staff_list')
+                
+            except Exception as e:
+                messages.error(request, f'Error creating staff member: {str(e)}')
+    else:
+        form = StaffAddForm()
+    
+    context = {
+        'form': form,
+        'company': company,
+    }
+    return render(request, 'staff_management/add_staff.html', context)

@@ -25,9 +25,10 @@ def reports_dashboard(request):
     # Basic statistics for the dashboard
     total_staff = UserProfile.objects.filter(company=company, role='staff').count()
     total_products = Product.objects.filter(company=company).count()
-    total_inventory_value = Product.objects.filter(company=company).aggregate(
-        total_value=Sum('total_value')
-    )['total_value'] or 0
+    
+    # Fix: Calculate total inventory value manually since it's a property
+    products = Product.objects.filter(company=company)
+    total_inventory_value = sum(product.total_value for product in products)
     
     # Low stock alert
     low_stock_products = Product.objects.filter(

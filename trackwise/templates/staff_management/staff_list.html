@@ -75,7 +75,7 @@
     <div class="content-card">
         <h3>Quick Actions</h3>
         <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
-            <a href="#" class="btn btn-primary" style="width: auto;">+ Add New Staff</a>
+            <a href="{% url 'staff_management:add_staff' %}" class="btn btn-primary" style="width: auto;">+ Add New Staff</a>
             <a href="{% url 'reports:staff_activity_report' %}" class="btn btn-secondary" style="width: auto;">View Staff Reports</a>
             <a href="#" class="btn btn-outline" style="width: auto; border-color: var(--info-color); color: var(--info-color);">
                 Export Staff List
