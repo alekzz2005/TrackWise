@@ -30,7 +30,7 @@ SECRET_KEY = 'django-insecure-l*y9*la5o2t-cx6utb=w9ty9keswzzhf_uw2-5s9m_+!2gq$ev
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["trackwise-7hg9.onrender.com"]
 
 
 # Application definition
