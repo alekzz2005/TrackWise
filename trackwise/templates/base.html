@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}TrackWise{% endblock %}</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <style>
+        /* Additional styles for base template */
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem 2rem;
+            background: white;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        .dashboard-header h1 {
+            margin: 0;
+            color: var(--dark-color);
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+        
+        .dashboard-header p {
+            margin: 0.25rem 0 0 0;
+            color: var(--secondary-color);
+            font-size: 0.9rem;
+        }
+        
+        .dashboard-nav {
+            background: #f8f9fa;
+            padding: 1rem 2rem;
+            border-bottom: 1px solid #dee2e6;
+        }
+        
+        .dashboard-nav nav {
+            display: flex;
+            gap: 1rem;
+        }
+        
+        .dashboard-nav nav a {
+            padding: 0.5rem 1rem;
+            text-decoration: none;
+            border-radius: 0.375rem;
+            color: #6c757d;
+            transition: all 0.2s ease;
+        }
+        
+        .dashboard-nav nav a.nav-active {
+            background: var(--primary-color);
+            color: white;
+        }
+        
+        .dashboard-nav nav a.nav-inactive:hover {
+            background: #e9ecef;
+            color: #495057;
+        }
+        
+        .dashboard-container {
+            min-height: 100vh;
+            background: #f8f9fa;
+        }
+        
+        .dashboard-content {
+            padding: 2rem;
+        }
+        
+        .btn-outline-logout {
+            background: transparent;
+            border: 1px solid var(--danger-color);
+            color: var(--danger-color);
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem;
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+        
+        .btn-outline-logout:hover {
+            background: var(--danger-color);
+            color: white;
+        }
+        
+        /* Alert styles to match your dashboard */
+        .alert {
+            padding: 1rem;
+            border-radius: 0.375rem;
+            margin-bottom: 1rem;
+            border: 1px solid transparent;
+        }
+        
+        .alert-success {
+            background-color: #d1e7dd;
+            border-color: #badbcc;
+            color: #0f5132;
+        }
+        
+        .alert-error, .alert-danger {
+            background-color: #f8d7da;
+            border-color: #f5c2c7;
+            color: #842029;
+        }
+        
+        .alert-warning {
+            background-color: #fff3cd;
+            border-color: #ffecb5;
+            color: #664d03;
+        }
+        
+        .alert-info {
+            background-color: #cff4fc;
+            border-color: #b6effb;
+            color: #055160;
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Dashboard Header -->
+        <div class="dashboard-header">
+            <div>
+                <h1>{% block page_title %}TrackWise{% endblock %}</h1>
+                <p>{% block page_subtitle %}Intelligent Inventory Management{% endblock %}</p>
+            </div>
+            <div style="margin-left: auto;">
+                {% if user.is_authenticated %}
+                    <span style="margin-right: 1rem; color: var(--secondary-color);">
+                        Welcome, {{ user.first_name|default:user.username }}
+                    </span>
+                    <a href="{% url 'logout' %}" class="btn-outline-logout" style="width: auto;">
+                        Logout
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Dashboard Navigation -->
+        <div class="dashboard-nav">
+            <nav>
+                <a href="{% url 'dashboard' %}" class="{% if request.resolver_match.url_name == 'dashboard' %}nav-active{% else %}nav-inactive{% endif %}">Dashboard</a>
+                <a href="{% url 'inventory_list' %}" class="{% if 'inventory' in request.resolver_match.url_name %}nav-active{% else %}nav-inactive{% endif %}">Inventory</a>
+                <a href="{% url 'reports:reports_dashboard' %}" class="{% if 'reports' in request.resolver_match.url_name %}nav-active{% else %}nav-inactive{% endif %}">Reports</a>
+                <a href="{% url 'staff_management:staff_list' %}" class="{% if 'staff' in request.resolver_match.url_name %}nav-active{% else %}nav-inactive{% endif %}">Staff Management</a>
+                <a href="#" class="nav-inactive">Company Settings</a>
+            </nav>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="dashboard-content">
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+            
+            {% block content %}
+            <!-- Content will be injected here from child templates -->
+            {% endblock %}
+        </div>
+    </div>
+
+    {% block scripts %}
+    <!-- Additional scripts can be added here by child templates -->
+    {% endblock %}
+</body>
+</html>

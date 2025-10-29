@@ -1,0 +1,335 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Staff Management - TrackWise{% endblock %}
+{% block page_title %}Staff Management{% endblock %}
+{% block page_subtitle %}{{ profile.company.name }} - Manage Your Team{% endblock %}
+
+{% block content %}
+<div class="dashboard-content">
+    <!-- Search and Filter Section -->
+    <div class="content-card">
+        <h3>Search & Filter Staff</h3>
+        <form method="get" class="search-filter-form">
+            <div class="form-row">
+                <div class="form-group">
+                    <input type="text" name="search" class="form-control" placeholder="Search by name, department, or position..." value="{{ search_query }}">
+                </div>
+                <div class="form-group">
+                    <select name="department" class="form-select">
+                        <option value="">All Departments</option>
+                        {% for dept_code, dept_name in departments %}
+                            <option value="{{ dept_code }}" {% if department_filter == dept_code %}selected{% endif %}>
+                                {{ dept_name }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <select name="active" class="form-select">
+                        <option value="">All Status</option>
+                        <option value="active" {% if active_filter == 'active' %}selected{% endif %}>Active</option>
+                        <option value="inactive" {% if active_filter == 'inactive' %}selected{% endif %}>Inactive</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary" style="width: auto;">Apply Filters</button>
+                    <a href="{% url 'staff_management:staff_list' %}" class="btn btn-outline" style="width: auto;">Clear</a>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- Staff Statistics -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <h3>Total Staff</h3>
+            <p class="stat-number-primary">{{ staff_members.paginator.count }}</p>
+            <p class="stat-description">All staff members</p>
+        </div>
+        
+        <div class="stat-card">
+            <h3>Active Staff</h3>
+            <p class="stat-number-success">
+                {% with active_count=staff_members.paginator.count %}
+                    {{ active_count }}
+                {% endwith %}
+            </p>
+            <p class="stat-description">Currently active</p>
+        </div>
+        
+        <div class="stat-card">
+            <h3>Departments</h3>
+            <p class="stat-number-info">{{ departments|length }}</p>
+            <p class="stat-description">Different departments</p>
+        </div>
+        
+        <div class="stat-card">
+            <h3>New This Month</h3>
+            <p class="stat-number-warning">0</p>
+            <p class="stat-description">Recently joined</p>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="content-card">
+        <h3>Quick Actions</h3>
+        <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+            <a href="#" class="btn btn-primary" style="width: auto;">+ Add New Staff</a>
+            <a href="{% url 'reports:staff_activity_report' %}" class="btn btn-secondary" style="width: auto;">View Staff Reports</a>
+            <a href="#" class="btn btn-outline" style="width: auto; border-color: var(--info-color); color: var(--info-color);">
+                Export Staff List
+            </a>
+        </div>
+    </div>
+
+    <!-- Staff List -->
+    <div class="content-card">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+            <h3 style="margin: 0; color: var(--dark-color);">Staff Members</h3>
+            <div style="display: flex; gap: 0.5rem; align-items: center;">
+                <span class="badge" style="background: var(--primary-color); color: white; padding: 0.25rem 0.5rem; border-radius: 0.25rem;">
+                    {{ staff_members.paginator.count }} staff
+                </span>
+            </div>
+        </div>
+        
+        {% if staff_members %}
+            <div class="staff-grid">
+                {% for staff in staff_members %}
+                    <div class="staff-card" onclick="window.location.href='{% url 'staff_management:staff_detail' staff.id %}';" style="cursor: pointer;">
+                        <div class="staff-header">
+                            <div class="staff-avatar">
+                                {% if staff.profile_picture %}
+                                    <img src="{{ staff.profile_picture.url }}" alt="{{ staff.user.get_full_name }}">
+                                {% else %}
+                                    <div class="avatar-placeholder">
+                                        {{ staff.user.first_name|first|upper }}{{ staff.user.last_name|first|upper }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <div class="staff-status">
+                                {% if staff.is_active %}
+                                    <span class="status-badge active">Active</span>
+                                {% else %}
+                                    <span class="status-badge inactive">Inactive</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="staff-info">
+                            <h4>{{ staff.user.get_full_name|default:staff.user.username }}</h4>
+                            <p class="staff-email">{{ staff.user.email }}</p>
+                            
+                            <div class="staff-details">
+                                <div class="detail-item">
+                                    <span class="detail-label">Department:</span>
+                                    <span class="detail-value">{{ staff.get_department_display }}</span>
+                                </div>
+                                <div class="detail-item">
+                                    <span class="detail-label">Position:</span>
+                                    <span class="detail-value">{{ staff.position|default:"Not specified" }}</span>
+                                </div>
+                                <div class="detail-item">
+                                    <span class="detail-label">Joined:</span>
+                                    <span class="detail-value">{{ staff.date_joined|date:"M d, Y" }}</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="staff-actions">
+                            <a href="{% url 'staff_management:staff_detail' staff.id %}" class="btn btn-outline" style="width: 100%;">View Details</a>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+
+            <!-- Pagination -->
+            {% if staff_members.has_other_pages %}
+                <div class="pagination" style="margin-top: 2rem; display: flex; justify-content: center; gap: 0.5rem;">
+                    {% if staff_members.has_previous %}
+                        <a href="?page={{ staff_members.previous_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if department_filter %}&department={{ department_filter }}{% endif %}{% if active_filter %}&active={{ active_filter }}{% endif %}" 
+                           class="btn btn-outline" style="width: auto;">
+                            Previous
+                        </a>
+                    {% endif %}
+
+                    {% for num in staff_members.paginator.page_range %}
+                        {% if staff_members.number == num %}
+                            <span class="btn btn-primary" style="width: auto;">{{ num }}</span>
+                        {% else %}
+                            <a href="?page={{ num }}{% if search_query %}&search={{ search_query }}{% endif %}{% if department_filter %}&department={{ department_filter }}{% endif %}{% if active_filter %}&active={{ active_filter }}{% endif %}" 
+                               class="btn btn-outline" style="width: auto;">{{ num }}</a>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% if staff_members.has_next %}
+                        <a href="?page={{ staff_members.next_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if department_filter %}&department={{ department_filter }}{% endif %}{% if active_filter %}&active={{ active_filter }}{% endif %}" 
+                           class="btn btn-outline" style="width: auto;">
+                            Next
+                        </a>
+                    {% endif %}
+                </div>
+            {% endif %}
+        {% else %}
+            <div class="empty-state">
+                <div class="empty-state-icon">👥</div>
+                <h4>No Staff Members Found</h4>
+                <p>Try adjusting your search or filter criteria, or add your first staff member.</p>
+                <a href="#" class="btn btn-primary" style="width: auto; margin-top: 1rem;">
+                    + Add First Staff Member
+                </a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<style>
+    .staff-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 1.5rem;
+    }
+
+    .staff-card {
+        background: white;
+        border: 1px solid #e5e7eb;
+        border-radius: 0.5rem;
+        padding: 1.5rem;
+        transition: all 0.2s ease;
+    }
+
+    .staff-card:hover {
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        transform: translateY(-2px);
+    }
+
+    .staff-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 1rem;
+    }
+
+    .staff-avatar {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        overflow: hidden;
+        background: var(--primary-color);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: bold;
+        font-size: 1.2rem;
+    }
+
+    .staff-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .avatar-placeholder {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .status-badge {
+        padding: 0.25rem 0.5rem;
+        border-radius: 0.25rem;
+        font-size: 0.75rem;
+        font-weight: 500;
+    }
+
+    .status-badge.active {
+        background: var(--success-color);
+        color: white;
+    }
+
+    .status-badge.inactive {
+        background: var(--danger-color);
+        color: white;
+    }
+
+    .staff-info h4 {
+        margin: 0 0 0.5rem 0;
+        color: var(--dark-color);
+        font-size: 1.1rem;
+    }
+
+    .staff-email {
+        margin: 0 0 1rem 0;
+        color: var(--secondary-color);
+        font-size: 0.9rem;
+    }
+
+    .staff-details {
+        margin-bottom: 1rem;
+    }
+
+    .detail-item {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 0.5rem;
+        font-size: 0.9rem;
+    }
+
+    .detail-label {
+        color: var(--secondary-color);
+        font-weight: 500;
+    }
+
+    .detail-value {
+        color: var(--dark-color);
+    }
+
+    .search-filter-form {
+        margin-bottom: 0;
+    }
+
+    .form-row {
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+        align-items: end;
+    }
+
+    .form-group {
+        flex: 1;
+        min-width: 200px;
+    }
+
+    .form-control, .form-select {
+        width: 100%;
+        padding: 0.5rem 0.75rem;
+        border: 1px solid #d1d5db;
+        border-radius: 0.375rem;
+        font-size: 0.9rem;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 3rem 2rem;
+        color: var(--secondary-color);
+    }
+
+    .empty-state-icon {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+    }
+
+    .empty-state h4 {
+        margin: 0 0 0.5rem 0;
+        color: var(--dark-color);
+    }
+
+    .empty-state p {
+        margin: 0;
+    }
+</style>
+{% endblock %}

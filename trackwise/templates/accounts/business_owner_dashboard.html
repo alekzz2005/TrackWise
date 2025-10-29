@@ -23,8 +23,8 @@
             <nav style="display: flex; gap: 1rem;">
                 <a href="#" class="nav-active">Dashboard</a>
                 <a href="{% url 'inventory_list' %}" class="nav-inactive">Inventory</a>
-                <a href="#" class="nav-inactive">Reports</a>
-                <a href="#" class="nav-inactive">Staff Management</a>
+               <a href="{% url 'reports:reports_dashboard' %}" class="nav-inactive">Reports</a>
+                <a href="{% url 'staff_management:staff_list' %}" class="nav-inactive">Staff Management</a>
                 <a href="#" class="nav-inactive">Company Settings</a>
             </nav>
         </div>
@@ -102,7 +102,7 @@
                     {% if recent_products %}
                         <div class="products-grid">
                             {% for product in recent_products %}
-                                <div class="product-card" onclick="window.location.href='{% url 'product_detail' product.pk %}'" style="cursor: pointer;">
+                                <div class="product-card" onclick="window.location.href='{% url 'product_detail' product.pk %}';" style="cursor: pointer;">
                                     <div class="product-image">
                                         {% if product.image %}
                                             <img src="{{ product.image.url }}" alt="{{ product.item_name }}">

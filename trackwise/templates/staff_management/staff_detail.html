@@ -1,0 +1,151 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ staff.user.get_full_name }} - Staff Details - TrackWise{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <!-- Back Button -->
+            <div class="mb-4">
+                <a href="{% url 'staff_management:staff_list' %}" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left me-2"></i>Back to Staff List
+                </a>
+            </div>
+
+            <div class="row">
+                <!-- Staff Information -->
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-body text-center">
+                            {% if staff.profile_picture %}
+                                <img src="{{ staff.profile_picture.url }}" alt="{{ staff.user.get_full_name }}" class="rounded-circle mb-3" width="120" height="120">
+                            {% else %}
+                                <div class="bg-secondary rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 120px; height: 120px;">
+                                    <span class="text-white h3">{{ staff.user.first_name|first|upper }}{{ staff.user.last_name|first|upper }}</span>
+                                </div>
+                            {% endif %}
+                            
+                            <h4>{{ staff.user.get_full_name|default:staff.user.username }}</h4>
+                            <p class="text-muted">{{ staff.user.email }}</p>
+                            
+                            <div class="mb-3">
+                                {% if staff.is_active %}
+                                    <span class="badge bg-success">Active</span>
+                                {% else %}
+                                    <span class="badge bg-danger">Inactive</span>
+                                {% endif %}
+                                <span class="badge bg-info">{{ staff.get_department_display }}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quick Actions -->
+                    <div class="card mt-3">
+                        <div class="card-header">
+                            <h6 class="card-title mb-0">Quick Actions</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="d-grid gap-2">
+                                <a href="#" class="btn btn-outline-primary">Update Information</a>
+                                <a href="#" class="btn btn-outline-secondary">Send Message</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Detailed Information -->
+                <div class="col-md-8">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">Staff Details</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h6>Personal Information</h6>
+                                    <table class="table table-sm">
+                                        <tr>
+                                            <td><strong>Username:</strong></td>
+                                            <td>{{ staff.user.username }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Full Name:</strong></td>
+                                            <td>{{ staff.user.get_full_name|default:"Not provided" }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Email:</strong></td>
+                                            <td>{{ staff.user.email }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Phone:</strong></td>
+                                            <td>{{ staff.phone_number|default:"Not provided" }}</td>
+                                        </tr>
+                                    </table>
+                                </div>
+                                <div class="col-md-6">
+                                    <h6>Employment Information</h6>
+                                    <table class="table table-sm">
+                                        <tr>
+                                            <td><strong>Department:</strong></td>
+                                            <td>{{ staff.get_department_display }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Position:</strong></td>
+                                            <td>{{ staff.position|default:"Not specified" }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Date Joined:</strong></td>
+                                            <td>{{ staff.date_joined }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Assigned Location:</strong></td>
+                                            <td>{{ staff.assigned_location|default:"Not specified" }}</td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <!-- Notes Section -->
+                            {% if staff.notes %}
+                                <div class="mt-4">
+                                    <h6>Notes</h6>
+                                    <div class="card bg-light">
+                                        <div class="card-body">
+                                            <p class="mb-0">{{ staff.notes }}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endif %}
+
+                            <!-- Account Information -->
+                            <div class="mt-4">
+                                <h6>Account Information</h6>
+                                <table class="table table-sm">
+                                    <tr>
+                                        <td><strong>Date Joined:</strong></td>
+                                        <td>{{ staff.user.date_joined|date:"M d, Y" }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Last Login:</strong></td>
+                                        <td>{{ staff.user.last_login|date:"M d, Y H:i"|default:"Never" }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Profile Created:</strong></td>
+                                        <td>{{ staff.created_at|date:"M d, Y" }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Last Updated:</strong></td>
+                                        <td>{{ staff.updated_at|date:"M d, Y H:i" }}</td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,235 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Inventory Report - TrackWise{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1 class="h3 mb-0">Inventory Report</h1>
+                <div>
+                    <a href="{% url 'reports:reports_dashboard' %}" class="btn btn-outline-secondary me-2">
+                        <i class="fas fa-arrow-left me-2"></i>Back to Reports
+                    </a>
+                    <a href="?export=csv{% if start_date %}&start_date={{ start_date }}{% endif %}{% if end_date %}&end_date={{ end_date }}{% endif %}{% if category_filter %}&category={{ category_filter }}{% endif %}" class="btn btn-success">
+                        <i class="fas fa-download me-2"></i>Export CSV
+                    </a>
+                </div>
+            </div>
+
+            <!-- Filter Card -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Filter Report</h5>
+                </div>
+                <div class="card-body">
+                    <form method="get" class="row g-3">
+                        <div class="col-md-3">
+                            <label for="start_date" class="form-label">Start Date</label>
+                            <input type="date" name="start_date" class="form-control" value="{{ start_date }}">
+                        </div>
+                        <div class="col-md-3">
+                            <label for="end_date" class="form-label">End Date</label>
+                            <input type="date" name="end_date" class="form-control" value="{{ end_date }}">
+                        </div>
+                        <div class="col-md-3">
+                            <label for="category" class="form-label">Category</label>
+                            <select name="category" class="form-select">
+                                <option value="">All Categories</option>
+                                {% for category_code, category_name in categories %}
+                                    <option value="{{ category_code }}" {% if category_filter == category_code %}selected{% endif %}>
+                                        {{ category_name }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">&nbsp;</label>
+                            <div>
+                                <button type="submit" class="btn btn-primary me-2">Apply Filters</button>
+                                <a href="{% url 'reports:inventory_report' %}" class="btn btn-outline-secondary">Clear</a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Summary Cards -->
+            <div class="row mb-4">
+                <div class="col-xl-3 col-md-6">
+                    <div class="card bg-primary text-white mb-4">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <div class="text-xs font-weight-bold text-uppercase mb-1">Total Products</div>
+                                    <div class="h5 mb-0">{{ total_products }}</div>
+                                </div>
+                                <div class="col-auto">
+                                    <i class="fas fa-boxes fa-2x"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-3 col-md-6">
+                    <div class="card bg-success text-white mb-4">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <div class="text-xs font-weight-bold text-uppercase mb-1">Total Value</div>
+                                    <div class="h5 mb-0">${{ total_inventory_value|floatformat:2 }}</div>
+                                </div>
+                                <div class="col-auto">
+                                    <i class="fas fa-dollar-sign fa-2x"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-3 col-md-6">
+                    <div class="card bg-warning text-white mb-4">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <div class="text-xs font-weight-bold text-uppercase mb-1">Low Stock</div>
+                                    <div class="h5 mb-0">{{ low_stock_count }}</div>
+                                </div>
+                                <div class="col-auto">
+                                    <i class="fas fa-exclamation-triangle fa-2x"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-3 col-md-6">
+                    <div class="card bg-danger text-white mb-4">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <div class="text-xs font-weight-bold text-uppercase mb-1">Out of Stock</div>
+                                    <div class="h5 mb-0">{{ out_of_stock_count }}</div>
+                                </div>
+                                <div class="col-auto">
+                                    <i class="fas fa-times-circle fa-2x"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Category Breakdown -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">Category Breakdown</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-sm">
+                                    <thead>
+                                        <tr>
+                                            <th>Category</th>
+                                            <th>Product Count</th>
+                                            <th>Total Value</th>
+                                            <th>Percentage</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for stat in category_stats %}
+                                            <tr>
+                                                <td>
+                                                    <span class="badge bg-secondary">{{ stat.name }}</span>
+                                                </td>
+                                                <td>{{ stat.count }}</td>
+                                                <td>${{ stat.total_value|floatformat:2 }}</td>
+                                                <td>
+                                                    <div class="progress" style="height: 20px;">
+                                                        <div class="progress-bar" role="progressbar" style="width: {{ stat.percentage }}%;" 
+                                                             aria-valuenow="{{ stat.percentage }}" aria-valuemin="0" aria-valuemax="100">
+                                                            {{ stat.percentage|floatformat:1 }}%
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Product Details -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Product Details</h5>
+                </div>
+                <div class="card-body">
+                    {% if products %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Product Name</th>
+                                        <th>Category</th>
+                                        <th>Quantity</th>
+                                        <th>Unit Price</th>
+                                        <th>Total Value</th>
+                                        <th>Stock Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for product in products %}
+                                        <tr>
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    {% if product.image %}
+                                                        <img src="{{ product.image.url }}" alt="{{ product.item_name }}" class="rounded me-3" width="40" height="40">
+                                                    {% else %}
+                                                        <div class="bg-light rounded d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
+                                                            <i class="fas fa-box text-muted"></i>
+                                                        </div>
+                                                    {% endif %}
+                                                    <div>
+                                                        <strong>{{ product.item_name }}</strong>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-info">{{ product.get_category_display }}</span>
+                                            </td>
+                                            <td>{{ product.get_display_quantity }}</td>
+                                            <td>${{ product.cost_price|floatformat:2 }}</td>
+                                            <td>${{ product.total_value|floatformat:2 }}</td>
+                                            <td>
+                                                {% if product.quantity == 0 %}
+                                                    <span class="badge bg-danger">Out of Stock</span>
+                                                {% elif product.quantity <= 10 %}
+                                                    <span class="badge bg-warning">Low Stock</span>
+                                                {% else %}
+                                                    <span class="badge bg-success">In Stock</span>
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="text-center py-5">
+                            <i class="fas fa-boxes fa-3x text-muted mb-3"></i>
+                            <h4>No products found</h4>
+                            <p class="text-muted">Try adjusting your filters or add products to your inventory.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
