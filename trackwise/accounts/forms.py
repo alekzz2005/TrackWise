@@ -107,11 +107,17 @@ class BusinessOwnerRegistrationForm(UserCreationForm):
             else:
                 company = self.cleaned_data['existing_company']
             
-            # Create user profile
+            # Create user profile with ALL fields that exist in the database
             UserProfile.objects.create(
                 user=user,
                 role='business_owner',
-                company=company
+                company=company,
+                phone_number='',
+                assigned_location='Main Office',
+                department='Management',
+                position='Owner',
+                is_active=True,
+                notes='Business owner account',
             )
         return user
 
@@ -163,7 +169,13 @@ class StaffRegistrationForm(UserCreationForm):
             UserProfile.objects.create(
                 user=user,
                 role='staff',
-                company=self.cleaned_data['company']
+                company=self.cleaned_data['company'],
+                phone_number='',
+                assigned_location='Main Office',
+                department='General',
+                position='Staff Member',
+                is_active=True,
+                notes='Staff account',
             )
         return user
 

@@ -1,0 +1,133 @@
+:root {
+    --primary-orange: #ff6b35;
+    --dark-orange: #e55a2b;
+    --light-orange: #ff8c5a;
+    --lighter-orange: #fff5f0;
+    --dark-gray: #333;
+    --light-gray: #f8f9fa;
+}
+
+.bg-orange {
+    background-color: var(--primary-orange) !important;
+}
+
+.btn-orange {
+    background-color: var(--primary-orange);
+    border-color: var(--primary-orange);
+    color: white;
+}
+
+.btn-orange:hover {
+    background-color: var(--dark-orange);
+    border-color: var(--dark-orange);
+    color: white;
+}
+
+.text-orange {
+    color: var(--primary-orange) !important;
+}
+
+.border-orange {
+    border-color: var(--primary-orange) !important;
+}
+
+.card {
+    border: none;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    transition: transform 0.2s;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+}
+
+.card-header {
+    background-color: white;
+    border-bottom: 2px solid var(--lighter-orange);
+}
+
+.stat-card {
+    background: linear-gradient(135deg, var(--primary-orange), var(--light-orange));
+    color: white;
+    border-radius: 10px;
+}
+
+.navbar-brand {
+    font-weight: bold;
+    font-size: 1.5rem;
+}
+
+.sidebar {
+    background-color: var(--lighter-orange);
+    min-height: calc(100vh - 76px);
+}
+
+.sidebar .nav-link {
+    color: var(--dark-gray);
+    padding: 0.75rem 1rem;
+    border-radius: 5px;
+    margin-bottom: 0.25rem;
+}
+
+.sidebar .nav-link:hover,
+.sidebar .nav-link.active {
+    background-color: var(--primary-orange);
+    color: white;
+}
+
+.table th {
+    background-color: var(--lighter-orange);
+    border-bottom: 2px solid var(--primary-orange);
+}
+
+.alert-success {
+    background-color: #d4edda;
+    border-color: #c3e6cb;
+    color: #155724;
+}
+
+.alert-error {
+    background-color: #f8d7da;
+    border-color: #f5c6cb;
+    color: #721c24;
+}
+
+.form-control:focus {
+    border-color: var(--primary-orange);
+    box-shadow: 0 0 0 0.2rem rgba(255, 107, 53, 0.25);
+}
+
+.login-container {
+    min-height: 100vh;
+    background: linear-gradient(135deg, var(--primary-orange), var(--light-orange));
+}
+
+.login-card {
+    border: none;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+}
+
+.login-header {
+    background: linear-gradient(135deg, var(--primary-orange), var(--light-orange));
+    color: white;
+    border-radius: 15px 15px 0 0 !important;
+}
+
+.role-card {
+    transition: transform 0.3s, box-shadow 0.3s;
+    border: 2px solid transparent;
+    cursor: pointer;
+}
+
+.role-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(255, 107, 53, 0.3);
+    border-color: var(--primary-orange);
+}
+
+.role-icon {
+    font-size: 3rem;
+    color: var(--primary-orange);
+    margin-bottom: 1rem;
+}

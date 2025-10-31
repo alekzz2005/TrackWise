@@ -30,8 +30,7 @@ SECRET_KEY = 'django-insecure-l*y9*la5o2t-cx6utb=w9ty9keswzzhf_uw2-5s9m_+!2gq$ev
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["trackwise-7hg9.onrender.com"]
-
+ALLOWED_HOSTS = ["127.0.0.1", "localhost", "trackwise-7hg9.onrender.com"]
 
 # Application definition
 
@@ -44,6 +43,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'accounts',
     'inventory',
+    'dashboard',
 ]
 
 MIDDLEWARE = [
@@ -136,9 +136,9 @@ STATICFILES_DIRS = [BASE_DIR / "static"]
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Authentication settings
-LOGIN_REDIRECT_URL = 'dashboard'  # You'll create this later
-LOGOUT_REDIRECT_URL = 'login'
-LOGIN_URL = 'login'
+LOGIN_REDIRECT_URL = 'dashboard:dashboard'
+LOGOUT_REDIRECT_URL = 'accounts:login'
+LOGIN_URL = 'accounts:login'
 
 # Media files
 MEDIA_URL = '/media/'
