@@ -2,50 +2,177 @@
 {% load static %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/accounts.css' %}">
+<link rel="stylesheet" href="{% static 'css/accounts/base.css' %}">
+<link rel="stylesheet" href="{% static 'css/accounts/login.css' %}">
 {% endblock %}
 
 {% block title %}Login - TrackWise{% endblock %}
 
 {% block content %}
-<div class="auth-container">
-    <div class="auth-card">
-        <div class="auth-header">
-            <h2><i class="fas fa-chart-line"></i> TrackWise</h2>
-            <p class="mb-0">Sign in to your account</p>
+<div class="auth-body">
+    <div class="auth-container">
+        <div class="logo-container">
+            <div class="logo-text">
+                <i class="fas fa-chart-line"></i>
+                TrackWise
+            </div>
         </div>
         
-        <div class="auth-body">
-            <form method="post">
+        <div class="form-section">
+            <div class="auth-header">
+                <h2>Welcome Back</h2>
+                <p>Don't have an account? <a href="{% url 'accounts:business_owner_register' %}">Sign up</a></p>
+            </div>
+
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            {% if form.errors %}
+                <div class="alert alert-danger">
+                    Please enter a correct username and password. Note that both fields may be case-sensitive.
+                </div>
+            {% endif %}
+            
+            <form method="post" id="login-form" novalidate>
                 {% csrf_token %}
                 
-                <div class="mb-3">
-                    <label for="id_username" class="form-label">Username</label>
+                <div class="form-group">
+                    <label class="form-label" for="{{ form.username.id_for_label }}">Username *</label>
                     {{ form.username }}
                     {% if form.username.errors %}
-                    <div class="text-danger small">{{ form.username.errors }}</div>
+                        {% for error in form.username.errors %}
+                            <span class="error-message show">{{ error }}</span>
+                        {% endfor %}
                     {% endif %}
                 </div>
-                
-                <div class="mb-3">
-                    <label for="id_password" class="form-label">Password</label>
+
+                <div class="form-group">
+                    <label class="form-label" for="{{ form.password.id_for_label }}">Password *</label>
                     {{ form.password }}
                     {% if form.password.errors %}
-                    <div class="text-danger small">{{ form.password.errors }}</div>
+                        {% for error in form.password.errors %}
+                            <span class="error-message show">{{ error }}</span>
+                        {% endfor %}
                     {% endif %}
                 </div>
-                
-                <button type="submit" class="btn btn-orange w-100 py-2">
-                    <i class="fas fa-sign-in-alt"></i> Sign In
-                </button>
+
+                <div class="button-group">
+                    <button type="submit" class="btn btn-success">
+                        <span>Sign In</span>
+                    </button>
+                </div>
             </form>
+            
+            <div class="auth-footer">
+                <p>
+                    Need help? <a href="#">Contact Support</a>
+                </p>
+            </div>
         </div>
-        
-        <div class="auth-footer">
-            <p class="mb-0">Don't have an account? 
-                <a href="{% url 'accounts:role_selection' %}" class="text-orange">Sign up</a>
-            </p>
-        </div>
+
+        <div class="particles-section" id="particles-js"></div>
     </div>
 </div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/particles.js/2.0.0/particles.min.js"></script>
+<script>
+    // Particles configuration
+    particlesJS('particles-js', {
+        particles: {
+            number: { value: 80, density: { enable: true, value_area: 800 } },
+            color: { value: '#7aa7e0' },
+            shape: { type: 'circle' },
+            opacity: { value: 0.8, random: true },
+            size: { value: 20, random: true },
+            line_linked: {
+                enable: true,
+                distance: 150,
+                color: '#7aa7e0',
+                opacity: 0.6,
+                width: 2
+            },
+            move: {
+                enable: true,
+                speed: 1.5,
+                direction: 'none',
+                random: true,
+                out_mode: 'out'
+            }
+        },
+        interactivity: {
+            detect_on: 'canvas',
+            events: {
+                onhover: { enable: true, mode: 'grab' },
+                resize: true
+            },
+            modes: {
+                grab: { distance: 180, line_linked: { opacity: 1 } }
+            }
+        },
+        retina_detect: true
+    });
+
+    // Form validation
+    const form = document.getElementById('login-form');
+    const usernameInput = document.getElementById('{{ form.username.id_for_label }}');
+    const passwordInput = document.getElementById('{{ form.password.id_for_label }}');
+
+    function validateForm() {
+        let isValid = true;
+
+        // Clear existing errors
+        document.querySelectorAll('.error-message').forEach(error => {
+            if (!error.classList.contains('show')) {
+                error.remove();
+            }
+        });
+
+        // Username validation
+        const username = usernameInput.value.trim();
+        if (!username) {
+            showError(usernameInput, 'Username is required');
+            isValid = false;
+        }
+
+        // Password validation
+        const password = passwordInput.value;
+        if (!password) {
+            showError(passwordInput, 'Password is required');
+            isValid = false;
+        }
+
+        return isValid;
+    }
+
+    function showError(input, message) {
+        input.classList.add('error');
+        const errorElement = document.createElement('span');
+        errorElement.className = 'error-message show';
+        errorElement.textContent = message;
+        input.parentNode.appendChild(errorElement);
+    }
+
+    // Clear errors on input
+    [usernameInput, passwordInput].forEach(input => {
+        input.addEventListener('input', () => {
+            input.classList.remove('error');
+            const error = input.parentNode.querySelector('.error-message:not(.show)');
+            if (error) {
+                error.remove();
+            }
+        });
+    });
+
+    // Form submission
+    form.addEventListener('submit', (e) => {
+        if (!validateForm()) {
+            e.preventDefault();
+        }
+    });
+</script>
 {% endblock %}

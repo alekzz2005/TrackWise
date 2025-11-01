@@ -2,7 +2,8 @@
 {% load static %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/accounts.css' %}">
+<link rel="stylesheet" href="{% static 'css/accounts/base.css' %}">
+<link rel="stylesheet" href="{% static 'css/accounts/registration.css' %}">
 {% endblock %}
 
 {% block title %}Processing - TrackWise{% endblock %}
@@ -10,25 +11,19 @@
 {% block content %}
 <div class="processing-container">
     <div class="processing-card">
-        <div class="spinner"></div>
-        <h2>Setting Up Your Account</h2>
-        <p class="mb-4">Please wait while we configure your {{ role }} account...</p>
-        <div class="progress" style="height: 6px; width: 200px; margin: 0 auto;">
-            <div class="progress-bar bg-white" style="width: 100%; animation: progress 2s infinite;"></div>
+        <div class="processing-spinner"></div>
+        <h2>Processing Your Registration</h2>
+        <p>We're setting up your {{ role|title }} account. This will only take a moment...</p>
+        <div class="mt-4">
+            <p><small>You will be redirected automatically</small></p>
         </div>
     </div>
 </div>
 
 <script>
-setTimeout(function() {
-    window.location.href = "{% url next_url %}";
-}, 3000);
+    // Redirect after 3 seconds
+    setTimeout(function() {
+        window.location.href = "{% url next_url %}";
+    }, 3000);
 </script>
-
-<style>
-@keyframes progress {
-    0% { transform: translateX(-100%); }
-    100% { transform: translateX(400%); }
-}
-</style>
 {% endblock %}

@@ -10,6 +10,11 @@ def role_selection(request):
         return redirect('dashboard:dashboard')
     return render(request, 'accounts/role_selection.html')
 
+def landing_page(request):
+    if request.user.is_authenticated:
+        return redirect('dashboard:dashboard')
+    return render(request, 'landing.html')
+
 def business_owner_register(request):
     if request.user.is_authenticated:
         return redirect('dashboard:dashboard')
