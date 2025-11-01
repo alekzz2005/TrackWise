@@ -214,8 +214,13 @@
             </form>
             
             <div class="auth-footer">
-                <p>
-                    Need help? <a href="#">Contact Support</a>
+                <p class="footer-content">
+                    <a href="{% url 'accounts:landing' %}" class="footer-home-link">
+                        <i class="fas fa-home"></i> Back to Home
+                    </a>
+                    <a>|</a>
+                    <span class="footer-spacer"></span>
+                    <a href="#" class="footer-support-link">Contact Support</a>
                 </p>
             </div>
         </div>

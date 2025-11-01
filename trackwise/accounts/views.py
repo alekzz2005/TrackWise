@@ -34,8 +34,8 @@ def business_owner_register(request):
             login(request, user)
             messages.success(request, 'Business Owner account created successfully! Welcome to TrackWise.')
             return redirect('dashboard:dashboard')
-        else:
-            messages.error(request, 'Please correct the errors below.')
+        # else:
+        #     messages.error(request, 'Please correct the errors below.')
     else:
         form = BusinessOwnerRegistrationForm()
     
