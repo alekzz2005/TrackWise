@@ -6,104 +6,299 @@
 {% block extra_css %}
 {{ block.super }}
 <style>
-.staff-report-wrapper {
-    padding: 20px;
+:root {
+  --primary-blue: #4a6fa5;
+  --primary-dark: #2c5282;
+  --accent-light: #a7c5eb;
+  --bg-light: #dbe4f0;
+  --bg-page: #f0f4f8;
+  --text-white: #ffffff;
+  --shadow-md: 0 6px 20px rgba(0, 0, 0, 0.15);
+  --transition: all 0.3s ease;
 }
 
+/* Layout */
+body {
+  background: var(--bg-page);
+  color: #333;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.staff-report-wrapper {
+  padding: 2rem;
+  background-color: var(--bg-page);
+}
+
+/* Header */
+h1 {
+  color: var(--primary-dark);
+  font-weight: 800;
+}
+
+.btn-outline-secondary {
+  color: var(--primary-dark);
+  border-color: var(--primary-dark);
+  transition: var(--transition);
+}
+
+.btn-outline-secondary:hover {
+  background: var(--primary-dark);
+  color: var(--text-white);
+}
+
+/* Debug Alert */
+.debug-alert {
+  background: var(--accent-light);
+  border: 1px solid var(--primary-blue);
+  border-radius: 8px;
+  padding: 0.8rem 1rem;
+  color: var(--primary-dark);
+  font-weight: 500;
+  margin-bottom: 1.5rem;
+}
+
+/* Statistic Cards */
 .stat-card {
-    background: white;
-    border-radius: 10px;
-    padding: 1.5rem;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    text-align: center;
-    margin-bottom: 1rem;
+  background: var(--text-white);
+  border-radius: 15px;
+  box-shadow: var(--shadow-md);
+  text-align: center;
+  padding: 1.5rem;
+  transition: var(--transition);
+  border-top: 5px solid transparent;
+}
+
+.stat-card:hover {
+  transform: translateY(-5px);
 }
 
 .stat-number {
-    font-size: 2rem;
-    font-weight: bold;
-    margin-bottom: 0.5rem;
+  font-size: 2rem;
+  font-weight: 700;
 }
 
 .stat-label {
-    color: #666;
-    font-size: 0.9rem;
+  color: #666;
+  font-size: 0.9rem;
 }
 
-.debug-alert {
-    background: #d1ecf1;
-    border: 1px solid #bee5eb;
-    border-radius: 5px;
-    padding: 10px;
-    margin-bottom: 20px;
+/* Table */
+.table {
+  border-radius: 10px;
+  overflow: hidden;
+  background: var(--text-white);
+  box-shadow: var(--shadow-md);
 }
 
+.table thead.table-dark th {
+  background: linear-gradient(135deg, var(--primary-blue), var(--primary-dark)) !important;
+  color: var(--text-white);
+  font-weight: 600;
+  border: none;
+}
+
+.table-striped tbody tr:nth-of-type(odd) {
+  background-color: var(--bg-light);
+}
+
+.table-hover tbody tr:hover {
+  background-color: #e8f0fa;
+}
+
+/* Performance Badges */
 .performance-badge {
-    padding: 0.3rem 0.8rem;
-    border-radius: 20px;
-    font-size: 0.8rem;
-    font-weight: 600;
+  padding: 0.3rem 0.7rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
 }
 
-.badge-success-custom { 
-    background: #c6f6d5; 
-    color: #22543d; 
+.badge-success-custom {
+  background: #c6f6d5;
+  color: #22543d;
 }
 
-.badge-info-custom { 
-    background: #bee3f8; 
-    color: #2a4365; 
+.badge-info-custom {
+  background: #bee3f8;
+  color: #2a4365;
 }
 
-.badge-warning-custom { 
-    background: #feebc8; 
-    color: #744210; 
+.badge-warning-custom {
+  background: #feebc8;
+  color: #744210;
 }
 
-.badge-danger-custom { 
-    background: #fed7d7; 
-    color: #742a2a; 
+.badge-danger-custom {
+  background: #fed7d7;
+  color: #742a2a;
 }
 
+/* Metric Bars */
 .metric-bar {
-    height: 8px;
-    background: #e2e8f0;
-    border-radius: 4px;
-    overflow: hidden;
-    width: 80px;
-    display: inline-block;
-    margin-right: 10px;
+  height: 8px;
+  background: #e2e8f0;
+  border-radius: 4px;
+  width: 90px;
+  margin-right: 10px;
+  box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
 }
 
-.metric-fill {
-    height: 100%;
-    border-radius: 4px;
+.tasks-fill {
+  background: linear-gradient(90deg, #38a169, #2f855a);
 }
 
-.tasks-fill { 
-    background: #38a169; 
+.attendance-fill {
+  background: linear-gradient(90deg, var(--primary-blue), var(--primary-dark));
 }
 
-.attendance-fill { 
-    background: #4a6fa5; 
-}
-
+/* Export Buttons */
 .export-buttons {
-    display: flex;
-    gap: 10px;
-    align-items: center;
+  gap: 10px;
+  align-items: center;
 }
 
 .export-buttons .btn {
-    font-size: 0.8rem;
-    padding: 0.4rem 0.8rem;
+  font-size: 0.8rem;
+  padding: 0.45rem 0.9rem;
+  border-radius: 8px;
+  font-weight: 500;
+  transition: var(--transition);
+  box-shadow: var(--shadow-md);
 }
 
-.export-buttons .btn i {
-    margin-right: 4px;
+.export-buttons .btn-success {
+  background: linear-gradient(135deg, #48bb78, #38a169);
+  border: none;
+}
+
+.export-buttons .btn-danger {
+  background: linear-gradient(135deg, #e53e3e, #c53030);
+  border: none;
+}
+
+.export-buttons .btn-info {
+  background: linear-gradient(135deg, var(--primary-blue), var(--primary-dark));
+  border: none;
+}
+
+.export-buttons .btn:hover {
+  transform: translateY(-2px);
+}
+
+.btn-outline-secondary {
+    position: relative;
+    overflow: hidden;
+    padding: 16px 24px;
+    border-radius: 10px;
+    background: transparent;
+    color: var(--primary-dark);
+    cursor: pointer;
+    font-weight: 600;
+    text-transform: uppercase;
+    transition: var(--transition);
+    font-size: 14px;
+    letter-spacing: 0.5px;
+    box-shadow: var(--shadow-sm);
+    text-decoration: none; /* ← removes underline */
+}
+
+/* Ripple effect */
+.btn-outline-secondary::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(42, 82, 130, 0.25);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+    z-index: 0;
+}
+
+.btn-outline-secondary:hover::before {
+    width: 300px;
+    height: 300px;
+}
+
+/* Hover lift + glow */
+.btn-outline-secondary:hover {
+    background: linear-gradient(135deg, var(--primary-blue), var(--primary-dark));
+    color: var(--text-white);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(42, 82, 130, 0.4);
+    border-color: transparent;
+    text-decoration: none; /* ← removes underline */
+}
+
+/* Keep the text above the ripple */
+.btn-outline-secondary span {
+    position: relative;
+    z-index: 1;
+}
+
+/* Active click feedback */
+.btn-outline-secondary:active {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 10px rgba(42, 82, 130, 0.3);
+}
+
+
+
+/* Summary Box */
+.bg-light.rounded {
+  background: var(--bg-light) !important;
+  border: 1px solid #e2e8f0;
+  box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
+}
+
+/* Cards */
+.card {
+  border: none;
+  border-radius: 12px;
+  box-shadow: var(--shadow-md);
+  overflow: hidden;
+}
+
+.card-header {
+  background: linear-gradient(135deg, var(--primary-blue), var(--primary-dark));
+  color: var(--text-white);
+  font-weight: 600;
+}
+
+.card-body {
+  background: var(--text-white);
+}
+
+/* Responsive */
+@media (max-width: 992px) {
+  .stat-card {
+    margin-bottom: 1rem;
+  }
+
+  .export-buttons {
+    flex-wrap: wrap;
+  }
+}
+
+@media (max-width: 768px) {
+  .staff-report-wrapper {
+    padding: 1rem;
+  }
+
+  .stat-number {
+    font-size: 1.6rem;
+  }
+
+  .export-buttons .btn {
+    width: 100%;
+    text-align: center;
+  }
 }
 </style>
 {% endblock %}
+
 
 {% block content %}
 <div class="staff-report-wrapper">
@@ -116,7 +311,7 @@
                         <h1><i class="fas fa-user-clock me-2"></i>Staff Activity Report</h1>
                         <p class="text-muted">Staff performance metrics and activity overview</p>
                     </div>
-                    <a href="{% url 'reports:reports_dashboard' %}" class="btn btn-outline-secondary">
+                    <a href="{% url 'reports:reports_dashboard' %}" class="btn-outline-secondary">
                         <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
                     </a>
                 </div>
