@@ -13,7 +13,7 @@ def inventory_list(request):
         profile = request.user.userprofile
     except UserProfile.DoesNotExist:
         messages.error(request, 'User profile not found.')
-        return redirect('dashboard')
+        return redirect('dashboard:dashboard')
     
     # Both business owners and staff can access inventory, but with different permissions
     products = Product.objects.filter(company=profile.company)
@@ -36,12 +36,18 @@ def inventory_list(request):
     # Calculate total inventory value
     total_inventory_value = sum(product.total_value for product in products)
     
+    # Calculate low stock and out of stock counts
+    low_stock_count = products.filter(quantity__lte=10, quantity__gt=0).count()
+    out_of_stock_count = products.filter(quantity=0).count()
+    
     context = {
         'products': products,
         'search_query': search_query,
         'cost_filter': cost_filter,
         'profile': profile,
-        'total_inventory_value': total_inventory_value
+        'total_inventory_value': total_inventory_value,
+        'low_stock_count': low_stock_count,
+        'out_of_stock_count': out_of_stock_count,
     }
     
     # Use different templates for owner vs staff
@@ -56,7 +62,7 @@ def product_detail(request, pk):
         profile = request.user.userprofile
     except UserProfile.DoesNotExist:
         messages.error(request, 'User profile not found.')
-        return redirect('dashboard')
+        return redirect('dashboard:dashboard')
     
     # Both owners and staff can view product details
     product = get_object_or_404(Product, pk=pk, company=profile.company)
@@ -65,13 +71,13 @@ def product_detail(request, pk):
     if request.method == 'POST':
         if profile.role != 'business_owner':
             messages.error(request, 'Access denied. Only business owners can edit products.')
-            return redirect('inventory_list')
+            return redirect('inventory:inventory_list')
         
         form = ProductForm(request.POST, request.FILES, instance=product)
         if form.is_valid():
             form.save()
             messages.success(request, f'Product "{product.item_name}" updated successfully!')
-            return redirect('inventory_list')
+            return redirect('inventory:inventory_list')
     else:
         form = ProductForm(instance=product)
     
@@ -93,7 +99,7 @@ def product_add(request):
         profile = request.user.userprofile
     except UserProfile.DoesNotExist:
         messages.error(request, 'User profile not found.')
-        return redirect('dashboard')
+        return redirect('dashboard:dashboard')
     
     # Both owners and staff can add products
     if request.method == 'POST':
@@ -103,7 +109,10 @@ def product_add(request):
             product.company = profile.company
             product.save()
             messages.success(request, f'Product "{product.item_name}" added successfully!')
-            return redirect('inventory_list')
+            return redirect('inventory:inventory_list')  # Fixed: added namespace
+        else:
+            # If form is invalid, show errors
+            messages.error(request, 'Please correct the errors below.')
     else:
         form = ProductForm()
     
@@ -159,16 +168,16 @@ def product_delete(request, pk):
         # Only business owners can delete products
         if profile.role != 'business_owner':
             messages.error(request, 'Access denied. Only business owners can delete products.')
-            return redirect('inventory_list')
+            return redirect('inventory:inventory_list')  # Fixed: added namespace
         
         if request.method == 'POST':
             product_name = product.item_name
             product.delete()
             messages.success(request, f'Product "{product_name}" deleted successfully!')
-            return redirect('inventory_list')
+            return redirect('inventory:inventory_list')  # Fixed: added namespace
     except (Product.DoesNotExist, UserProfile.DoesNotExist):
         messages.error(request, 'Product not found.')
-        return redirect('inventory_list')
+        return redirect('inventory:inventory_list')  # Fixed: added namespace
     
     context = {
         'product': product,

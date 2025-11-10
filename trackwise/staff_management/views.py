@@ -10,12 +10,23 @@ from .forms import StaffUserCreationForm, StaffProfileForm, StaffSearchForm, Sta
 
 @login_required
 def staff_list(request):
-    """Display all staff with search and filtering capabilities"""
+    """Display staff from the current user's company only"""
+    # Get the current user's profile and company
+    try:
+        current_user_profile = UserProfile.objects.get(user=request.user)
+        user_company = current_user_profile.company
+    except UserProfile.DoesNotExist:
+        messages.error(request, 'Your user profile is not properly configured. Please contact administrator.')
+        return redirect('dashboard:dashboard')
+    
+    # Filter staff profiles by the current user's company
     staff_profiles = StaffProfile.objects.select_related(
         'user_profile', 
         'user_profile__user',
         'user_profile__company'
-    ).all().order_by('user_profile__user__first_name')
+    ).filter(
+        user_profile__company=user_company
+    ).order_by('user_profile__user__first_name')
     
     search_form = StaffSearchForm(request.GET)
     
@@ -51,12 +62,23 @@ def staff_list(request):
 
 @login_required
 def staff_detail(request, staff_id):
-    """Display detailed information about a specific staff member"""
+    """Display detailed information about a specific staff member from the same company"""
+    # Get the current user's company
+    try:
+        current_user_profile = UserProfile.objects.get(user=request.user)
+        user_company = current_user_profile.company
+    except UserProfile.DoesNotExist:
+        messages.error(request, 'Your user profile is not properly configured. Please contact administrator.')
+        return redirect('staff_management:staff_list')
+    
+    # Only allow viewing staff from the same company
     staff_profile = get_object_or_404(
         StaffProfile.objects.select_related(
             'user_profile', 
             'user_profile__user',
             'user_profile__company'
+        ).filter(
+            user_profile__company=user_company
         ), 
         id=staff_id
     )
@@ -69,30 +91,30 @@ def staff_detail(request, staff_id):
 
 @login_required
 def staff_create(request):
-    """Create a new staff account"""
+    """Create a new staff account in the current user's company"""
+    # Get the current user's company
+    try:
+        current_user_profile = UserProfile.objects.get(user=request.user)
+        company = current_user_profile.company
+    except UserProfile.DoesNotExist:
+        messages.error(request, 'Your user profile is not properly configured. Please contact administrator.')
+        return redirect('staff_management:staff_list')
+    
     if request.method == 'POST':
         user_form = StaffUserCreationForm(request.POST)
         profile_form = StaffProfileForm(request.POST)
         
         if user_form.is_valid() and profile_form.is_valid():
-            # Get the current user's company
-            try:
-                current_user_profile = UserProfile.objects.get(user=request.user)
-                company = current_user_profile.company
-            except UserProfile.DoesNotExist:
-                messages.error(request, 'Your user profile is not properly configured. Please contact administrator.')
-                return redirect('staff_management:staff_list')
-            
             # Create the user
             user = user_form.save(commit=False)
             user.is_active = True
             user.save()
             
-            # Create user profile
+            # Create user profile with the current user's company
             user_profile = UserProfile.objects.create(
                 user=user,
                 role='staff',
-                company=company,
+                company=company,  # Use the current user's company
                 phone_number='',
                 assigned_location=profile_form.cleaned_data.get('assigned_locations', '').split(',')[0] if profile_form.cleaned_data.get('assigned_locations') else 'Main Office',
                 department=profile_form.cleaned_data.get('department', 'General'),
@@ -121,9 +143,23 @@ def staff_create(request):
 
 @login_required
 def staff_update(request, staff_id):
-    """Update staff information"""
+    """Update staff information - only for staff in the same company"""
+    # Get the current user's company
+    try:
+        current_user_profile = UserProfile.objects.get(user=request.user)
+        user_company = current_user_profile.company
+    except UserProfile.DoesNotExist:
+        messages.error(request, 'Your user profile is not properly configured. Please contact administrator.')
+        return redirect('staff_management:staff_list')
+    
+    # Only allow updating staff from the same company
     staff_profile = get_object_or_404(
-        StaffProfile.objects.select_related('user_profile', 'user_profile__user'), 
+        StaffProfile.objects.select_related(
+            'user_profile', 
+            'user_profile__user'
+        ).filter(
+            user_profile__company=user_company
+        ), 
         id=staff_id
     )
     user_profile = staff_profile.user_profile
@@ -149,7 +185,8 @@ def staff_update(request, staff_id):
             user_profile.save()
             
             messages.success(request, f'Staff member {user.get_full_name()} updated successfully!')
-            return redirect('staff_management:staff_detail', staff_id=staff_id)
+            # CHANGED: Redirect to staff_list instead of staff_detail
+            return redirect('staff_management:staff_list')
         else:
             messages.error(request, 'Please correct the errors below.')
     else:
@@ -169,9 +206,28 @@ def staff_update(request, staff_id):
 
 @login_required
 def staff_toggle_status(request, staff_id):
-    """Toggle staff active/inactive status"""
+    """Toggle staff active/inactive status - only for staff in the same company"""
     if request.method == 'POST':
-        staff_profile = get_object_or_404(StaffProfile, id=staff_id)
+        # Get the current user's company
+        try:
+            current_user_profile = UserProfile.objects.get(user=request.user)
+            user_company = current_user_profile.company
+        except UserProfile.DoesNotExist:
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                return JsonResponse({
+                    'status': 'error',
+                    'message': 'User profile not configured'
+                })
+            messages.error(request, 'Your user profile is not properly configured.')
+            return redirect('staff_management:staff_list')
+        
+        # Only allow toggling status for staff from the same company
+        staff_profile = get_object_or_404(
+            StaffProfile.objects.filter(
+                user_profile__company=user_company
+            ), 
+            id=staff_id
+        )
         
         if staff_profile.status == 'active':
             staff_profile.status = 'inactive'
