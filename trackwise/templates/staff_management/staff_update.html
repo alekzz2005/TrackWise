@@ -1,0 +1,544 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<style>
+:root {
+  --primary-blue: #4a6fa5;
+  --primary-dark: #2c5282;
+  --accent-light: #a7c5eb;
+  --bg-light: #dbe4f0;
+  --bg-page: #f0f4f8;
+  --text-white: #ffffff;
+  --shadow-md: 0 8px 25px rgba(0, 0, 0, 0.2);
+  --transition: all 0.3s ease;
+  --success: #38a169;
+  --warning: #ed8936;
+  --danger: #e53e3e;
+}
+
+.auth-body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: linear-gradient(135deg, var(--accent-light) 0%, var(--accent-light) 100%);
+  padding: 20px;
+  overflow-x: hidden;
+  padding-top: 80px;
+}
+
+.auth-container {
+  display: grid;
+  grid-template-columns: 1fr 400px;
+  max-width: 1000px;
+  width: 100%;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 20px;
+  box-shadow: var(--shadow-md);
+  overflow: hidden;
+  min-height: 700px;
+}
+
+.logo-container {
+  background: linear-gradient(135deg, var(--primary-blue), var(--primary-dark));
+  padding: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.logo-text {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--text-white);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.form-section {
+  padding: 2.5rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.auth-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.auth-header h2 {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--primary-dark);
+  margin-bottom: 0.5rem;
+}
+
+.auth-header p {
+  color: #666;
+  font-size: 1rem;
+}
+
+.alert {
+  padding: 12px 15px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  font-weight: 500;
+}
+
+.alert-success {
+  background: rgba(56, 161, 105, 0.1);
+  border: 1px solid var(--success);
+  color: #22543d;
+}
+
+.alert-error {
+  background: rgba(229, 62, 62, 0.1);
+  border: 1px solid var(--danger);
+  color: #742a2a;
+}
+
+.alert-warning {
+  background: rgba(237, 137, 54, 0.1);
+  border: 1px solid var(--warning);
+  color: #744210;
+}
+
+.form-container {
+  flex: 1;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: var(--primary-dark);
+}
+
+.form-control {
+  width: 100%;
+  padding: 0.75rem;
+  border: 2px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: var(--transition);
+}
+
+.form-control:focus {
+  outline: none;
+  border-color: var(--primary-blue);
+  box-shadow: 0 0 0 3px rgba(74, 111, 165, 0.1);
+}
+
+.form-control.error {
+  border-color: var(--danger);
+}
+
+.error-message {
+  color: var(--danger);
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+  display: none;
+}
+
+.error-message.show {
+  display: block;
+}
+
+.form-text {
+  font-size: 0.875rem;
+  color: #666;
+  margin-top: 0.25rem;
+}
+
+.button-group {
+  display: flex;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.btn {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  text-decoration: none;
+  font-size: 0.9rem;
+  flex: 1;
+  justify-content: center;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--primary-blue), var(--primary-dark));
+  color: var(--text-white);
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.btn-outline {
+  background: transparent;
+  border: 2px solid var(--primary-blue);
+  color: var(--primary-blue);
+}
+
+.btn-outline:hover {
+  background: var(--primary-blue);
+  color: var(--text-white);
+  transform: translateY(-2px);
+}
+
+.particles-section {
+  background: linear-gradient(135deg, var(--primary-blue), var(--primary-dark));
+  position: relative;
+  overflow: hidden;
+}
+
+#particles-js {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+}
+
+@media (max-width: 1024px) {
+  .auth-container {
+    grid-template-columns: 1fr;
+    max-width: 600px;
+  }
+  
+  .particles-section {
+    display: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .auth-body {
+    padding: 10px;
+    padding-top: 70px;
+  }
+  
+  .form-section {
+    padding: 1.5rem;
+  }
+  
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+  
+  .button-group {
+    flex-direction: column;
+  }
+}
+</style>
+{% endblock %}
+
+{% block title %}Edit {{ staff.user_profile.user.get_full_name }} - TrackWise{% endblock %}
+
+{% block content %}
+<div class="auth-body">
+    <div class="auth-container staff-update-container">
+        <div class="logo-container">
+            <div class="logo-text">
+                <i class="fas fa-chart-line"></i>
+                TrackWise
+            </div>
+        </div>
+        
+        <div class="form-section staff-update-section">
+            <div class="auth-header">
+                <h2>Edit Staff Member</h2>
+                <p>Update staff member information</p>
+            </div>
+
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+            
+            <form method="post" class="form-container" id="staff-update-form">
+                {% csrf_token %}
+                
+                <h4 style="color: var(--primary-dark); margin-bottom: 1rem; border-bottom: 2px solid var(--bg-light); padding-bottom: 0.5rem;">Account Information</h4>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label" for="id_first_name">First Name *</label>
+                        <input type="text" name="first_name" id="id_first_name" class="form-control" value="{{ user.first_name }}" required>
+                        {% if profile_form.first_name.errors %}
+                            {% for error in profile_form.first_name.errors %}
+                                <span class="error-message show">{{ error }}</span>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="id_last_name">Last Name *</label>
+                        <input type="text" name="last_name" id="id_last_name" class="form-control" value="{{ user.last_name }}" required>
+                        {% if profile_form.last_name.errors %}
+                            {% for error in profile_form.last_name.errors %}
+                                <span class="error-message show">{{ error }}</span>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label" for="id_email">Email *</label>
+                        <input type="email" name="email" id="id_email" class="form-control" value="{{ user.email }}" required>
+                        {% if profile_form.email.errors %}
+                            {% for error in profile_form.email.errors %}
+                                <span class="error-message show">{{ error }}</span>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="{{ profile_form.employee_id.id_for_label }}">Employee ID *</label>
+                        {{ profile_form.employee_id }}
+                        {% if profile_form.employee_id.errors %}
+                            {% for error in profile_form.employee_id.errors %}
+                                <span class="error-message show">{{ error }}</span>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <h4 style="color: var(--primary-dark); margin: 2rem 0 1rem 0; border-bottom: 2px solid var(--bg-light); padding-bottom: 0.5rem;">Employment Information</h4>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label" for="{{ profile_form.department.id_for_label }}">Department *</label>
+                        {{ profile_form.department }}
+                        {% if profile_form.department.errors %}
+                            {% for error in profile_form.department.errors %}
+                                <span class="error-message show">{{ error }}</span>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="{{ profile_form.position.id_for_label }}">Position *</label>
+                        {{ profile_form.position }}
+                        {% if profile_form.position.errors %}
+                            {% for error in profile_form.position.errors %}
+                                <span class="error-message show">{{ error }}</span>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label" for="{{ profile_form.hire_date.id_for_label }}">Hire Date *</label>
+                        {{ profile_form.hire_date }}
+                        {% if profile_form.hire_date.errors %}
+                            {% for error in profile_form.hire_date.errors %}
+                                <span class="error-message show">{{ error }}</span>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="{{ profile_form.salary.id_for_label }}">Salary</label>
+                        {{ profile_form.salary }}
+                        {% if profile_form.salary.errors %}
+                            {% for error in profile_form.salary.errors %}
+                                <span class="error-message show">{{ error }}</span>
+                            {% endfor %}
+                        {% endif %}
+                        <div class="form-text">Optional</div>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label" for="{{ profile_form.status.id_for_label }}">Status *</label>
+                        {{ profile_form.status }}
+                        {% if profile_form.status.errors %}
+                            {% for error in profile_form.status.errors %}
+                                <span class="error-message show">{{ error }}</span>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="{{ profile_form.assigned_locations.id_for_label }}">Assigned Locations *</label>
+                    {{ profile_form.assigned_locations }}
+                    {% if profile_form.assigned_locations.errors %}
+                        {% for error in profile_form.assigned_locations.errors %}
+                            <span class="error-message show">{{ error }}</span>
+                        {% endfor %}
+                    {% endif %}
+                    <div class="form-text">Enter locations separated by commas</div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="{{ profile_form.notes.id_for_label }}">Notes</label>
+                    {{ profile_form.notes }}
+                    {% if profile_form.notes.errors %}
+                        {% for error in profile_form.notes.errors %}
+                            <span class="error-message show">{{ error }}</span>
+                        {% endfor %}
+                    {% endif %}
+                    <div class="form-text">Optional additional information</div>
+                </div>
+                
+                <div class="button-group">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Update Staff
+                    </button>
+                    <a href="{% url 'staff_management:staff_detail' staff.id %}" class="btn btn-outline">
+                        <i class="fas fa-times"></i> Cancel
+                    </a>
+                </div>
+            </form>
+        </div>
+
+        <div class="particles-section staff-update-particles" id="particles-js"></div>
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/particles.js/2.0.0/particles.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Particles configuration
+    particlesJS('particles-js', {
+        particles: {
+            number: { value: 40, density: { enable: true, value_area: 800 } },
+            color: { value: '#ffffff' },
+            shape: { type: 'circle' },
+            opacity: { value: 0.5, random: true },
+            size: { value: 3, random: true },
+            line_linked: {
+                enable: true,
+                distance: 150,
+                color: '#ffffff',
+                opacity: 0.4,
+                width: 1
+            },
+            move: {
+                enable: true,
+                speed: 1,
+                direction: 'none',
+                random: true,
+                out_mode: 'out'
+            }
+        },
+        interactivity: {
+            detect_on: 'canvas',
+            events: {
+                onhover: { enable: true, mode: 'grab' },
+                resize: true
+            },
+            modes: {
+                grab: { distance: 140, line_linked: { opacity: 0.8 } }
+            }
+        },
+        retina_detect: true
+    });
+
+    // Form validation
+    const form = document.getElementById('staff-update-form');
+    const inputs = form.querySelectorAll('.form-control');
+    
+    inputs.forEach(input => {
+        input.addEventListener('blur', function() {
+            validateField(this);
+        });
+        
+        input.addEventListener('input', function() {
+            clearError(this);
+        });
+    });
+    
+    function validateField(field) {
+        const value = field.value.trim();
+        const fieldName = field.name;
+        
+        clearError(field);
+        
+        if (field.hasAttribute('required') && !value) {
+            showError(field, 'This field is required');
+            return false;
+        }
+        
+        // Email validation
+        if (fieldName === 'email' && value) {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(value)) {
+                showError(field, 'Please enter a valid email address');
+                return false;
+            }
+        }
+        
+        return true;
+    }
+    
+    function showError(field, message) {
+        field.classList.add('error');
+        let errorElement = field.parentNode.querySelector('.error-message');
+        if (!errorElement) {
+            errorElement = document.createElement('span');
+            errorElement.className = 'error-message';
+            field.parentNode.appendChild(errorElement);
+        }
+        errorElement.textContent = message;
+        errorElement.classList.add('show');
+    }
+    
+    function clearError(field) {
+        field.classList.remove('error');
+        const errorElement = field.parentNode.querySelector('.error-message');
+        if (errorElement) {
+            errorElement.classList.remove('show');
+        }
+    }
+    
+    form.addEventListener('submit', function(e) {
+        let isValid = true;
+        
+        inputs.forEach(input => {
+            if (!validateField(input)) {
+                isValid = false;
+            }
+        });
+        
+        if (!isValid) {
+            e.preventDefault();
+            // Scroll to first error
+            const firstError = form.querySelector('.error');
+            if (firstError) {
+                firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }
+    });
+});
+</script>
+{% endblock %}

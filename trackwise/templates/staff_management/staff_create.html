@@ -1,0 +1,459 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/staff_management/staff_create.css' %}">
+{% endblock %}
+
+{% block title %}Add Staff - TrackWise{% endblock %}
+
+{% block content %}
+<div class="auth-body">
+    <div class="auth-container">
+        <div class="logo-container">
+            <div class="logo-text">
+                <i class="fas fa-chart-line"></i>
+                TrackWise
+            </div>
+        </div>
+        
+        <div class="form-section">
+            <div class="auth-header">
+                <h2>Add New Staff</h2>
+                <p>Create staff member accounts for your team</p>
+            </div>
+
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            {% if user_form.errors or profile_form.errors %}
+                <div class="alert alert-error">
+                    <strong>Please correct the errors below:</strong>
+                    <ul>
+                        {% for field in user_form %}
+                            {% for error in field.errors %}
+                                <li>{{ field.label }}: {{ error }}</li>
+                            {% endfor %}
+                        {% endfor %}
+                        {% for field in profile_form %}
+                            {% for error in field.errors %}
+                                <li>{{ field.label }}: {{ error }}</li>
+                            {% endfor %}
+                        {% endfor %}
+                        {% for error in user_form.non_field_errors %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                        {% for error in profile_form.non_field_errors %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
+            
+            <form method="post" id="staff-form">
+                {% csrf_token %}
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label" for="id_first_name">First Name *</label>
+                        <input type="text" name="first_name" id="id_first_name" class="form-control" value="{{ user_form.first_name.value|default:'' }}" required>
+                        {% if user_form.first_name.errors %}
+                            {% for error in user_form.first_name.errors %}
+                                <span class="error-message show">{{ error }}</span>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="id_last_name">Last Name *</label>
+                        <input type="text" name="last_name" id="id_last_name" class="form-control" value="{{ user_form.last_name.value|default:'' }}" required>
+                        {% if user_form.last_name.errors %}
+                            {% for error in user_form.last_name.errors %}
+                                <span class="error-message show">{{ error }}</span>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label" for="id_username">Username *</label>
+                        <input type="text" name="username" id="id_username" class="form-control" value="{{ user_form.username.value|default:'' }}" required>
+                        {% if user_form.username.errors %}
+                            {% for error in user_form.username.errors %}
+                                <span class="error-message show">{{ error }}</span>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="id_email">Email *</label>
+                        <input type="email" name="email" id="id_email" class="form-control" value="{{ user_form.email.value|default:'' }}" required>
+                        {% if user_form.email.errors %}
+                            {% for error in user_form.email.errors %}
+                                <span class="error-message show">{{ error }}</span>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label" for="id_password1">Password *</label>
+                        <input type="password" name="password1" id="id_password1" class="form-control" required>
+                        {% if user_form.password1.errors %}
+                            {% for error in user_form.password1.errors %}
+                                <span class="error-message show">{{ error }}</span>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="id_password2">Confirm Password *</label>
+                        <input type="password" name="password2" id="id_password2" class="form-control" required>
+                        {% if user_form.password2.errors %}
+                            {% for error in user_form.password2.errors %}
+                                <span class="error-message show">{{ error }}</span>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label" for="id_employee_id">Employee ID *</label>
+                        <input type="text" name="employee_id" id="id_employee_id" class="form-control" value="{{ profile_form.employee_id.value|default:'' }}" required>
+                        {% if profile_form.employee_id.errors %}
+                            {% for error in profile_form.employee_id.errors %}
+                                <span class="error-message show">{{ error }}</span>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="id_department">Department *</label>
+                        <input type="text" name="department" id="id_department" class="form-control" value="{{ profile_form.department.value|default:'' }}" required>
+                        {% if profile_form.department.errors %}
+                            {% for error in profile_form.department.errors %}
+                                <span class="error-message show">{{ error }}</span>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label" for="id_position">Position *</label>
+                        <input type="text" name="position" id="id_position" class="form-control" value="{{ profile_form.position.value|default:'' }}" required>
+                        {% if profile_form.position.errors %}
+                            {% for error in profile_form.position.errors %}
+                                <span class="error-message show">{{ error }}</span>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="id_hire_date">Hire Date *</label>
+                        <input type="date" name="hire_date" id="id_hire_date" class="form-control" value="{{ profile_form.hire_date.value|default:'' }}" required>
+                        {% if profile_form.hire_date.errors %}
+                            {% for error in profile_form.hire_date.errors %}
+                                <span class="error-message show">{{ error }}</span>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label" for="id_salary">Salary</label>
+                        <input type="number" name="salary" id="id_salary" class="form-control" value="{{ profile_form.salary.value|default:'' }}" step="0.01">
+                        {% if profile_form.salary.errors %}
+                            {% for error in profile_form.salary.errors %}
+                                <span class="error-message show">{{ error }}</span>
+                            {% endfor %}
+                        {% endif %}
+                        <div class="form-text">Optional</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="id_status">Status *</label>
+                        <select name="status" id="id_status" class="form-control" required>
+                            <option value="">Select Status</option>
+                            <option value="active" {% if profile_form.status.value == 'active' %}selected{% endif %}>Active</option>
+                            <option value="inactive" {% if profile_form.status.value == 'inactive' %}selected{% endif %}>Inactive</option>
+                            <option value="on_leave" {% if profile_form.status.value == 'on_leave' %}selected{% endif %}>On Leave</option>
+                        </select>
+                        {% if profile_form.status.errors %}
+                            {% for error in profile_form.status.errors %}
+                                <span class="error-message show">{{ error }}</span>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="id_assigned_locations">Assigned Locations *</label>
+                    <textarea name="assigned_locations" id="id_assigned_locations" class="form-control" rows="3" required>{{ profile_form.assigned_locations.value|default:'' }}</textarea>
+                    {% if profile_form.assigned_locations.errors %}
+                        {% for error in profile_form.assigned_locations.errors %}
+                            <span class="error-message show">{{ error }}</span>
+                        {% endfor %}
+                    {% endif %}
+                    <div class="form-text">Enter locations separated by commas</div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="id_notes">Notes</label>
+                    <textarea name="notes" id="id_notes" class="form-control" rows="4">{{ profile_form.notes.value|default:'' }}</textarea>
+                    {% if profile_form.notes.errors %}
+                        {% for error in profile_form.notes.errors %}
+                            <span class="error-message show">{{ error }}</span>
+                        {% endfor %}
+                    {% endif %}
+                    <div class="form-text">Optional additional information</div>
+                </div>
+                
+                <div class="button-group">
+                    <button type="submit" class="btn btn-success">
+                        <i class="fas fa-user-plus"></i> Create Staff
+                    </button>
+                    <a href="{% url 'staff_management:staff_list' %}" class="btn btn-danger">
+                        <i class="fas fa-times"></i> Cancel
+                    </a>
+                </div>
+            </form>
+            
+            <div class="auth-footer">
+                <p class="footer-content">
+                    <a href="{% url 'staff_management:staff_list' %}" class="footer-home-link">
+                        <i class="fas fa-arrow-left"></i> Back to Staff
+                    </a>
+                    <a>|</a>
+                    <span class="footer-spacer"></span>
+                    <a href="#" class="footer-support-link">Contact Support</a>
+                </p>
+            </div>
+        </div>
+
+        <div class="particles-section" id="particles-js"></div>
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/particles.js/2.0.0/particles.min.js"></script>
+<script>
+    // Particles configuration
+    particlesJS('particles-js', {
+        particles: {
+            number: { value: 80, density: { enable: true, value_area: 800 } },
+            color: { value: '#7aa7e0' },
+            shape: { type: 'circle' },
+            opacity: { value: 0.8, random: true },
+            size: { value: 20, random: true },
+            line_linked: {
+                enable: true,
+                distance: 150,
+                color: '#7aa7e0',
+                opacity: 0.6,
+                width: 2
+            },
+            move: {
+                enable: true,
+                speed: 1.5,
+                direction: 'none',
+                random: true,
+                out_mode: 'out'
+            }
+        },
+        interactivity: {
+            detect_on: 'canvas',
+            events: {
+                onhover: { enable: true, mode: 'grab' },
+                resize: true
+            },
+            modes: {
+                grab: { distance: 180, line_linked: { opacity: 1 } }
+            }
+        },
+        retina_detect: true
+    });
+
+    // Form validation
+    const form = document.getElementById('staff-form');
+
+    // Validation functions
+    function showError(inputId, message) {
+        const input = document.getElementById(inputId);
+        if (input) {
+            input.classList.add('error');
+            // Find or create error message element
+            let errorElement = input.parentNode.querySelector('.error-message');
+            if (!errorElement) {
+                errorElement = document.createElement('span');
+                errorElement.className = 'error-message';
+                input.parentNode.appendChild(errorElement);
+            }
+            errorElement.textContent = message;
+            errorElement.classList.add('show');
+        }
+    }
+
+    function clearError(inputId) {
+        const input = document.getElementById(inputId);
+        if (input) {
+            input.classList.remove('error');
+            const errorElement = input.parentNode.querySelector('.error-message');
+            if (errorElement) {
+                errorElement.classList.remove('show');
+            }
+        }
+    }
+
+    function validateForm() {
+        let isValid = true;
+
+        // Clear all errors first
+        clearError('id_first_name');
+        clearError('id_last_name');
+        clearError('id_username');
+        clearError('id_email');
+        clearError('id_password1');
+        clearError('id_password2');
+        clearError('id_employee_id');
+        clearError('id_department');
+        clearError('id_position');
+        clearError('id_hire_date');
+        clearError('id_status');
+        clearError('id_assigned_locations');
+
+        // First Name
+        const firstName = document.getElementById('id_first_name').value.trim();
+        if (!firstName) {
+            showError('id_first_name', 'First name is required');
+            isValid = false;
+        }
+
+        // Last Name
+        const lastName = document.getElementById('id_last_name').value.trim();
+        if (!lastName) {
+            showError('id_last_name', 'Last name is required');
+            isValid = false;
+        }
+
+        // Username
+        const username = document.getElementById('id_username').value.trim();
+        if (!username) {
+            showError('id_username', 'Username is required');
+            isValid = false;
+        }
+
+        // Email
+        const email = document.getElementById('id_email').value.trim();
+        if (!email) {
+            showError('id_email', 'Email is required');
+            isValid = false;
+        } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+            showError('id_email', 'Please enter a valid email address');
+            isValid = false;
+        }
+
+        // Password
+        const password1 = document.getElementById('id_password1').value;
+        if (!password1) {
+            showError('id_password1', 'Password is required');
+            isValid = false;
+        } else if (password1.length < 8) {
+            showError('id_password1', 'Password must be at least 8 characters long');
+            isValid = false;
+        }
+
+        // Confirm Password
+        const password2 = document.getElementById('id_password2').value;
+        if (!password2) {
+            showError('id_password2', 'Please confirm your password');
+            isValid = false;
+        } else if (password1 !== password2) {
+            showError('id_password2', 'Passwords do not match');
+            isValid = false;
+        }
+
+        // Employee ID
+        const employeeId = document.getElementById('id_employee_id').value.trim();
+        if (!employeeId) {
+            showError('id_employee_id', 'Employee ID is required');
+            isValid = false;
+        }
+
+        // Department
+        const department = document.getElementById('id_department').value.trim();
+        if (!department) {
+            showError('id_department', 'Department is required');
+            isValid = false;
+        }
+
+        // Position
+        const position = document.getElementById('id_position').value.trim();
+        if (!position) {
+            showError('id_position', 'Position is required');
+            isValid = false;
+        }
+
+        // Hire Date
+        const hireDate = document.getElementById('id_hire_date').value;
+        if (!hireDate) {
+            showError('id_hire_date', 'Hire date is required');
+            isValid = false;
+        }
+
+        // Status
+        const status = document.getElementById('id_status').value;
+        if (!status) {
+            showError('id_status', 'Status is required');
+            isValid = false;
+        }
+
+        // Assigned Locations
+        const assignedLocations = document.getElementById('id_assigned_locations').value.trim();
+        if (!assignedLocations) {
+            showError('id_assigned_locations', 'Assigned locations are required');
+            isValid = false;
+        }
+
+        return isValid;
+    }
+
+    // Form submission - validate form
+    form.addEventListener('submit', (e) => {
+        if (!validateForm()) {
+            e.preventDefault();
+            // Scroll to first error
+            const firstError = document.querySelector('.error-message.show');
+            if (firstError) {
+                firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }
+    });
+
+    // Clear errors on input
+    document.querySelectorAll('.form-control').forEach(input => {
+        input.addEventListener('input', () => {
+            clearError(input.id);
+        });
+    });
+
+    // Add error styling to existing server-side errors on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        const errorMessages = document.querySelectorAll('.error-message.show');
+        errorMessages.forEach(error => {
+            const input = error.previousElementSibling;
+            if (input && input.classList.contains('form-control')) {
+                input.classList.add('error');
+            }
+        });
+    });
+</script>
+{% endblock %}

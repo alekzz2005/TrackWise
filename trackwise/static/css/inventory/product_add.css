@@ -1,0 +1,128 @@
+/* Product Add specific styles */
+.auth-body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background: linear-gradient(135deg, var(--accent-light) 0%, var(--accent-light) 100%);
+    padding: 20px;
+    overflow-x: hidden;
+    padding-top: 80px;
+}
+
+/* Django form field styling */
+.alert-danger {
+    background: rgba(244, 67, 54, 0.1);
+    border: 1px solid var(--danger);
+    border-radius: 8px;
+    padding: 12px 15px;
+    margin-bottom: 20px;
+    color: #ffcccc;
+}
+
+.alert-success {
+    background: rgba(76, 175, 80, 0.1);
+    border: 1px solid var(--success);
+    border-radius: 8px;
+    padding: 12px 15px;
+    margin-bottom: 20px;
+    color: #ccffcc;
+}
+
+.alert ul {
+    margin: 0;
+    padding-left: 20px;
+}
+
+/* Ensure Django errors are visible */
+.errorlist {
+    list-style: none;
+    padding: 0;
+    margin: 5px 0 0 0;
+    color: #ffcccc;
+    font-size: 13px;
+}
+
+.errorlist li {
+    margin-bottom: 3px;
+}
+
+/* Enhanced error styling */
+.form-errors {
+    background: rgba(244, 67, 54, 0.1);
+    border: 1px solid var(--danger);
+    border-radius: 8px;
+    padding: 12px 15px;
+    margin-bottom: 20px;
+    color: #ffcccc;
+}
+
+.alert-danger {
+    background: rgba(244, 67, 54, 0.1);
+    border: 1px solid var(--danger);
+    border-radius: 8px;
+    padding: 12px 15px;
+    margin-bottom: 20px;
+    color: #ffcccc;
+}
+
+.alert-success {
+    background: rgba(76, 175, 80, 0.1);
+    border: 1px solid var(--success);
+    border-radius: 8px;
+    padding: 12px 15px;
+    margin-bottom: 20px;
+    color: #ccffcc;
+}
+
+/* Ensure server errors are properly styled */
+.error-message.show {
+    display: block !important;
+    animation: fadeIn 0.3s ease;
+}
+
+/* Smooth scrolling for error focus */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Form styling for product add */
+.form-text {
+    font-size: 0.875rem;
+    color: rgba(255, 255, 255, 0.7);
+    margin-top: 5px;
+}
+
+/* Button styling */
+.btn-success {
+    background: var(--success);
+    border: none;
+    padding: 12px 24px;
+    border-radius: 8px;
+    color: white;
+    font-weight: 600;
+    transition: var(--transition);
+}
+
+.btn-success:hover {
+    background: #2e7d32;
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.btn-danger {
+    background: var(--danger);
+    border: none;
+    padding: 12px 24px;
+    border-radius: 8px;
+    color: white;
+    font-weight: 600;
+    transition: var(--transition);
+}
+
+.btn-danger:hover {
+    background: #c62828;
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
