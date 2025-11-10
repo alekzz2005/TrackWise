@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'inventory',
     'dashboard',
     'staff_management',
+    'reports',
 ]
 
 MIDDLEWARE = [
@@ -84,8 +85,8 @@ WSGI_APPLICATION = 'trackwise.wsgi.application'
 DATABASES = {
     "default": dj_database_url.config(
         default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}",
-        conn_max_age=600,
-        ssl_require=True  # Supabase requires this, SQLite ignores it
+        conn_max_age=0,
+        ssl_require=True,  # Supabase requires this, SQLite ignores it
     )
 }
 
