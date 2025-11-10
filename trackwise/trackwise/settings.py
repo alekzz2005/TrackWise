@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'accounts',
     'inventory',
     'dashboard',
+    'staff_management',
 ]
 
 MIDDLEWARE = [

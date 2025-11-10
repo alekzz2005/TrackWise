@@ -2,166 +2,587 @@
 {% load static %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/dashboard/dashboard.css' %}">
+<style>
+:root {
+  --primary-blue: #4a6fa5;
+  --primary-dark: #2c5282;
+  --accent-light: #a7c5eb;
+  --bg-light: #dbe4f0;
+  --bg-page: #f0f4f8;
+  --text-white: #ffffff;
+  --shadow-md: 0 8px 25px rgba(0, 0, 0, 0.2);
+  --transition: all 0.3s ease;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+  background-color: var(--bg-page);
+  color: #333;
+}
+
+/* NAVBAR */
+.navbar {
+  background: linear-gradient(135deg, var(--primary-blue), var(--primary-dark));
+  padding: 1rem 2rem;
+  color: var(--text-white);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: var(--shadow-md);
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+}
+
+.navbar-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.navbar-brand {
+  font-weight: 700;
+  font-size: 1.3rem;
+  color: var(--text-white);
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.navbar-menu {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.nav-link {
+  color: var(--text-white);
+  text-decoration: none;
+  transition: var(--transition);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.nav-link:hover, .nav-link.active {
+  color: var(--accent-light);
+}
+
+/* User Section */
+.user-section {
+  position: relative;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 5px;
+  transition: var(--transition);
+}
+
+.user-info:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.user-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--accent-light);
+  color: var(--primary-dark);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+}
+
+.user-dropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background: white;
+  color: #333;
+  border-radius: 8px;
+  box-shadow: var(--shadow-md);
+  width: 200px;
+  padding: 0.5rem 0;
+  z-index: 100;
+  display: none;
+}
+
+.user-dropdown.active {
+  display: block;
+}
+
+.user-dropdown-item {
+  padding: 0.75rem 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  cursor: pointer;
+  transition: var(--transition);
+  border: none;
+  background: none;
+  width: 100%;
+  text-align: left;
+}
+
+.user-dropdown-item:hover {
+  background: var(--bg-light);
+}
+
+.user-dropdown-divider {
+  height: 1px;
+  background: #e0e0e0;
+  margin: 0.5rem 0;
+}
+
+/* HERO SECTION */
+.hero {
+  background: var(--bg-light);
+  margin: 2rem auto;
+  padding: 3rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-radius: 20px;
+  max-width: 1200px;
+  box-shadow: var(--shadow-md);
+  flex-wrap: wrap;
+}
+
+.hero-text {
+  max-width: 45%;
+  min-width: 280px;
+}
+
+.hero-text h1 {
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--primary-dark);
+  margin-bottom: 1rem;
+}
+
+.hero-text p {
+  margin-bottom: 1.5rem;
+  color: #555;
+}
+
+.hero-text button {
+  padding: 1rem 2rem;
+  background: linear-gradient(135deg, var(--primary-blue), var(--primary-dark));
+  border: none;
+  border-radius: 15px;
+  color: var(--text-white);
+  font-weight: 700;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.hero-text button:hover {
+  background: var(--primary-dark);
+  transform: translateY(-2px);
+}
+
+/* KPI GRID */
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+  width: 350px;
+}
+
+.kpi-card {
+  background: linear-gradient(135deg, var(--primary-blue), var(--primary-dark));
+  color: var(--text-white);
+  padding: 1.5rem;
+  border-radius: 15px;
+  text-align: center;
+  box-shadow: var(--shadow-md);
+  transition: var(--transition);
+}
+
+.kpi-card:hover {
+  transform: translateY(-5px);
+}
+
+.kpi-value {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 0.3rem;
+}
+
+.kpi-label {
+  font-size: 0.95rem;
+  color: var(--accent-light);
+}
+
+/* INVENTORY SECTION */
+.inventory-section {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+  padding: 0 2rem 4rem;
+}
+
+.inventory-card {
+  background: var(--primary-blue);
+  color: var(--text-white);
+  border-radius: 15px;
+  padding: 1.5rem;
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  box-shadow: var(--shadow-md);
+  transition: var(--transition);
+}
+
+.inventory-card:hover {
+  transform: translateY(-5px);
+}
+
+.inventory-image {
+  width: 70px;
+  height: 70px;
+  background: var(--bg-light);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--primary-dark);
+}
+
+.inventory-info {
+  flex-grow: 1;
+}
+
+.inventory-info h4 {
+  font-size: 1rem;
+  font-weight: 700;
+  background: var(--accent-light);
+  color: var(--primary-dark);
+  border-radius: 10px;
+  display: inline-block;
+  padding: 0.2rem 0.6rem;
+  margin-bottom: 0.5rem;
+}
+
+.inventory-info p {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  padding: 0.4rem 0.6rem;
+  font-size: 0.9rem;
+  margin-bottom: 0.3rem;
+}
+
+/* Activity Section */
+.activity-section {
+  max-width: 1200px;
+  margin: 0 auto 4rem;
+  padding: 0 2rem;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+}
+
+.section-card {
+  background: white;
+  border-radius: 15px;
+  padding: 1.5rem;
+  box-shadow: var(--shadow-md);
+}
+
+.section-card h3 {
+  color: var(--primary-dark);
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.activity-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 0;
+  border-bottom: 1px solid #eee;
+}
+
+.activity-item:last-child {
+  border-bottom: none;
+}
+
+.activity-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--bg-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--primary-blue);
+}
+
+.activity-content {
+  flex-grow: 1;
+}
+
+.activity-time {
+  font-size: 0.8rem;
+  color: #777;
+  margin-top: 0.2rem;
+}
+
+.activity-status .badge {
+  padding: 0.3rem 0.6rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.bg-danger {
+  background: #e53e3e;
+  color: white;
+}
+
+.bg-warning {
+  background: #ed8936;
+  color: white;
+}
+
+.bg-success {
+  background: #38a169;
+  color: white;
+}
+
+.quick-actions {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+}
+
+.action-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem;
+  background: var(--bg-light);
+  border-radius: 10px;
+  color: var(--primary-dark);
+  text-decoration: none;
+  font-weight: 600;
+  transition: var(--transition);
+}
+
+.action-btn:hover {
+  background: var(--accent-light);
+  transform: translateY(-2px);
+}
+
+@media (max-width: 900px) {
+  .hero {
+    flex-direction: column;
+    text-align: center;
+    gap: 2rem;
+  }
+
+  .hero-text {
+    max-width: 100%;
+  }
+
+  .kpi-grid {
+    width: 100%;
+    max-width: 400px;
+  }
+
+  .activity-section {
+    grid-template-columns: 1fr;
+  }
+  
+  .navbar-content {
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+  
+  .navbar-menu {
+    order: 3;
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+/* Dashboard Wrapper */
+.dashboard-wrapper {
+  padding-top: 80px;
+  min-height: 100vh;
+}
+</style>
 {% endblock %}
 
 {% block title %}Dashboard - TrackWise{% endblock %}
 
 {% block content %}
-<!-- Navigation -->
-<nav class="navbar">
-    <div class="navbar-content">
-        <!-- Logo on the left -->
-        <a href="{% url 'dashboard:dashboard' %}" class="navbar-brand">
-            <i class="fas fa-chart-line"></i>
-            TrackWise
-        </a>
-
-        <!-- Navigation in center -->
-        <div class="navbar-menu">
-            <a href="{% url 'dashboard:dashboard' %}" class="nav-link active"><i class="fas fa-home"></i> Dashboard</a>
-            <a href="{% url 'inventory:inventory_list' %}" class="nav-link"><i class="fas fa-boxes"></i> Inventory</a>
-            <a href="#" class="nav-link"><i class="fas fa-chart-bar"></i> Reports</a>
-            <a href="#" class="nav-link"><i class="fas fa-users"></i> Staff</a>
-        </div>
-
-        <!-- Profile with dropdown on the right -->
-        <div class="user-section">
-            <div class="user-info" id="userDropdownTrigger">
-                <span>{{ profile.user.first_name }} {{ profile.user.last_name }}</span>
-                <div class="user-avatar">{{ profile.user.first_name|first }}{{ profile.user.last_name|first }}</div>
-                <i class="fas fa-chevron-down" style="font-size: 0.8rem;"></i>
-            </div>
-            
-            <div class="user-dropdown" id="userDropdown">
-                <div class="user-dropdown-item">
-                    <i class="fas fa-user"></i>
-                    <span>Profile Settings</span>
-                </div>
-                <div class="user-dropdown-item">
-                    <i class="fas fa-cog"></i>
-                    <span>Account Settings</span>
-                </div>
-                <div class="user-dropdown-divider"></div>
-                <form method="post" action="{% url 'accounts:logout' %}" style="display: inline;">
-                    {% csrf_token %}
-                    <button type="submit" class="user-dropdown-item">
-                        <i class="fas fa-sign-out-alt"></i>
-                        <span>Logout</span>
-                    </button>
-                </form>
-            </div>
-        </div>
-    </div>
-</nav>
-
-<!-- Dashboard Content -->
 <div class="dashboard-wrapper">
-    <div class="container">
-        <div class="dashboard-header">
-            <h1 class="welcome-text">Welcome back, {{ profile.user.first_name }}!</h1>
-            <p class="subtitle">Here's what's happening with your business today</p>
-        </div>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="navbar-content">
+            <!-- Logo on the left -->
+            <a href="{% url 'dashboard:dashboard' %}" class="navbar-brand">
+                <i class="fas fa-chart-line"></i>
+                TrackWise
+            </a>
 
-        <div class="row">
-            <!-- Left Column -->
-            <div class="left-column">
-                <!-- Statistics Cards -->
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <div class="stat-number">{{ total_products }}</div>
-                        <div class="stat-label">Total Products</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-number">{{ low_stock }}</div>
-                        <div class="stat-label">Low Stock Items</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-number">{{ out_of_stock }}</div>
-                        <div class="stat-label">Out of Stock</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-number">{{ total_staff }}</div>
-                        <div class="stat-label">Staff Members</div>
-                    </div>
-                </div>
-
-                <!-- Recent Activity -->
-                <div class="activity-feed">
-                    <h4><i class="fas fa-history"></i> Recent Activity</h4>
-                    
-                    {% if recent_activity %}
-                        {% for product in recent_activity %}
-                        <div class="activity-item">
-                            <div class="activity-icon">
-                                <i class="fas fa-box"></i>
-                            </div>
-                            <div class="activity-content">
-                                <strong>{{ product.item_name }}</strong> was updated
-                                <div class="activity-time">{{ product.updated_at|timesince }} ago</div>
-                            </div>
-                            <div class="activity-status">
-                                <span class="badge {% if product.quantity == 0 %}bg-danger{% elif product.quantity <= 10 %}bg-warning{% else %}bg-success{% endif %}">
-                                    {{ product.quantity }} in stock
-                                </span>
-                            </div>
-                        </div>
-                        {% endfor %}
-                    {% else %}
-                        <p class="text-muted">No recent activity</p>
-                    {% endif %}
-                </div>
+            <!-- Navigation in center -->
+            <div class="navbar-menu">
+                <a href="{% url 'dashboard:dashboard' %}" class="nav-link"><i class="fas fa-home"></i> Dashboard</a>
+                <a href="{% url 'inventory:inventory_list' %}" class="nav-link"><i class="fas fa-boxes"></i> Inventory</a>
+                <a href="#" class="nav-link"><i class="fas fa-chart-bar"></i> Reports</a>
+                <a href="{% url 'staff_management:staff_list' %}" class="nav-link active"><i class="fas fa-users"></i> Staffs</a>
             </div>
 
-            <!-- Right Column -->
-            <div class="right-column">
-                <!-- Quick Actions -->
-                <div class="quick-actions">
-                    <h5><i class="fas fa-bolt"></i> Quick Actions</h5>
-                    <a href="{% url 'inventory:product_add' %}" class="action-btn">
-                        <i class="fas fa-plus"></i> Add New Product
-                    </a>
-                    <a href="{% url 'inventory:inventory_list' %}" class="action-btn">
-                        <i class="fas fa-boxes"></i> View Inventory
-                    </a>
-                    <a href="#" class="action-btn">
-                        <i class="fas fa-chart-bar"></i> View Reports
-                    </a>
-                    <a href="#" class="action-btn">
-                        <i class="fas fa-users"></i> Manage Staff
-                    </a>
+            <!-- Profile with dropdown on the right -->
+            <div class="user-section">
+                <div class="user-info" id="userDropdownTrigger">
+                    <span>{{ profile.user.first_name }} {{ profile.user.last_name }}</span>
+                    <div class="user-avatar">{{ profile.user.first_name|first }}{{ profile.user.last_name|first }}</div>
+                    <i class="fas fa-chevron-down" style="font-size: 0.8rem;"></i>
                 </div>
-
-                <!-- Recent Products -->
-                <div class="recent-products">
-                    <h5><i class="fas fa-clock"></i> Recent Products</h5>
-                    
-                    {% if recent_products %}
-                        {% for product in recent_products %}
-                        <div class="product-item">
-                            {% if product.image %}
-                            <img src="{{ product.image.url }}" alt="{{ product.item_name }}" class="product-image">
-                            {% else %}
-                            <div class="product-image">
-                                <i class="fas fa-box"></i>
-                            </div>
-                            {% endif %}
-                            <div class="product-info">
-                                <strong>{{ product.item_name }}</strong>
-                                <div class="small">{{ product.category|title }}</div>
-                            </div>
-                            <span class="{% if product.quantity == 0 %}stock-out{% elif product.quantity <= 10 %}stock-low{% else %}stock-ok{% endif %}">
-                                {{ product.quantity }}
-                            </span>
-                        </div>
-                        {% endfor %}
-                    {% else %}
-                        <p class="text-muted">No products added yet</p>
-                    {% endif %}
+                
+                <div class="user-dropdown" id="userDropdown">
+                    <div class="user-dropdown-item">
+                        <i class="fas fa-user"></i>
+                        <span>Profile Settings</span>
+                    </div>
+                    <div class="user-dropdown-divider"></div>
+                    <form method="post" action="{% url 'accounts:logout' %}" style="display: inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="user-dropdown-item">
+                            <i class="fas fa-sign-out-alt"></i>
+                            <span>Logout</span>
+                        </button>
+                    </form>
                 </div>
             </div>
         </div>
-    </div>
+    </nav>
+
+    <!-- HERO SECTION -->
+    <section class="hero">
+        <div class="hero-text">
+            <h1>Welcome back, {{ profile.user.first_name }}!</h1>
+            <p>Here's what's happening with your business today</p>
+            <a href="{% url 'inventory:product_add' %}">
+                <button>ADD NEW PRODUCT</button>
+            </a>
+        </div>
+
+        <div class="kpi-grid">
+            <div class="kpi-card">
+                <div class="kpi-value">{{ total_products }}</div>
+                <div class="kpi-label">Total Products</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-value">{{ low_stock }}</div>
+                <div class="kpi-label">Low Stock Items</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-value">{{ out_of_stock }}</div>
+                <div class="kpi-label">Out of Stock</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-value">{{ total_staff }}</div>
+                <div class="kpi-label">Staff Members</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- RECENT PRODUCTS SECTION -->
+    <section class="inventory-section">
+        {% if recent_products %}
+            {% for product in recent_products %}
+            <div class="inventory-card">
+                {% if product.image %}
+                <img src="{{ product.image.url }}" alt="{{ product.item_name }}" class="inventory-image">
+                {% else %}
+                <div class="inventory-image">
+                    <i class="fas fa-box"></i>
+                </div>
+                {% endif %}
+                <div class="inventory-info">
+                    <h4>{{ product.item_name }}</h4>
+                    <p>Product Count: {{ product.quantity }}</p>
+                    <p>Category: {{ product.category|title }}</p>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <p class="text-muted">No products added yet</p>
+        {% endif %}
+    </section>
+
+    <!-- ACTIVITY SECTION -->
+    <section class="activity-section">
+        <!-- Recent Activity -->
+        <div class="section-card">
+            <h3><i class="fas fa-history"></i> Recent Activity</h3>
+            
+            {% if recent_activity %}
+                {% for product in recent_activity %}
+                <div class="activity-item">
+                    <div class="activity-icon">
+                        <i class="fas fa-box"></i>
+                    </div>
+                    <div class="activity-content">
+                        <strong>{{ product.item_name }}</strong> was updated
+                        <div class="activity-time">{{ product.updated_at|timesince }} ago</div>
+                    </div>
+                    <div class="activity-status">
+                        <span class="badge {% if product.quantity == 0 %}bg-danger{% elif product.quantity <= 10 %}bg-warning{% else %}bg-success{% endif %}">
+                            {{ product.quantity }} in stock
+                        </span>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <p class="text-muted">No recent activity</p>
+            {% endif %}
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="section-card">
+            <h3><i class="fas fa-bolt"></i> Quick Actions</h3>
+            <div class="quick-actions">
+                <a href="{% url 'inventory:product_add' %}" class="action-btn">
+                    <i class="fas fa-plus"></i> Add New Product
+                </a>
+                <a href="{% url 'inventory:inventory_list' %}" class="action-btn">
+                    <i class="fas fa-boxes"></i> View Inventory
+                </a>
+                <a href="#" class="action-btn">
+                    <i class="fas fa-chart-bar"></i> View Reports
+                </a>
+                <a href="#" class="action-btn">
+                    <i class="fas fa-users"></i> Manage Staff
+                </a>
+            </div>
+        </div>
+    </section>
 </div>
 
 <script>

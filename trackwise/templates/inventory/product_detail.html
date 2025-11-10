@@ -3,72 +3,306 @@
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/inventory.css' %}">
+<link rel="stylesheet" href="{% static 'css/inventory/product_detail.css' %}">
 {% endblock %}
 
 {% block title %}{{ product.item_name }} - TrackWise{% endblock %}
 
 {% block content %}
-<div class="container py-4">
-    <div class="row">
-        <div class="col-md-6 mb-4">
-            {% if product.image %}
-            <img src="{{ product.image.url }}" alt="{{ product.item_name }}" class="product-detail-image">
-            {% else %}
-            <div class="product-detail-image bg-light d-flex align-items-center justify-content-center">
-                <i class="fas fa-box fa-5x text-muted"></i>
+<div class="auth-body">
+    <div class="auth-container product-detail-container">
+        <div class="logo-container">
+            <div class="logo-text">
+                <i class="fas fa-chart-line"></i>
+                TrackWise
             </div>
-            {% endif %}
         </div>
         
-        <div class="col-md-6">
-            <div class="detail-card">
-                <h2 class="mb-4">{{ product.item_name }}</h2>
+        <div class="form-section product-detail-section">
+            <div class="auth-header">
+                <h2>Edit Product</h2>
+                <p>Update product information</p>
+            </div>
+
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+            
+            <div class="product-image-section">
+                {% if product.image %}
+                <img src="{{ product.image.url }}" alt="{{ product.item_name }}" class="product-detail-image">
+                {% else %}
+                <div class="product-detail-image-placeholder">
+                    <i class="fas fa-box fa-4x text-muted"></i>
+                    <p>No image available</p>
+                </div>
+                {% endif %}
+            </div>
+            
+            <form method="post" enctype="multipart/form-data" id="product-edit-form">
+                {% csrf_token %}
                 
-                <form method="post" enctype="multipart/form-data">
-                    {% csrf_token %}
-                    
-                    <div class="detail-item">
-                        <div class="detail-label">Product Name</div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label" for="{{ form.item_name.id_for_label }}">Product Name *</label>
                         {{ form.item_name }}
+                        <span class="error-message" id="{{ form.item_name.id_for_label }}_error"></span>
+                        {% if form.item_name.errors %}
+                            {% for error in form.item_name.errors %}
+                                <span class="error-message show" id="server_{{ form.item_name.id_for_label }}_error">{{ error }}</span>
+                            {% endfor %}
+                        {% endif %}
                     </div>
                     
-                    <div class="detail-item">
-                        <div class="detail-label">Category</div>
+                    <div class="form-group">
+                        <label class="form-label" for="{{ form.category.id_for_label }}">Category *</label>
                         {{ form.category }}
+                        <span class="error-message" id="{{ form.category.id_for_label }}_error"></span>
+                        {% if form.category.errors %}
+                            {% for error in form.category.errors %}
+                                <span class="error-message show" id="server_{{ form.category.id_for_label }}_error">{{ error }}</span>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label" for="{{ form.quantity.id_for_label }}">Quantity *</label>
+                        {{ form.quantity }}
+                        <span class="error-message" id="{{ form.quantity.id_for_label }}_error"></span>
+                        {% if form.quantity.errors %}
+                            {% for error in form.quantity.errors %}
+                                <span class="error-message show" id="server_{{ form.quantity.id_for_label }}_error">{{ error }}</span>
+                            {% endfor %}
+                        {% endif %}
                     </div>
                     
-                    <div class="row">
-                        <div class="col-6">
-                            <div class="detail-label">Quantity</div>
-                            {{ form.quantity }}
-                        </div>
-                        <div class="col-6">
-                            <div class="detail-label">Unit of Measure</div>
-                            {{ form.unit_of_measure }}
-                        </div>
+                    <div class="form-group">
+                        <label class="form-label" for="{{ form.unit_of_measure.id_for_label }}">Unit of Measure *</label>
+                        {{ form.unit_of_measure }}
+                        <span class="error-message" id="{{ form.unit_of_measure.id_for_label }}_error"></span>
+                        {% if form.unit_of_measure.errors %}
+                            {% for error in form.unit_of_measure.errors %}
+                                <span class="error-message show" id="server_{{ form.unit_of_measure.id_for_label }}_error">{{ error }}</span>
+                            {% endfor %}
+                        {% endif %}
                     </div>
-                    
-                    <div class="detail-item">
-                        <div class="detail-label">Cost Price</div>
-                        {{ form.cost_price }}
-                    </div>
-                    
-                    <div class="detail-item">
-                        <div class="detail-label">Product Image</div>
-                        {{ form.image }}
-                    </div>
-                    
-                    <div class="d-flex gap-2 mt-4">
-                        <button type="submit" class="btn btn-orange">
-                            <i class="fas fa-save"></i> Update Product
-                        </button>
-                        <a href="{% url 'inventory:inventory_list' %}" class="btn btn-outline-secondary">
-                            <i class="fas fa-arrow-left"></i> Back to Inventory
-                        </a>
-                    </div>
-                </form>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="{{ form.cost_price.id_for_label }}">Cost Price ($) *</label>
+                    {{ form.cost_price }}
+                    <span class="error-message" id="{{ form.cost_price.id_for_label }}_error"></span>
+                    {% if form.cost_price.errors %}
+                        {% for error in form.cost_price.errors %}
+                            <span class="error-message show" id="server_{{ form.cost_price.id_for_label }}_error">{{ error }}</span>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="{{ form.image.id_for_label }}">Product Image</label>
+                    {{ form.image }}
+                    <span class="error-message" id="{{ form.image.id_for_label }}_error"></span>
+                    {% if form.image.errors %}
+                        {% for error in form.image.errors %}
+                            <span class="error-message show" id="server_{{ form.image.id_for_label }}_error">{{ error }}</span>
+                            {% endfor %}
+                    {% endif %}
+                    <div class="form-text">Change product image (optional)</div>
+                </div>
+                
+                <div class="button-group">
+                    <button type="submit" class="btn btn-success">
+                        <i class="fas fa-save"></i> Update Product
+                    </button>
+                    <a href="{% url 'inventory:inventory_list' %}" class="btn btn-danger">
+                        <i class="fas fa-arrow-left"></i> Back to Inventory
+                    </a>
+                </div>
+            </form>
+            
+            <div class="auth-footer">
+                <p class="footer-content">
+                    <a href="{% url 'inventory:inventory_list' %}" class="footer-home-link">
+                        <i class="fas fa-arrow-left"></i> Back to Inventory
+                    </a>
+                    <a>|</a>
+                    <span class="footer-spacer"></span>
+                    <a href="#" class="footer-support-link">Contact Support</a>
+                </p>
             </div>
         </div>
+
+        <div class="particles-section product-detail-particles" id="particles-js"></div>
     </div>
 </div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/particles.js/2.0.0/particles.min.js"></script>
+<script>
+    // Particles configuration
+    particlesJS('particles-js', {
+        particles: {
+            number: { value: 60, density: { enable: true, value_area: 600 } },
+            color: { value: '#7aa7e0' },
+            shape: { type: 'circle' },
+            opacity: { value: 0.7, random: true },
+            size: { value: 15, random: true },
+            line_linked: {
+                enable: true,
+                distance: 120,
+                color: '#7aa7e0',
+                opacity: 0.5,
+                width: 1.5
+            },
+            move: {
+                enable: true,
+                speed: 1.2,
+                direction: 'none',
+                random: true,
+                out_mode: 'out'
+            }
+        },
+        interactivity: {
+            detect_on: 'canvas',
+            events: {
+                onhover: { enable: true, mode: 'grab' },
+                resize: true
+            },
+            modes: {
+                grab: { distance: 140, line_linked: { opacity: 0.8 } }
+            }
+        },
+        retina_detect: true
+    });
+
+    // Form validation
+    const form = document.getElementById('product-edit-form');
+
+    // Validation functions
+    function showError(inputId, errorId, message) {
+        const input = document.getElementById(inputId);
+        const error = document.getElementById(errorId);
+        if (input) {
+            input.classList.add('error');
+            // Also add to Django's error list if it exists
+            const serverError = document.getElementById('server_' + errorId);
+            if (serverError) {
+                serverError.style.display = 'none';
+            }
+        }
+        if (error) {
+            error.textContent = message;
+            error.classList.add('show');
+        }
+    }
+
+    function clearError(inputId, errorId) {
+        const input = document.getElementById(inputId);
+        const error = document.getElementById(errorId);
+        if (input) input.classList.remove('error');
+        if (error) error.classList.remove('show');
+        
+        // Also handle server errors
+        const serverError = document.getElementById('server_' + errorId);
+        if (serverError) {
+            serverError.classList.remove('show');
+        }
+    }
+
+    function validateForm() {
+        let isValid = true;
+
+        // Clear all errors first
+        clearError('{{ form.item_name.id_for_label }}', '{{ form.item_name.id_for_label }}_error');
+        clearError('{{ form.category.id_for_label }}', '{{ form.category.id_for_label }}_error');
+        clearError('{{ form.quantity.id_for_label }}', '{{ form.quantity.id_for_label }}_error');
+        clearError('{{ form.unit_of_measure.id_for_label }}', '{{ form.unit_of_measure.id_for_label }}_error');
+        clearError('{{ form.cost_price.id_for_label }}', '{{ form.cost_price.id_for_label }}_error');
+
+        // Product name
+        const itemName = document.getElementById('{{ form.item_name.id_for_label }}').value.trim();
+        if (!itemName) {
+            showError('{{ form.item_name.id_for_label }}', '{{ form.item_name.id_for_label }}_error', 'Product name is required');
+            isValid = false;
+        }
+
+        // Category
+        const category = document.getElementById('{{ form.category.id_for_label }}').value;
+        if (!category) {
+            showError('{{ form.category.id_for_label }}', '{{ form.category.id_for_label }}_error', 'Category is required');
+            isValid = false;
+        }
+
+        // Quantity
+        const quantity = document.getElementById('{{ form.quantity.id_for_label }}').value;
+        if (!quantity) {
+            showError('{{ form.quantity.id_for_label }}', '{{ form.quantity.id_for_label }}_error', 'Quantity is required');
+            isValid = false;
+        } else if (quantity < 0) {
+            showError('{{ form.quantity.id_for_label }}', '{{ form.quantity.id_for_label }}_error', 'Quantity must be a positive number');
+            isValid = false;
+        }
+
+        // Unit of measure
+        const unitOfMeasure = document.getElementById('{{ form.unit_of_measure.id_for_label }}').value;
+        if (!unitOfMeasure) {
+            showError('{{ form.unit_of_measure.id_for_label }}', '{{ form.unit_of_measure.id_for_label }}_error', 'Unit of measure is required');
+            isValid = false;
+        }
+
+        // Cost price
+        const costPrice = document.getElementById('{{ form.cost_price.id_for_label }}').value;
+        if (!costPrice) {
+            showError('{{ form.cost_price.id_for_label }}', '{{ form.cost_price.id_for_label }}_error', 'Cost price is required');
+            isValid = false;
+        } else if (costPrice < 0) {
+            showError('{{ form.cost_price.id_for_label }}', '{{ form.cost_price.id_for_label }}_error', 'Cost price must be a positive number');
+            isValid = false;
+        }
+
+        return isValid;
+    }
+
+    // Form submission - validate form
+    form.addEventListener('submit', (e) => {
+        if (!validateForm()) {
+            e.preventDefault();
+            // Scroll to first error
+            const firstError = document.querySelector('.error-message.show');
+            if (firstError) {
+                firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }
+    });
+
+    // Clear errors on input
+    document.querySelectorAll('.form-control').forEach(input => {
+        input.addEventListener('input', () => {
+            const errorId = input.id + '_error';
+            clearError(input.id, errorId);
+        });
+    });
+
+    // Image preview functionality
+    const imageInput = document.getElementById('{{ form.image.id_for_label }}');
+    if (imageInput) {
+        imageInput.addEventListener('change', function() {
+            const file = this.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const imageSection = document.querySelector('.product-image-section');
+                    imageSection.innerHTML = `<img src="${e.target.result}" alt="Preview" class="product-detail-image">`;
+                }
+                reader.readAsDataURL(file);
+            }
+        });
+    }
+</script>
 {% endblock %}

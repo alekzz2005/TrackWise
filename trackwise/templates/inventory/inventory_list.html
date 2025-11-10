@@ -2,145 +2,250 @@
 {% load static %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/inventory.css' %}">
+<link rel="stylesheet" href="{% static 'css/inventory/inventory_list.css' %}">
+<link rel="stylesheet" href="{% static 'css/dashboard/business_owner_dashboard.css' %}">
 {% endblock %}
 
 {% block title %}Inventory - TrackWise{% endblock %}
 
 {% block content %}
-<div class="container py-4">
-    <div class="inventory-header">
-        <h2><i class="fas fa-boxes text-orange"></i> Inventory Management</h2>
-        <div class="d-flex gap-3">
-            <div class="search-box">
-                <i class="fas fa-search"></i>
-                <form method="get" class="d-inline">
-                    <input type="text" name="search" class="form-control" placeholder="Search products..." 
-                           value="{{ search_query }}">
+<!-- Navigation -->
+<nav class="navbar">
+    <div class="navbar-content">
+        <!-- Logo on the left -->
+        <a href="{% url 'dashboard:dashboard' %}" class="navbar-brand">
+            <i class="fas fa-chart-line"></i>
+            TrackWise
+        </a>
+
+        <!-- Navigation in center -->
+        <div class="navbar-menu">
+            <a href="{% url 'dashboard:dashboard' %}" class="nav-link"><i class="fas fa-home"></i> Dashboard</a>
+            <a href="{% url 'inventory:inventory_list' %}" class="nav-link active"><i class="fas fa-boxes"></i> Inventory</a>
+            <a href="#" class="nav-link"><i class="fas fa-chart-bar"></i> Reports</a>
+            <a href="#" class="nav-link"><i class="fas fa-users"></i> Staff</a>
+        </div>
+
+        <!-- Profile with dropdown on the right -->
+        <div class="user-section">
+            <div class="user-info" id="userDropdownTrigger">
+                <span>{{ user.first_name }} {{ user.last_name }}</span>
+                <div class="user-avatar">{{ user.first_name|first }}{{ user.last_name|first }}</div>
+                <i class="fas fa-chevron-down" style="font-size: 0.8rem;"></i>
+            </div>
+            
+            <div class="user-dropdown" id="userDropdown">
+                <div class="user-dropdown-item">
+                    <i class="fas fa-user"></i>
+                    <span>Profile Settings</span>
+                </div>
+                <div class="user-dropdown-item">
+                    <i class="fas fa-cog"></i>
+                    <span>Account Settings</span>
+                </div>
+                <div class="user-dropdown-divider"></div>
+                <form method="post" action="{% url 'accounts:logout' %}" style="display: inline;">
+                    {% csrf_token %}
+                    <button type="submit" class="user-dropdown-item">
+                        <i class="fas fa-sign-out-alt"></i>
+                        <span>Logout</span>
+                    </button>
                 </form>
             </div>
-            <div class="filters">
-                <select name="cost_filter" class="form-select" onchange="this.form.submit()">
-                    <option value="">Sort by Cost</option>
-                    <option value="low" {% if cost_filter == 'low' %}selected{% endif %}>Low to High</option>
-                    <option value="high" {% if cost_filter == 'high' %}selected{% endif %}>High to Low</option>
-                </select>
-                <a href="{% url 'inventory:product_add' %}" class="btn btn-orange">
-                    <i class="fas fa-plus"></i> Add Product
-                </a>
-            </div>
         </div>
     </div>
+</nav>
 
-    <!-- Summary Cards -->
-    <div class="row mb-4">
-        <div class="col-md-3">
-            <div class="card stat-card text-white">
-                <div class="card-body">
-                    <h5 class="card-title">Total Products</h5>
-                    <h2 class="card-text">{{ products.count }}</h2>
+<!-- Inventory Content -->
+<div class="dashboard-wrapper">
+    <div class="container">
+        <!-- Header Section -->
+        <div class="inventory-header">
+            <div class="header-content">
+                <h1 class="welcome-text">
+                    <i class="fas fa-boxes"></i>
+                    Inventory Management
+                </h1>
+                <p class="subtitle">Manage your products and stock levels efficiently</p>
+            </div>
+            
+            <div class="header-actions">
+                <div class="search-container">
+                    <form method="get" class="search-form">
+                        <div class="search-box">
+                            <i class="fas fa-search"></i>
+                            <input type="text" name="search" class="search-input" placeholder="Search products..." 
+                                   value="{{ search_query }}">
+                        </div>
+                    </form>
+                </div>
+                
+                <div class="filter-actions">
+                    <select name="cost_filter" class="filter-select" onchange="this.form.submit()">
+                        <option value="">Sort by Cost</option>
+                        <option value="low" {% if cost_filter == 'low' %}selected{% endif %}>Low to High</option>
+                        <option value="high" {% if cost_filter == 'high' %}selected{% endif %}>High to Low</option>
+                    </select>
+                    
+                    <a href="{% url 'inventory:product_add' %}" class="btn-primary">
+                        <i class="fas fa-plus"></i> Add Product
+                    </a>
                 </div>
             </div>
         </div>
-        <div class="col-md-3">
-            <div class="card stat-card text-white">
-                <div class="card-body">
-                    <h5 class="card-title">Total Value</h5>
-                    <h2 class="card-text">${{ total_inventory_value|floatformat:2 }}</h2>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card stat-card text-white">
-                <div class="card-body">
-                    <h5 class="card-title">Low Stock</h5>
-                    <h2 class="card-text">{{ products|length|default:0 }}</h2>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card stat-card text-white">
-                <div class="card-body">
-                    <h5 class="card-title">Out of Stock</h5>
-                    <h2 class="card-text">{{ products|length|default:0 }}</h2>
-                </div>
-            </div>
-        </div>
-    </div>
 
-    <!-- Products Grid -->
-    <div class="row">
-        {% for product in products %}
-        <div class="col-lg-4 col-md-6 mb-4">
-            <div class="product-card">
-                <div class="product-image-container">
-                    {% if product.image %}
-                    <img src="{{ product.image.url }}" alt="{{ product.item_name }}" class="product-image">
-                    {% else %}
-                    <div class="product-image bg-light d-flex align-items-center justify-content-center">
-                        <i class="fas fa-box fa-3x text-muted"></i>
+        <!-- Summary Cards -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-number">{{ products.count }}</div>
+                <div class="stat-label">Total Products</div>
+                <i class="stat-icon fas fa-boxes"></i>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-number">${{ total_inventory_value|floatformat:2 }}</div>
+                <div class="stat-label">Total Value</div>
+                <i class="stat-icon fas fa-dollar-sign"></i>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-number">{{ low_stock_count|default:0 }}</div>
+                <div class="stat-label">Low Stock</div>
+                <i class="stat-icon fas fa-exclamation-triangle"></i>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-number">{{ out_of_stock_count|default:0 }}</div>
+                <div class="stat-label">Out of Stock</div>
+                <i class="stat-icon fas fa-times-circle"></i>
+            </div>
+        </div>
+
+        <!-- Products Grid -->
+        <div class="inventory-content">
+            {% if products %}
+            <div class="products-grid">
+                {% for product in products %}
+                <div class="product-card">
+                    <div class="product-header">
+                        <div class="product-image-container">
+                            {% if product.image %}
+                            <img src="{{ product.image.url }}" alt="{{ product.item_name }}" class="product-image">
+                            {% else %}
+                            <div class="product-image-placeholder">
+                                <i class="fas fa-box"></i>
+                            </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="product-badge {% if product.quantity == 0 %}out-of-stock{% elif product.quantity <= 10 %}low-stock{% else %}in-stock{% endif %}">
+                            {{ product.quantity }} in stock
+                        </div>
                     </div>
-                    {% endif %}
-                </div>
-                <div class="product-card-body">
-                    <div class="d-flex justify-content-between align-items-start mb-2">
-                        <h5 class="product-title">{{ product.item_name }}</h5>
+                    
+                    <div class="product-body">
+                        <h3 class="product-title">{{ product.item_name }}</h3>
                         <span class="product-category">{{ product.get_category_display }}</span>
-                    </div>
-                    
-                    <div class="product-stats">
-                        <div class="stat">
-                            <div class="stat-value">{{ product.quantity }}</div>
-                            <div class="stat-label">In Stock</div>
+                        
+                        <div class="product-stats">
+                            <div class="product-stat">
+                                <span class="stat-label">Cost Price</span>
+                                <span class="stat-value">${{ product.cost_price }}</span>
+                            </div>
+                            <div class="product-stat">
+                                <span class="stat-label">Unit</span>
+                                <span class="stat-value">{{ product.unit_of_measure }}</span>
+                            </div>
                         </div>
-                        <div class="stat">
-                            <div class="stat-value">${{ product.cost_price }}</div>
-                            <div class="stat-label">Cost Price</div>
+                        
+                        <div class="stock-controls">
+                            <form method="post" action="{% url 'inventory:increase_stock' product.pk %}" class="stock-form">
+                                {% csrf_token %}
+                                <button type="submit" class="stock-btn increase">
+                                    <i class="fas fa-plus"></i>
+                                </button>
+                            </form>
+                            
+                            <div class="stock-display">
+                                <span class="stock-quantity">{{ product.quantity }}</span>
+                            </div>
+                            
+                            <form method="post" action="{% url 'inventory:decrease_stock' product.pk %}" class="stock-form">
+                                {% csrf_token %}
+                                <button type="submit" class="stock-btn decrease" {% if product.quantity == 0 %}disabled{% endif %}>
+                                    <i class="fas fa-minus"></i>
+                                </button>
+                            </form>
                         </div>
                     </div>
                     
-                    <div class="stock-actions">
-                        <form method="post" action="{% url 'inventory:increase_stock' product.pk %}">
-                            {% csrf_token %}
-                            <button type="submit" class="stock-btn stock-increase">
-                                <i class="fas fa-plus"></i>
-                            </button>
-                        </form>
-                        <form method="post" action="{% url 'inventory:decrease_stock' product.pk %}">
-                            {% csrf_token %}
-                            <button type="submit" class="stock-btn stock-decrease" {% if product.quantity == 0 %}disabled{% endif %}>
-                                <i class="fas fa-minus"></i>
-                            </button>
-                        </form>
-                    </div>
-                    
-                    <div class="d-flex justify-content-between mt-3">
-                        <a href="{% url 'inventory:product_detail' product.pk %}" class="btn btn-sm btn-outline-orange">
+                    <div class="product-actions">
+                        <a href="{% url 'inventory:product_detail' product.pk %}" class="action-btn view">
                             <i class="fas fa-eye"></i> View
                         </a>
-                        <form method="post" action="{% url 'inventory:product_delete' product.pk %}" class="d-inline">
+                        <form method="post" action="{% url 'inventory:product_delete' product.pk %}" class="delete-form">
                             {% csrf_token %}
-                            <button type="submit" class="btn btn-sm btn-outline-danger" 
-                                    onclick="return confirm('Are you sure you want to delete {{ product.item_name }}?')">
+                            <button type="submit" class="action-btn delete" onclick="return confirm('Are you sure you want to delete {{ product.item_name }}?')">
                                 <i class="fas fa-trash"></i> Delete
                             </button>
                         </form>
                     </div>
                 </div>
+                {% endfor %}
             </div>
-        </div>
-        {% empty %}
-        <div class="col-12">
+            {% else %}
+            <!-- Empty State -->
             <div class="empty-state">
-                <i class="fas fa-box-open fa-4x"></i>
+                <div class="empty-icon">
+                    <i class="fas fa-box-open"></i>
+                </div>
                 <h3>No Products Found</h3>
                 <p>Get started by adding your first product to the inventory.</p>
-                <a href="{% url 'inventory:product_add' %}" class="btn btn-orange">
+                <a href="{% url 'inventory:product_add' %}" class="btn-primary">
                     <i class="fas fa-plus"></i> Add Your First Product
                 </a>
             </div>
+            {% endif %}
         </div>
-        {% endfor %}
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const userDropdownTrigger = document.getElementById('userDropdownTrigger');
+    const userDropdown = document.getElementById('userDropdown');
+    
+    // Toggle dropdown on click
+    userDropdownTrigger.addEventListener('click', function(e) {
+        e.stopPropagation();
+        userDropdown.classList.toggle('active');
+    });
+    
+    // Close dropdown when clicking outside
+    document.addEventListener('click', function(e) {
+        if (!userDropdown.contains(e.target) && !userDropdownTrigger.contains(e.target)) {
+            userDropdown.classList.remove('active');
+        }
+    });
+    
+    // Close dropdown when pressing Escape key
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            userDropdown.classList.remove('active');
+        }
+    });
+    
+    // Real-time search
+    const searchInput = document.querySelector('.search-input');
+    if (searchInput) {
+        let searchTimeout;
+        searchInput.addEventListener('input', function() {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                this.form.submit();
+            }, 500);
+        });
+    }
+});
+</script>
 {% endblock %}

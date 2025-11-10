@@ -1,0 +1,332 @@
+/* business_owner_dashboard.css */
+/* Base Theme Variables */
+:root {
+    --primary-blue: #4a6fa5;
+    --primary-dark: #2c5282;
+    --accent-light: #a7c5eb;
+    --bg-light: #dbe4f0;
+    --bg-page: #f0f4f8;
+    --text-white: #ffffff;
+    --shadow-md: 0 8px 25px rgba(0, 0, 0, 0.2);
+    --transition: all 0.3s ease;
+}
+
+/* Navigation */
+.navbar {
+    background: linear-gradient(135deg, var(--primary-blue), var(--primary-dark));
+    padding: 1rem 2rem;
+    color: var(--text-white);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: var(--shadow-md);
+}
+
+.navbar-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.navbar-brand {
+    font-weight: 700;
+    font-size: 1.3rem;
+    color: var(--text-white);
+    text-decoration: none;
+}
+
+.navbar-menu {
+    display: flex;
+    gap: 1.5rem;
+}
+
+.nav-link {
+    color: var(--text-white);
+    text-decoration: none;
+    transition: var(--transition);
+}
+
+.nav-link:hover {
+    color: var(--accent-light);
+}
+
+.nav-link.active {
+    color: var(--accent-light);
+}
+
+.user-section {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    color: var(--text-white);
+    position: relative;
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    cursor: pointer;
+    padding: 0.5rem 0.75rem;
+    border-radius: 8px;
+    transition: var(--transition);
+}
+
+.user-info:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.user-avatar {
+    width: 40px;
+    height: 40px;
+    background: var(--accent-light);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--primary-dark);
+    font-weight: 700;
+    font-size: 0.9rem;
+}
+
+.user-dropdown {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background: var(--text-white);
+    border-radius: 12px;
+    box-shadow: var(--shadow-md);
+    min-width: 200px;
+    padding: 0.5rem 0;
+    margin-top: 0.5rem;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: var(--transition);
+    z-index: 1001;
+}
+
+.user-dropdown.active {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.user-dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1.5rem;
+    color: var(--primary-dark);
+    text-decoration: none;
+    transition: var(--transition);
+    border: none;
+    background: none;
+    width: 100%;
+    text-align: left;
+    font-size: 0.95rem;
+}
+
+.user-dropdown-item:hover {
+    background: var(--bg-light);
+    color: var(--primary-blue);
+}
+
+.user-dropdown-item i {
+    width: 16px;
+    text-align: center;
+}
+
+.user-dropdown-divider {
+    height: 1px;
+    background: var(--bg-light);
+    margin: 0.5rem 0;
+}
+
+/* Dashboard Layout */
+.dashboard-wrapper {
+    min-height: 100vh;
+    padding: 20px;
+    background-color: var(--bg-page);
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* HERO SECTION */
+.hero {
+    background: var(--bg-light);
+    margin: 2rem auto;
+    padding: 3rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-radius: 20px;
+    box-shadow: var(--shadow-md);
+    flex-wrap: wrap;
+}
+
+.hero-text {
+    max-width: 45%;
+    min-width: 280px;
+}
+
+.hero-text h1 {
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--primary-dark);
+    margin-bottom: 1rem;
+}
+
+.hero-btn {
+    padding: 1rem 2rem;
+    background: linear-gradient(135deg, var(--primary-blue), var(--primary-dark));
+    border: none;
+    border-radius: 15px;
+    color: var(--text-white);
+    font-weight: 700;
+    cursor: pointer;
+    transition: var(--transition);
+    text-decoration: none;
+    display: inline-block;
+}
+
+.hero-btn:hover {
+    background: var(--primary-dark);
+    transform: translateY(-2px);
+    color: var(--text-white);
+}
+
+/* KPI GRID */
+.kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+    width: 350px;
+}
+
+.kpi-card {
+    background: linear-gradient(135deg, var(--primary-blue), var(--primary-dark));
+    color: var(--text-white);
+    padding: 1.5rem;
+    border-radius: 15px;
+    text-align: center;
+    box-shadow: var(--shadow-md);
+    transition: var(--transition);
+}
+
+.kpi-card:hover {
+    transform: translateY(-5px);
+}
+
+.kpi-value {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 0.3rem;
+}
+
+.kpi-label {
+    font-size: 0.95rem;
+    color: var(--accent-light);
+}
+
+/* INVENTORY SECTION */
+.inventory-section {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+    padding: 0 0 4rem;
+}
+
+.inventory-card {
+    background: var(--primary-blue);
+    color: var(--text-white);
+    border-radius: 15px;
+    padding: 1.5rem;
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    box-shadow: var(--shadow-md);
+    transition: var(--transition);
+}
+
+.inventory-card:hover {
+    transform: translateY(-5px);
+}
+
+.inventory-image {
+    width: 70px;
+    height: 70px;
+    background: var(--bg-light);
+    border-radius: 10px;
+    object-fit: cover;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #999;
+    font-size: 1.5rem;
+}
+
+.inventory-info {
+    flex-grow: 1;
+}
+
+.inventory-info h4 {
+    font-size: 1rem;
+    font-weight: 700;
+    background: var(--accent-light);
+    color: var(--primary-dark);
+    border-radius: 10px;
+    display: inline-block;
+    padding: 0.2rem 0.6rem;
+    margin-bottom: 0.5rem;
+}
+
+.inventory-info p {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    padding: 0.4rem 0.6rem;
+    font-size: 0.9rem;
+    margin-bottom: 0.3rem;
+}
+
+/* Responsive Design */
+@media (max-width: 900px) {
+    .hero {
+        flex-direction: column;
+        text-align: center;
+        gap: 2rem;
+    }
+
+    .hero-text {
+        max-width: 100%;
+    }
+
+    .kpi-grid {
+        width: 100%;
+        max-width: 400px;
+    }
+    
+    .navbar-menu {
+        display: none;
+    }
+    
+    .navbar {
+        padding: 1rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .dashboard-wrapper {
+        padding: 15px;
+    }
+    
+    .user-info span {
+        display: none;
+    }
+}

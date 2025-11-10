@@ -25,4 +25,5 @@ urlpatterns = [
     path('', include('accounts.urls')),  # This will make landing page the root
     path('inventory/', include('inventory.urls')),
     path('dashboard/', include('dashboard.urls')),
+    path('staff/', include('staff_management.urls')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
