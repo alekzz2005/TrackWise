@@ -2,8 +2,791 @@
 {% load static %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/inventory/inventory_list.css' %}">
-<link rel="stylesheet" href="{% static 'css/dashboard/business_owner_dashboard.css' %}">
+<style>
+    /* Base Theme Variables */
+    :root {
+        --primary-blue: #4a6fa5;
+        --primary-dark: #2c5282;
+        --primary-darker: #1a365d;
+        --accent-light: #a7c5eb;
+        --bg-light: #dbe4f0;
+        --bg-page: #f0f4f8;
+        --success: #4CAF50;
+        --success-dark: #45a049;
+        --danger: #f44336;
+        --danger-dark: #da3226;
+        --warning: #ff9800;
+        --warning-dark: #f57c00;
+        --text-white: #ffffff;
+        --shadow-sm: 0 2px 5px rgba(0, 0, 0, 0.1);
+        --shadow-md: 0 8px 25px rgba(0, 0, 0, 0.2);
+        --shadow-lg: 0 15px 35px rgba(0, 0, 0, 0.2);
+        --transition: all 0.3s ease;
+    }
+
+    /* NAVBAR */
+    .navbar {
+    background: linear-gradient(135deg, var(--primary-blue), var(--primary-dark));
+    padding: 1rem 2rem;
+    color: var(--text-white);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: var(--shadow-md);
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    }
+
+    .navbar-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    max-width: 1400px;
+    margin: 0 auto;
+    }
+
+    .navbar-brand {
+    font-weight: 700;
+    font-size: 1.3rem;
+    color: var(--text-white);
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    }
+
+    .navbar-menu {
+    display: flex;
+    gap: 1.5rem;
+    }
+
+    .nav-link {
+    color: var(--text-white);
+    text-decoration: none;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    }
+
+    .nav-link:hover, .nav-link.active {
+    color: var(--accent-light);
+    }
+
+    /* User Section */
+    .user-section {
+    position: relative;
+    }
+
+    .user-info {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 5px;
+    transition: var(--transition);
+    }
+
+    .user-info:hover {
+    background: rgba(255, 255, 255, 0.1);
+    }
+
+    .user-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--accent-light);
+    color: var(--primary-dark);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    }
+
+    .user-dropdown {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background: white;
+    color: #333;
+    border-radius: 8px;
+    box-shadow: var(--shadow-md);
+    width: 200px;
+    padding: 0.5rem 0;
+    z-index: 100;
+    display: none;
+    }
+
+    .user-dropdown.active {
+    display: block;
+    }
+
+    .user-dropdown-item {
+    padding: 0.75rem 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    cursor: pointer;
+    transition: var(--transition);
+    border: none;
+    background: none;
+    width: 100%;
+    text-align: left;
+    }
+
+    .user-dropdown-item:hover {
+    background: var(--bg-light);
+    }
+
+    .user-dropdown-divider {
+    height: 1px;
+    background: #e0e0e0;
+    margin: 0.5rem 0;
+    }
+
+    /* Main Content */
+    .dashboard-wrapper {
+        padding-top: 80px;
+        min-height: 100vh;
+        background-color: var(--bg-page);
+    }
+
+    .container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 0 2rem;
+    }
+
+    /* Inventory Header */
+    .inventory-header {
+        background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-dark) 100%);
+        border-radius: 20px;
+        padding: 2.5rem;
+        margin-bottom: 2rem;
+        box-shadow: var(--shadow-lg);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .inventory-header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 300px;
+        height: 300px;
+        background: radial-gradient(circle, rgba(167, 197, 235, 0.2) 0%, transparent 70%);
+        border-radius: 50%;
+        transform: translate(30%, -30%);
+    }
+
+    .header-content {
+        position: relative;
+        z-index: 1;
+        margin-bottom: 2rem;
+    }
+
+    .welcome-text {
+        color: var(--text-white);
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .welcome-text i {
+        color: var(--accent-light);
+    }
+
+    .subtitle {
+        color: var(--accent-light);
+        font-size: 1.1rem;
+        margin: 0;
+    }
+
+    .header-actions {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 2rem;
+        position: relative;
+        z-index: 1;
+    }
+
+    /* Search Box */
+    .search-container {
+        flex: 1;
+        max-width: 400px;
+    }
+
+    .search-form {
+        width: 100%;
+    }
+
+    .search-box {
+        position: relative;
+        width: 100%;
+    }
+
+    .search-box i {
+        position: absolute;
+        left: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--accent-light);
+        z-index: 2;
+    }
+
+    .search-input {
+        width: 100%;
+        padding: 1rem 1rem 1rem 3rem;
+        background: rgba(255, 255, 255, 0.1);
+        border: 2px solid rgba(255, 255, 255, 0.2);
+        border-radius: 12px;
+        color: var(--text-white);
+        font-size: 1rem;
+        transition: var(--transition);
+        backdrop-filter: blur(10px);
+    }
+
+    .search-input::placeholder {
+        color: rgba(255, 255, 255, 0.7);
+    }
+
+    .search-input:focus {
+        outline: none;
+        background: rgba(255, 255, 255, 0.15);
+        border-color: var(--accent-light);
+        box-shadow: 0 0 0 3px rgba(167, 197, 235, 0.3);
+    }
+
+    /* Filter Actions */
+    .filter-actions {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .filter-select {
+        padding: 1rem 1.5rem;
+        background: rgba(255, 255, 255, 0.1);
+        border: 2px solid rgba(255, 255, 255, 0.2);
+        border-radius: 12px;
+        color: var(--text-white);
+        font-size: 1rem;
+        cursor: pointer;
+        transition: var(--transition);
+        backdrop-filter: blur(10px);
+    }
+
+    .filter-select:focus {
+        outline: none;
+        background: rgba(255, 255, 255, 0.15);
+        border-color: var(--accent-light);
+    }
+
+    .filter-select option {
+        background: var(--primary-dark);
+        color: var(--text-white);
+    }
+
+    .btn-primary {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        padding: 1rem 1.5rem;
+        background: var(--accent-light);
+        color: var(--primary-dark);
+        text-decoration: none;
+        border-radius: 12px;
+        font-weight: 600;
+        transition: var(--transition);
+        box-shadow: var(--shadow-sm);
+    }
+
+    .btn-primary:hover {
+        background: var(--text-white);
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+        color: var(--primary-dark);
+    }
+
+    /* Stats Grid */
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .stat-card {
+        background: linear-gradient(135deg, var(--primary-blue), var(--primary-dark));
+        border-radius: 16px;
+        padding: 2rem;
+        color: var(--text-white);
+        box-shadow: var(--shadow-md);
+        transition: var(--transition);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .stat-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 100px;
+        height: 100px;
+        background: radial-gradient(circle, rgba(167, 197, 235, 0.3) 0%, transparent 70%);
+        border-radius: 50%;
+        transform: translate(30%, -30%);
+    }
+
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--shadow-lg);
+    }
+
+    .stat-number {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: var(--text-white);
+        margin-bottom: 0.5rem;
+        position: relative;
+        z-index: 1;
+    }
+
+    .stat-label {
+        font-size: 0.95rem;
+        color: var(--accent-light);
+        font-weight: 500;
+        position: relative;
+        z-index: 1;
+    }
+
+    .stat-icon {
+        position: absolute;
+        bottom: 1.5rem;
+        right: 1.5rem;
+        font-size: 2rem;
+        color: rgba(255, 255, 255, 0.2);
+        z-index: 1;
+    }
+
+    /* Table Layout Styles */
+    .inventory-view {
+        width: 100%;
+        background-color: var(--text-white);
+        border-radius: 16px;
+        box-shadow: var(--shadow-md);
+        overflow: hidden;
+        margin-bottom: 2rem;
+    }
+
+    /* Search Section */
+    .search-section {
+        padding: 20px;
+        background-color: var(--bg-light);
+        border-bottom: 1px solid #ddd;
+    }
+
+    .table-search-input {
+        width: 100%;
+        padding: 12px 20px;
+        border: none;
+        border-radius: 8px;
+        font-size: 1rem;
+        color: #333;
+        background-color: var(--text-white);
+        box-shadow: var(--shadow-sm);
+        font-weight: 600;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+    }
+
+    .table-search-input::placeholder {
+        color: #888;
+        text-transform: uppercase;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+    }
+
+    /* List Header */
+    .list-header {
+        display: grid;
+        grid-template-columns: 80px 3fr 2fr 1.5fr 1.5fr 120px;
+        padding: 15px 20px;
+        background: linear-gradient(135deg, var(--primary-dark), var(--primary-darker));
+        color: var(--text-white);
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 0.9rem;
+        gap: 10px;
+        align-items: center;
+    }
+
+    .header-item {
+        display: flex;
+        justify-content: flex-start;
+    }
+
+    .header-item:nth-child(4) {
+        justify-content: center;
+    }
+
+    .header-item:nth-child(5) {
+        justify-content: flex-end;
+    }
+
+    .header-item:nth-child(6) {
+        justify-content: center;
+    }
+
+    /* Item List */
+    .item-list {
+        /* Container for all items */
+    }
+
+    /* List Item Row */
+    .item-row {
+        display: grid;
+        grid-template-columns: 80px 3fr 2fr 1.5fr 1.5fr 120px;
+        align-items: center;
+        padding: 15px 20px;
+        border-bottom: 1px solid #eee;
+        background-color: var(--text-white);
+        transition: var(--transition);
+        gap: 10px;
+    }
+
+    .item-row:hover {
+        background-color: var(--bg-light);
+    }
+
+    .item-row:last-child {
+        border-bottom: none;
+    }
+
+    /* Product Image Container */
+    .product-image-container {
+        width: 60px;
+        height: 60px;
+        border-radius: 8px;
+        overflow: hidden;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-shrink: 0;
+    }
+
+    .product-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .product-image-placeholder {
+        width: 100%;
+        height: 100%;
+        background: var(--bg-light);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        color: var(--primary-blue);
+        font-size: 1.5rem;
+        border-radius: 8px;
+    }
+
+    /* Item Details */
+    .item-name {
+        font-weight: 600;
+        color: var(--primary-dark);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        font-size: 1rem;
+    }
+
+    .item-category {
+        color: #666;
+        font-size: 0.95rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    /* Quantity Controls */
+    .quantity-control {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        font-size: 1rem;
+        color: var(--primary-dark);
+        position: relative;
+    }
+
+    .quantity-text {
+        white-space: nowrap;
+        font-weight: 600;
+        min-width: 80px;
+        text-align: center;
+    }
+
+    .qty-button {
+        background: var(--primary-blue);
+        color: var(--text-white);
+        border: none;
+        width: 32px;
+        height: 32px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 1rem;
+        line-height: 1;
+        transition: var(--transition);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .qty-button:hover:not(:disabled) {
+        background: var(--primary-dark);
+        transform: scale(1.1);
+    }
+
+    .qty-button:disabled {
+        background: #ccc;
+        cursor: not-allowed;
+        transform: none;
+    }
+
+    /* Low Stock Badge */
+    .badge-low-stock {
+        position: absolute;
+        top: -8px;
+        right: -5px;
+        background: linear-gradient(135deg, var(--warning), var(--warning-dark));
+        color: var(--text-white);
+        padding: 3px 8px;
+        border-radius: 4px;
+        font-size: 0.7rem;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+        box-shadow: var(--shadow-sm);
+        z-index: 2;
+    }
+
+    /* Cost Price */
+    .cost-price {
+        font-weight: 700;
+        color: var(--primary-darker);
+        font-size: 1.1rem;
+        text-align: right;
+        white-space: nowrap;
+    }
+
+    /* Item Actions */
+    .item-actions {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+    }
+
+    .action-btn {
+        width: 36px;
+        height: 36px;
+        border: none;
+        border-radius: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: var(--transition);
+        font-size: 0.9rem;
+        text-decoration: none;
+    }
+
+    .action-btn.view {
+        background: var(--primary-blue);
+        color: var(--text-white);
+    }
+
+    .action-btn.view:hover {
+        background: var(--primary-dark);
+        transform: scale(1.1);
+    }
+
+    .action-btn.delete {
+        background: rgba(244, 67, 54, 0.1);
+        color: var(--danger);
+        border: 1px solid rgba(244, 67, 54, 0.2);
+    }
+
+    .action-btn.delete:hover {
+        background: var(--danger);
+        color: var(--text-white);
+        transform: scale(1.1);
+    }
+
+    .delete-form {
+        margin: 0;
+    }
+
+    /* Empty State */
+    .empty-state {
+        text-align: center;
+        padding: 4rem 2rem;
+        background: var(--text-white);
+        border-radius: 16px;
+        box-shadow: var(--shadow-md);
+        margin-bottom: 2rem;
+    }
+
+    .empty-icon {
+        font-size: 4rem;
+        color: var(--accent-light);
+        margin-bottom: 1.5rem;
+    }
+
+    .empty-state h3 {
+        color: var(--primary-dark);
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+    }
+
+    .empty-state p {
+        color: #666;
+        margin-bottom: 2rem;
+        font-size: 1.1rem;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 1200px) {
+        .stats-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    @media (max-width: 768px) {
+        .inventory-header {
+            padding: 1.5rem;
+        }
+        
+        .header-actions {
+            flex-direction: column;
+            align-items: stretch;
+            gap: 1rem;
+        }
+        
+        .search-container {
+            max-width: none;
+        }
+        
+        .filter-actions {
+            justify-content: space-between;
+        }
+        
+        .stats-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        /* Adjust table layout for mobile */
+        .list-header, .item-row {
+            grid-template-columns: 60px 2fr 1fr 1.5fr;
+            gap: 5px;
+        }
+
+        .list-header {
+            font-size: 0.75rem;
+        }
+
+        .header-item:nth-child(3), .item-category {
+            display: none;
+        }
+        
+        .header-item:nth-child(4) {
+            grid-column: 3 / 4;
+        }
+
+        .quantity-control, .cost-price {
+            justify-content: center;
+            text-align: center;
+        }
+
+        .item-name {
+            font-size: 0.9rem;
+        }
+        
+        .product-image-container {
+            width: 40px;
+            height: 40px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .welcome-text {
+            font-size: 1.5rem;
+        }
+        
+        .subtitle {
+            font-size: 0.95rem;
+        }
+        
+        .stat-card {
+            padding: 1.5rem;
+        }
+        
+        .stat-number {
+            font-size: 2rem;
+        }
+        
+        .list-header, .item-row {
+            grid-template-columns: 50px 2fr 1.5fr;
+            padding: 10px 15px;
+        }
+        
+        .header-item:nth-child(5), .cost-price {
+            display: none;
+        }
+        
+        .quantity-control {
+            flex-direction: column;
+            gap: 4px;
+        }
+        
+        .quantity-text {
+            min-width: auto;
+            font-size: 0.9rem;
+        }
+        
+        .qty-button {
+            width: 28px;
+            height: 28px;
+            font-size: 0.9rem;
+        }
+
+        .navbar-menu {
+            gap: 0.5rem;
+        }
+
+        .nav-link span {
+            display: none;
+        }
+
+        .nav-link {
+            padding: 0.5rem;
+        }
+    }
+</style>
 {% endblock %}
 
 {% block title %}Inventory - TrackWise{% endblock %}
@@ -12,21 +795,18 @@
 <!-- Navigation -->
 <nav class="navbar">
     <div class="navbar-content">
-        <!-- Logo on the left -->
         <a href="{% url 'dashboard:dashboard' %}" class="navbar-brand">
             <i class="fas fa-chart-line"></i>
             TrackWise
         </a>
 
-        <!-- Navigation in center -->
         <div class="navbar-menu">
             <a href="{% url 'dashboard:dashboard' %}" class="nav-link"><i class="fas fa-home"></i> Dashboard</a>
             <a href="{% url 'inventory:inventory_list' %}" class="nav-link active"><i class="fas fa-boxes"></i> Inventory</a>
             <a href="{% url 'reports:reports_dashboard' %}" class="nav-link"><i class="fas fa-chart-bar"></i> Reports</a>
-            <a href="{% url 'staff_management:staff_list' %}" class="nav-link active"><i class="fas fa-users"></i> Staffs</a>
+            <a href="{% url 'staff_management:staff_list' %}" class="nav-link"><i class="fas fa-users"></i> Staff</a>
         </div>
 
-        <!-- Profile with dropdown on the right -->
         <div class="user-section">
             <div class="user-info" id="userDropdownTrigger">
                 <span>{{ user.first_name }} {{ user.last_name }}</span>
@@ -38,10 +818,6 @@
                 <div class="user-dropdown-item">
                     <i class="fas fa-user"></i>
                     <span>Profile Settings</span>
-                </div>
-                <div class="user-dropdown-item">
-                    <i class="fas fa-cog"></i>
-                    <span>Account Settings</span>
                 </div>
                 <div class="user-dropdown-divider"></div>
                 <form method="post" action="{% url 'accounts:logout' %}" style="display: inline;">
@@ -94,7 +870,7 @@
             </div>
         </div>
 
-        <!-- Summary Cards -->
+        {% comment %} <!-- Summary Cards -->
         <div class="stats-grid">
             <div class="stat-card">
                 <div class="stat-number">{{ products.count }}</div>
@@ -119,15 +895,34 @@
                 <div class="stat-label">Out of Stock</div>
                 <i class="stat-icon fas fa-times-circle"></i>
             </div>
-        </div>
+        </div> {% endcomment %}
 
-        <!-- Products Grid -->
+        <!-- Products List (Table Layout) -->
         <div class="inventory-content">
             {% if products %}
-            <div class="products-grid">
-                {% for product in products %}
-                <div class="product-card">
-                    <div class="product-header">
+            <div class="inventory-view">
+                {% comment %} <!-- Search Section -->
+                <div class="search-section">
+                    <form method="get" class="search-form">
+                        <input type="search" class="table-search-input" placeholder="SEARCH" name="search" value="{{ search_query }}">
+                    </form>
+                </div> {% endcomment %}
+
+                <!-- List Header -->
+                <div class="list-header">
+                    <div class="header-item"></div> 
+                    <div class="header-item">ITEM NAME</div>
+                    <div class="header-item">CATEGORY</div>
+                    <div class="header-item" style="justify-content: center;">QUANTITY</div>
+                    <div class="header-item" style="justify-content: right;">COST PRICE</div>
+                    <div class="header-item" style="justify-content: center;">ACTIONS</div>
+                </div>
+
+                <!-- Item List -->
+                <div class="item-list">
+                    {% for product in products %}
+                    <div class="item-row" data-product-id="{{ product.pk }}">
+                        <!-- Product Image -->
                         <div class="product-image-container">
                             {% if product.image %}
                             <img src="{{ product.image.url }}" alt="{{ product.item_name }}" class="product-image">
@@ -138,60 +933,46 @@
                             {% endif %}
                         </div>
                         
-                        <div class="product-badge {% if product.quantity == 0 %}out-of-stock{% elif product.quantity <= 10 %}low-stock{% else %}in-stock{% endif %}">
-                            {{ product.quantity }} in stock
-                        </div>
-                    </div>
-                    
-                    <div class="product-body">
-                        <h3 class="product-title">{{ product.item_name }}</h3>
-                        <span class="product-category">{{ product.get_category_display }}</span>
+                        <!-- Item Name -->
+                        <div class="item-name">{{ product.item_name }}</div>
                         
-                        <div class="product-stats">
-                            <div class="product-stat">
-                                <span class="stat-label">Cost Price</span>
-                                <span class="stat-value">${{ product.cost_price }}</span>
-                            </div>
-                            <div class="product-stat">
-                                <span class="stat-label">Unit</span>
-                                <span class="stat-value">{{ product.unit_of_measure }}</span>
-                            </div>
-                        </div>
+                        <!-- Category -->
+                        <div class="item-category">{{ product.get_category_display }}</div>
                         
-                        <div class="stock-controls">
-                            <form method="post" action="{% url 'inventory:increase_stock' product.pk %}" class="stock-form">
-                                {% csrf_token %}
-                                <button type="submit" class="stock-btn increase">
-                                    <i class="fas fa-plus"></i>
-                                </button>
-                            </form>
-                            
-                            <div class="stock-display">
-                                <span class="stock-quantity">{{ product.quantity }}</span>
-                            </div>
-                            
-                            <form method="post" action="{% url 'inventory:decrease_stock' product.pk %}" class="stock-form">
-                                {% csrf_token %}
-                                <button type="submit" class="stock-btn decrease" {% if product.quantity == 0 %}disabled{% endif %}>
-                                    <i class="fas fa-minus"></i>
-                                </button>
-                            </form>
-                        </div>
-                    </div>
-                    
-                    <div class="product-actions">
-                        <a href="{% url 'inventory:product_detail' product.pk %}" class="action-btn view">
-                            <i class="fas fa-eye"></i> View
-                        </a>
-                        <form method="post" action="{% url 'inventory:product_delete' product.pk %}" class="delete-form">
-                            {% csrf_token %}
-                            <button type="submit" class="action-btn delete" onclick="return confirm('Are you sure you want to delete {{ product.item_name }}?')">
-                                <i class="fas fa-trash"></i> Delete
+                        <!-- Quantity Controls -->
+                        <div class="quantity-control">
+                            {% if product.quantity <= 10 and product.quantity > 0 %}
+                            <span class="badge-low-stock">LOW STOCK</span>
+                            {% endif %}
+                            <button type="button" class="qty-button decrease" data-product-id="{{ product.pk }}" {% if product.quantity == 0 %}disabled{% endif %}>
+                                <i class="fas fa-minus"></i>
                             </button>
-                        </form>
+                            <span class="quantity-text" id="quantity-{{ product.pk }}">
+                                {{ product.quantity }} {{ product.unit_of_measure }}
+                            </span>
+                            <button type="button" class="qty-button increase" data-product-id="{{ product.pk }}">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                        </div>
+                        
+                        <!-- Cost Price -->
+                        <div class="cost-price">₱{{ product.cost_price }}</div>
+                        
+                        <!-- Actions -->
+                        <div class="item-actions">
+                            <a href="{% url 'inventory:product_detail' product.pk %}" class="action-btn view" title="View Details">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                            <form method="post" action="{% url 'inventory:product_delete' product.pk %}" class="delete-form">
+                                {% csrf_token %}
+                                <button type="submit" class="action-btn delete" title="Delete Product" onclick="return confirm('Are you sure you want to delete {{ product.item_name }}?')">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </form>
+                        </div>
                     </div>
+                    {% endfor %}
                 </div>
-                {% endfor %}
             </div>
             {% else %}
             <!-- Empty State -->
@@ -235,16 +1016,176 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
     
-    // Real-time search
-    const searchInput = document.querySelector('.search-input');
-    if (searchInput) {
-        let searchTimeout;
-        searchInput.addEventListener('input', function() {
-            clearTimeout(searchTimeout);
-            searchTimeout = setTimeout(() => {
-                this.form.submit();
-            }, 500);
+    // Real-time search for both search inputs
+    const searchInputs = document.querySelectorAll('.search-input, .table-search-input');
+    searchInputs.forEach(searchInput => {
+        if (searchInput) {
+            let searchTimeout;
+            searchInput.addEventListener('input', function() {
+                clearTimeout(searchTimeout);
+                searchTimeout = setTimeout(() => {
+                    this.form.submit();
+                }, 500);
+            });
+        }
+    });
+
+    // AJAX for stock controls
+    function updateStock(productId, action) {
+        const url = `/inventory/${productId}/${action}/`;
+        const csrfToken = getCookie('csrftoken');
+        
+        // Get elements
+        const quantityElement = document.getElementById(`quantity-${productId}`);
+        const decreaseBtn = document.querySelector(`.decrease[data-product-id="${productId}"]`);
+        const lowStockBadge = document.querySelector(`.item-row[data-product-id="${productId}"] .badge-low-stock`);
+        
+        // Store original values for rollback in case of error
+        const originalQuantity = parseInt(quantityElement.textContent);
+        
+        // Optimistic update - update UI immediately
+        let newQuantity = originalQuantity;
+        if (action === 'increase') {
+            newQuantity = originalQuantity + 1;
+        } else if (action === 'decrease' && originalQuantity > 0) {
+            newQuantity = originalQuantity - 1;
+        }
+        
+        // Update quantity display
+        const unitText = quantityElement.textContent.replace(originalQuantity, '');
+        quantityElement.textContent = newQuantity + unitText;
+        
+        // Update button states
+        if (decreaseBtn) {
+            decreaseBtn.disabled = newQuantity === 0;
+        }
+        
+        // Update low stock badge
+        if (lowStockBadge) {
+            if (newQuantity > 10) {
+                lowStockBadge.style.display = 'none';
+            } else if (newQuantity <= 10 && newQuantity > 0) {
+                lowStockBadge.style.display = 'block';
+            } else {
+                lowStockBadge.style.display = 'none';
+            }
+        } else if (newQuantity <= 10 && newQuantity > 0) {
+            // Create low stock badge if needed
+            const quantityControl = document.querySelector(`.item-row[data-product-id="${productId}"] .quantity-control`);
+            if (quantityControl) {
+                const badge = document.createElement('span');
+                badge.className = 'badge-low-stock';
+                badge.textContent = 'LOW STOCK';
+                quantityControl.insertBefore(badge, quantityControl.firstChild);
+            }
+        }
+        
+        // Send AJAX request
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': csrfToken,
+                'Content-Type': 'application/json',
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Update with actual server data
+                quantityElement.textContent = data.new_quantity + unitText;
+                
+                // Update button states with server data
+                if (decreaseBtn) {
+                    decreaseBtn.disabled = data.new_quantity === 0;
+                }
+                
+                // Update low stock badge with server data
+                const updatedLowStockBadge = document.querySelector(`.item-row[data-product-id="${productId}"] .badge-low-stock`);
+                if (updatedLowStockBadge) {
+                    if (data.new_quantity > 10) {
+                        updatedLowStockBadge.style.display = 'none';
+                    } else if (data.new_quantity <= 10 && data.new_quantity > 0) {
+                        updatedLowStockBadge.style.display = 'block';
+                    } else {
+                        updatedLowStockBadge.style.display = 'none';
+                    }
+                }
+                
+            } else {
+                // Rollback optimistic update on error
+                quantityElement.textContent = originalQuantity + unitText;
+                if (decreaseBtn) {
+                    decreaseBtn.disabled = originalQuantity === 0;
+                }
+                
+                // Rollback low stock badge
+                const rollbackLowStockBadge = document.querySelector(`.item-row[data-product-id="${productId}"] .badge-low-stock`);
+                if (rollbackLowStockBadge) {
+                    if (originalQuantity > 10) {
+                        rollbackLowStockBadge.style.display = 'none';
+                    } else if (originalQuantity <= 10 && originalQuantity > 0) {
+                        rollbackLowStockBadge.style.display = 'block';
+                    } else {
+                        rollbackLowStockBadge.style.display = 'none';
+                    }
+                }
+                
+                alert('Error updating stock: ' + (data.error || 'Unknown error'));
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            // Rollback optimistic update on network error
+            quantityElement.textContent = originalQuantity + unitText;
+            if (decreaseBtn) {
+                decreaseBtn.disabled = originalQuantity === 0;
+            }
+            
+            // Rollback low stock badge
+            const networkLowStockBadge = document.querySelector(`.item-row[data-product-id="${productId}"] .badge-low-stock`);
+            if (networkLowStockBadge) {
+                if (originalQuantity > 10) {
+                    networkLowStockBadge.style.display = 'none';
+                } else if (originalQuantity <= 10 && originalQuantity > 0) {
+                    networkLowStockBadge.style.display = 'block';
+                } else {
+                    networkLowStockBadge.style.display = 'none';
+                }
+            }
+            
+            alert('Network error updating stock. Please try again.');
         });
+    }
+
+    // Add event listeners to stock buttons
+    document.querySelectorAll('.qty-button.increase').forEach(button => {
+        button.addEventListener('click', function() {
+            const productId = this.getAttribute('data-product-id');
+            updateStock(productId, 'increase');
+        });
+    });
+
+    document.querySelectorAll('.qty-button.decrease').forEach(button => {
+        button.addEventListener('click', function() {
+            const productId = this.getAttribute('data-product-id');
+            updateStock(productId, 'decrease');
+        });
+    });
+
+    // CSRF token helper function
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
     }
 });
 </script>

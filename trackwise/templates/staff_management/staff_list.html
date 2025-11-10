@@ -221,6 +221,8 @@
   box-shadow: var(--shadow-md);
   transition: var(--transition);
   border-left: 4px solid var(--primary-blue);
+  cursor: pointer;
+  position: relative;
 }
 
 .staff-card:hover {
@@ -335,6 +337,22 @@
   flex: 1;
   min-width: 80px;
   justify-content: center;
+}
+
+/* Click indicator */
+.staff-card::after {
+  content: 'Click to view/edit details';
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  font-size: 0.7rem;
+  color: var(--primary-blue);
+  opacity: 0;
+  transition: var(--transition);
+}
+
+.staff-card:hover::after {
+  opacity: 1;
 }
 
 /* Empty State */
@@ -537,6 +555,11 @@
     flex: none;
     width: 100%;
   }
+  
+  .staff-card::after {
+    content: 'Tap to view/edit';
+    font-size: 0.6rem;
+  }
 }
 </style>
 {% endblock %}
@@ -643,7 +666,9 @@
     <section class="staff-grid">
         {% if staff_profiles %}
             {% for staff in staff_profiles %}
-            <div class="staff-card {% if staff.status != 'active' %}inactive{% endif %}">
+            <div class="staff-card {% if staff.status != 'active' %}inactive{% endif %}" 
+                 onclick="window.location.href='{% url 'staff_management:staff_update' staff.id %}'"
+                 data-staff-id="{{ staff.id }}">
                 <div class="staff-card-header">
                     <div class="staff-avatar">
                         {{ staff.user_profile.user.first_name|first }}{{ staff.user_profile.user.last_name|first }}
@@ -674,16 +699,12 @@
                     </div>
                 </div>
                 
+                <!-- Only keep the status toggle button -->
                 <div class="staff-actions">
-                    <a href="{% url 'staff_management:staff_detail' staff.id %}" class="btn btn-outline btn-sm">
-                        <i class="fas fa-eye"></i> View
-                    </a>
-                    <a href="{% url 'staff_management:staff_update' staff.id %}" class="btn btn-primary btn-sm">
-                        <i class="fas fa-edit"></i> Edit
-                    </a>
                     <button class="btn {% if staff.status == 'active' %}btn-warning{% else %}btn-success{% endif %} btn-sm toggle-status" 
                             data-staff-id="{{ staff.id }}"
-                            data-staff-name="{{ staff.user_profile.user.get_full_name }}">
+                            data-staff-name="{{ staff.user_profile.user.get_full_name }}"
+                            onclick="event.stopPropagation()">
                         <i class="fas {% if staff.status == 'active' %}fa-user-slash{% else %}fa-user-check{% endif %}"></i>
                         {% if staff.status == 'active' %}Deactivate{% else %}Activate{% endif %}
                     </button>
@@ -725,7 +746,8 @@ document.addEventListener('DOMContentLoaded', function() {
     // Toggle staff status
     const toggleButtons = document.querySelectorAll('.toggle-status');
     toggleButtons.forEach(button => {
-        button.addEventListener('click', function() {
+        button.addEventListener('click', function(e) {
+            e.stopPropagation(); // Prevent card click event
             const staffId = this.dataset.staffId;
             const staffName = this.dataset.staffName;
             
