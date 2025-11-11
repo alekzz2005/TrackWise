@@ -1,0 +1,695 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<style>
+:root {
+    --primary-blue: #4a6fa5;
+    --primary-dark: #2c5282;
+    --primary-darker: #1a365d;
+    --accent-light: #a7c5eb;
+    --bg-light: #dbe4f0;
+    --bg-page: #f0f4f8;
+    --success: #4CAF50;
+    --success-dark: #45a049;
+    --danger: #f44336;
+    --danger-dark: #da3226;
+    --text-white: #ffffff;
+    --shadow-sm: 0 2px 5px rgba(0, 0, 0, 0.1);
+    --shadow-md: 0 8px 25px rgba(0, 0, 0, 0.2);
+    --shadow-lg: 0 15px 35px rgba(0, 0, 0, 0.2);
+    --transition: all 0.3s ease;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.profile-body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, var(--accent-light) 0%, var(--accent-light) 100%);
+    min-height: 100vh;
+    padding: 100px 20px 50px;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+}
+
+.profile-container {
+    max-width: 1000px;
+    width: 100%;
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 20px;
+    box-shadow: var(--shadow-lg);
+    overflow: hidden;
+}
+
+.profile-header {
+    background: linear-gradient(135deg, var(--primary-blue), var(--primary-dark));
+    color: white;
+    padding: 2rem;
+    text-align: center;
+}
+
+.profile-header h1 {
+    margin: 0;
+    font-size: 2rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+}
+
+.profile-header p {
+    margin: 0.5rem 0 0 0;
+    opacity: 0.9;
+}
+
+.profile-content {
+    padding: 2rem;
+}
+
+.profile-tabs {
+    display: flex;
+    border-bottom: 2px solid #e9ecef;
+    margin-bottom: 2rem;
+}
+
+.tab-button {
+    padding: 1rem 2rem;
+    background: none;
+    border: none;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #6c757d;
+    cursor: pointer;
+    transition: var(--transition);
+    border-bottom: 3px solid transparent;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.tab-button.active {
+    color: var(--primary-blue);
+    border-bottom-color: var(--primary-blue);
+}
+
+.tab-button:hover:not(.active) {
+    color: var(--primary-dark);
+    background-color: #f8f9fa;
+}
+
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+.profile-section {
+    margin-bottom: 2.5rem;
+}
+
+.section-heading {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+    color: var(--primary-dark);
+    font-size: 1.25rem;
+    font-weight: 600;
+}
+
+.section-heading i {
+    color: var(--primary-blue);
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+}
+
+.form-group.full-width {
+    grid-column: 1 / -1;
+}
+
+.form-group {
+    margin-bottom: 1rem;
+}
+
+.form-label {
+    display: block;
+    margin-bottom: 8px;
+    color: #333;
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.form-control {
+    width: 100%;
+    padding: 12px 16px;
+    border: 2px solid #e0e0e0;
+    border-radius: 10px;
+    background: #fff;
+    color: #333;
+    font-size: 15px;
+    transition: var(--transition);
+    font-family: inherit;
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: var(--accent-light);
+    box-shadow: 0 0 0 3px rgba(167, 197, 235, 0.3);
+}
+
+.form-control.error {
+    border-color: var(--danger);
+    animation: shake 0.3s ease;
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    75% { transform: translateX(5px); }
+}
+
+.current-avatar {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.avatar-img {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid var(--accent-light);
+}
+
+.avatar-placeholder {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: var(--accent-light);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--primary-dark);
+    font-size: 1.5rem;
+    border: 3px solid var(--accent-light);
+}
+
+.button-group {
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
+    margin-top: 2rem;
+}
+
+.btn {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: 600;
+    text-transform: uppercase;
+    transition: var(--transition);
+    font-size: 14px;
+    letter-spacing: 0.5px;
+    box-shadow: var(--shadow-sm);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.btn-success {
+    background: linear-gradient(135deg, var(--success), var(--success-dark));
+    color: var(--text-white);
+}
+
+.btn-secondary {
+    background: #6c757d;
+    color: white;
+}
+
+.btn-secondary:hover {
+    background: #5a6268;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, var(--primary-blue), var(--primary-dark));
+    color: var(--text-white);
+}
+
+.alert {
+    padding: 1rem 1.5rem;
+    border-radius: 10px;
+    margin-bottom: 2rem;
+    border: 1px solid transparent;
+}
+
+.alert-success {
+    background-color: #d4edda;
+    border-color: #c3e6cb;
+    color: #155724;
+}
+
+.alert-error {
+    background-color: #f8d7da;
+    border-color: #f5c6cb;
+    color: #721c24;
+}
+
+.alert-info {
+    background-color: #d1ecf1;
+    border-color: #bee5eb;
+    color: #0c5460;
+}
+
+.security-info p {
+    margin-bottom: 0.5rem;
+    color: #6c757d;
+}
+
+.error-message {
+    color: var(--danger);
+    font-size: 13px;
+    margin-top: 5px;
+    display: none;
+}
+
+.error-message.show {
+    display: block;
+    animation: fadeIn 0.3s ease;
+}
+
+.errorlist {
+    list-style: none;
+    padding: 0;
+    margin: 5px 0 0 0;
+    color: var(--danger);
+    font-size: 13px;
+}
+
+.errorlist li {
+    margin-bottom: 3px;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-5px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.text-muted {
+    color: #6c757d;
+}
+
+@media (max-width: 768px) {
+    .profile-body {
+        padding: 80px 15px 30px;
+    }
+    
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .profile-tabs {
+        flex-direction: column;
+    }
+    
+    .tab-button {
+        text-align: left;
+        padding: 0.75rem 1rem;
+    }
+    
+    .button-group {
+        flex-direction: column;
+    }
+    
+    .profile-header h1 {
+        font-size: 1.5rem;
+    }
+}
+</style>
+{% endblock %}
+
+{% block title %}Edit Profile - TrackWise{% endblock %}
+
+{% block content %}
+<div class="profile-body">
+    <div class="profile-container">
+        <div class="profile-header">
+            <h1><i class="fas fa-user-edit"></i> Account Settings</h1>
+            <p>Manage your personal and company information</p>
+        </div>
+
+        <div class="profile-content">
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            {% if profile_form.errors or company_form.errors %}
+                <div class="alert alert-error">
+                    <strong>Please correct the errors below:</strong>
+                    <ul>
+                        {% for field in profile_form %}
+                            {% for error in field.errors %}
+                                <li>{{ field.label }}: {{ error }}</li>
+                            {% endfor %}
+                        {% endfor %}
+                        {% for field in company_form %}
+                            {% for error in field.errors %}
+                                <li>{{ field.label }}: {{ error }}</li>
+                            {% endfor %}
+                        {% endfor %}
+                        {% for error in profile_form.non_field_errors %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                        {% for error in company_form.non_field_errors %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
+
+            <div class="profile-tabs">
+                <button class="tab-button active" data-tab="personal-tab">
+                    <i class="fas fa-user"></i> Personal Information
+                </button>
+                <button class="tab-button" data-tab="company-tab">
+                    <i class="fas fa-building"></i> Company Information
+                </button>
+                <button class="tab-button" data-tab="security-tab">
+                    <i class="fas fa-lock"></i> Security
+                </button>
+            </div>
+
+            <!-- Personal Information Tab -->
+            <div id="personal-tab" class="tab-content active">
+                <form method="post" enctype="multipart/form-data" id="profile-form">
+                    {% csrf_token %}
+                    <input type="hidden" name="form_type" value="profile">
+                    
+                    <div class="profile-section">
+                        <h3 class="section-heading">
+                            <i class="fas fa-id-card"></i>
+                            Profile Picture
+                        </h3>
+                        
+                        <div class="current-avatar">
+                            {% if profile.profile_picture %}
+                                <img src="{{ profile.profile_picture.url }}" alt="Profile Picture" class="avatar-img">
+                            {% else %}
+                                <div class="avatar-placeholder">
+                                    <i class="fas fa-user"></i>
+                                </div>
+                            {% endif %}
+                            <div>
+                                <p><strong>Current Avatar</strong></p>
+                                <p class="text-muted">JPG, GIF or PNG. Max size 2MB.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group full-width">
+                            <label class="form-label" for="{{ profile_form.profile_picture.id_for_label }}">Upload New Photo</label>
+                            {{ profile_form.profile_picture }}
+                            {% if profile_form.profile_picture.errors %}
+                                <ul class="errorlist">
+                                    {% for error in profile_form.profile_picture.errors %}
+                                        <li>{{ error }}</li>
+                                    {% endfor %}
+                                </ul>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="profile-section">
+                        <h3 class="section-heading">
+                            <i class="fas fa-info-circle"></i>
+                            Basic Information
+                        </h3>
+                        
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label class="form-label" for="{{ profile_form.first_name.id_for_label }}">First Name *</label>
+                                <input type="text" 
+                                       name="first_name" 
+                                       id="{{ profile_form.first_name.id_for_label }}" 
+                                       class="form-control {% if profile_form.first_name.errors %}error{% endif %}"
+                                       value="{{ profile_form.first_name.value|default:user.first_name }}"
+                                       required>
+                                {% if profile_form.first_name.errors %}
+                                    <ul class="errorlist">
+                                        {% for error in profile_form.first_name.errors %}
+                                            <li>{{ error }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label" for="{{ profile_form.last_name.id_for_label }}">Last Name *</label>
+                                <input type="text" 
+                                       name="last_name" 
+                                       id="{{ profile_form.last_name.id_for_label }}" 
+                                       class="form-control {% if profile_form.last_name.errors %}error{% endif %}"
+                                       value="{{ profile_form.last_name.value|default:user.last_name }}"
+                                       required>
+                                {% if profile_form.last_name.errors %}
+                                    <ul class="errorlist">
+                                        {% for error in profile_form.last_name.errors %}
+                                            <li>{{ error }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="form-group full-width">
+                                <label class="form-label" for="{{ profile_form.email.id_for_label }}">Email Address *</label>
+                                <input type="email" 
+                                       name="email" 
+                                       id="{{ profile_form.email.id_for_label }}" 
+                                       class="form-control {% if profile_form.email.errors %}error{% endif %}"
+                                       value="{{ profile_form.email.value|default:user.email }}"
+                                       required>
+                                {% if profile_form.email.errors %}
+                                    <ul class="errorlist">
+                                        {% for error in profile_form.email.errors %}
+                                            <li>{{ error }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="button-group">
+                        <a href="{% url 'dashboard:dashboard' %}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left"></i> Back to Dashboard
+                        </a>
+                        <button type="submit" class="btn btn-success">
+                            <i class="fas fa-save"></i> Save Changes
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Company Information Tab -->
+            <div id="company-tab" class="tab-content">
+                <form method="post" id="company-form">
+                    {% csrf_token %}
+                    <input type="hidden" name="form_type" value="company">
+                    
+                    <div class="profile-section">
+                        <h3 class="section-heading">
+                            <i class="fas fa-building"></i>
+                            Company Details
+                        </h3>
+                        
+                        <div class="form-grid">
+                            <div class="form-group full-width">
+                                <label class="form-label" for="{{ company_form.name.id_for_label }}">Company Name *</label>
+                                {{ company_form.name }}
+                                {% if company_form.name.errors %}
+                                    <ul class="errorlist">
+                                        {% for error in company_form.name.errors %}
+                                            <li>{{ error }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="form-group full-width">
+                                <label class="form-label" for="{{ company_form.address.id_for_label }}">Company Address</label>
+                                {{ company_form.address }}
+                                {% if company_form.address.errors %}
+                                    <ul class="errorlist">
+                                        {% for error in company_form.address.errors %}
+                                            <li>{{ error }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="form-group full-width">
+                                <label class="form-label" for="{{ company_form.contact_info.id_for_label }}">Contact Information</label>
+                                {{ company_form.contact_info }}
+                                {% if company_form.contact_info.errors %}
+                                    <ul class="errorlist">
+                                        {% for error in company_form.contact_info.errors %}
+                                            <li>{{ error }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="button-group">
+                        <a href="{% url 'dashboard:dashboard' %}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left"></i> Back to Dashboard
+                        </a>
+                        <button type="submit" class="btn btn-success">
+                            <i class="fas fa-save"></i> Update Company Info
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Security Tab -->
+            <div id="security-tab" class="tab-content">
+                <div class="profile-section">
+                    <h3 class="section-heading">
+                        <i class="fas fa-key"></i>
+                        Change Password
+                    </h3>
+                    <p>For security reasons, please update your password regularly.</p>
+                    
+                    <div class="button-group">
+                        <a href="{% url 'accounts:change_password' %}" class="btn btn-primary">
+                            <i class="fas fa-lock"></i> Change Password
+                        </a>
+                    </div>
+                </div>
+
+                <div class="profile-section">
+                    <h3 class="section-heading">
+                        <i class="fas fa-shield-alt"></i>
+                        Account Security
+                    </h3>
+                    <div class="security-info">
+                        <p><strong>Last Login:</strong> {{ user.last_login|date:"F j, Y g:i A"|default:"Never" }}</p>
+                        <p><strong>Date Joined:</strong> {{ user.date_joined|date:"F j, Y" }}</p>
+                        <p><strong>Account Role:</strong> {{ profile.get_role_display }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Tab functionality
+    const tabButtons = document.querySelectorAll('.tab-button');
+    const tabContents = document.querySelectorAll('.tab-content');
+    
+    tabButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            const targetTab = button.getAttribute('data-tab');
+            
+            // Update active tab button
+            tabButtons.forEach(btn => btn.classList.remove('active'));
+            button.classList.add('active');
+            
+            // Show target tab content
+            tabContents.forEach(content => {
+                content.classList.remove('active');
+                if (content.id === targetTab) {
+                    content.classList.add('active');
+                }
+            });
+        });
+    });
+    
+    // Check if there are errors and show the appropriate tab
+    const hasProfileErrors = document.querySelectorAll('#personal-tab .errorlist li').length > 0;
+    const hasCompanyErrors = document.querySelectorAll('#company-tab .errorlist li').length > 0;
+    
+    if (hasCompanyErrors) {
+        // Switch to company tab if there are company errors
+        document.querySelector('[data-tab="company-tab"]').click();
+    } else if (hasProfileErrors) {
+        // Switch to personal tab if there are profile errors
+        document.querySelector('[data-tab="personal-tab"]').click();
+    }
+    
+    // Form validation
+    const profileForm = document.getElementById('profile-form');
+    
+    function validateEmail(email) {
+        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    }
+    
+    // Profile form validation
+    if (profileForm) {
+        profileForm.addEventListener('submit', function(e) {
+            let isValid = true;
+            
+            // Validate first name
+            const firstName = document.getElementById('{{ profile_form.first_name.id_for_label }}').value.trim();
+            if (!firstName) {
+                isValid = false;
+            }
+            
+            // Validate last name
+            const lastName = document.getElementById('{{ profile_form.last_name.id_for_label }}').value.trim();
+            if (!lastName) {
+                isValid = false;
+            }
+            
+            // Validate email
+            const email = document.getElementById('{{ profile_form.email.id_for_label }}').value.trim();
+            if (!email || !validateEmail(email)) {
+                isValid = false;
+            }
+            
+            if (!isValid) {
+                e.preventDefault();
+            }
+        });
+    }
+    
+    // File input styling
+    const fileInputs = document.querySelectorAll('input[type="file"]');
+    fileInputs.forEach(input => {
+        input.addEventListener('change', function() {
+            const fileName = this.files[0] ? this.files[0].name : 'No file chosen';
+            const label = this.previousElementSibling;
+            if (label && label.classList.contains('form-label')) {
+                label.textContent = fileName;
+            }
+        });
+    });
+});
+</script>
+{% endblock %}

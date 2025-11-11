@@ -1,8 +1,8 @@
-from django.shortcuts import render, redirect
-from django.contrib.auth import login, logout, authenticate
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth import login, logout, authenticate, update_session_auth_hash
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from .forms import BusinessOwnerRegistrationForm, StaffRegistrationForm, CustomAuthenticationForm
+from .forms import BusinessOwnerRegistrationForm, StaffRegistrationForm, CustomAuthenticationForm, BusinessOwnerProfileForm, CustomPasswordChangeForm, CompanyForm
 from .models import UserProfile, Company
 
 def role_selection(request):
@@ -88,3 +88,90 @@ def logout_view(request):
     logout(request)
     messages.info(request, 'You have been logged out successfully.')
     return redirect('accounts:login')
+
+@login_required
+def edit_profile(request):
+    try:
+        profile = request.user.userprofile
+    except UserProfile.DoesNotExist:
+        messages.error(request, 'Profile not found.')
+        return redirect('dashboard:dashboard')
+    
+    company = profile.company
+    
+    if request.method == 'POST':
+        # Determine which form was submitted
+        form_type = request.POST.get('form_type')
+        
+        if form_type == 'profile':
+            # Only validate and save profile form
+            profile_form = BusinessOwnerProfileForm(
+                request.POST, 
+                request.FILES, 
+                instance=profile,
+                user=request.user
+            )
+            company_form = CompanyForm(instance=company)  # Keep existing company data
+            
+            if profile_form.is_valid():
+                profile_form.save()
+                messages.success(request, 'Profile updated successfully!')
+                return redirect('accounts:edit_profile')
+            else:
+                messages.error(request, 'Please correct the errors in your profile information.')
+                
+        elif form_type == 'company':
+            # Only validate and save company form
+            profile_form = BusinessOwnerProfileForm(instance=profile, user=request.user)  # Keep existing profile data
+            company_form = CompanyForm(request.POST, instance=company)
+            
+            if company_form.is_valid():
+                company_form.save()
+                messages.success(request, 'Company information updated successfully!')
+                return redirect('accounts:edit_profile')
+            else:
+                messages.error(request, 'Please correct the errors in your company information.')
+        else:
+            # Fallback - handle both forms (original behavior)
+            profile_form = BusinessOwnerProfileForm(
+                request.POST, 
+                request.FILES, 
+                instance=profile,
+                user=request.user
+            )
+            company_form = CompanyForm(request.POST, instance=company)
+            
+            if profile_form.is_valid() and company_form.is_valid():
+                profile_form.save()
+                company_form.save()
+                messages.success(request, 'Profile updated successfully!')
+                return redirect('accounts:edit_profile')
+            else:
+                messages.error(request, 'Please correct the errors below.')
+    else:
+        # GET request - initialize both forms
+        profile_form = BusinessOwnerProfileForm(instance=profile, user=request.user)
+        company_form = CompanyForm(instance=company)
+    
+    context = {
+        'profile_form': profile_form,
+        'company_form': company_form,
+        'profile': profile,
+    }
+    return render(request, 'accounts/edit_profile.html', context)
+
+@login_required
+def change_password(request):
+    if request.method == 'POST':
+        form = CustomPasswordChangeForm(request.user, request.POST)
+        if form.is_valid():
+            user = form.save()
+            update_session_auth_hash(request, user)
+            messages.success(request, 'Your password was successfully updated!')
+            return redirect('accounts:edit_profile')
+        else:
+            messages.error(request, 'Please correct the errors below.')
+    else:
+        form = CustomPasswordChangeForm(request.user)
+    
+    return render(request, 'accounts/change_password.html', {'form': form})

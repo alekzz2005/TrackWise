@@ -425,10 +425,10 @@ body {
             </div>
             
             <div class="user-dropdown" id="userDropdown">
-                <div class="user-dropdown-item">
-                    <i class="fas fa-user"></i>
-                    <span>Profile Settings</span>
-                </div>
+                <a href="{% url 'accounts:edit_profile' %}" class="user-dropdown-item">
+                    <i class="fas fa-user-edit"></i>
+                    <span>Edit Profile</span>
+                </a>
                 <div class="user-dropdown-divider"></div>
                 <form method="post" action="{% url 'accounts:logout' %}" style="display: inline;">
                     {% csrf_token %}
@@ -535,4 +535,36 @@ body {
     </section>
     {% endif %}
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // User dropdown functionality
+    const userDropdownTrigger = document.getElementById('userDropdownTrigger');
+    const userDropdown = document.getElementById('userDropdown');
+    
+    if (userDropdownTrigger && userDropdown) {
+        // Toggle dropdown on click
+        userDropdownTrigger.addEventListener('click', function(e) {
+            e.stopPropagation();
+            userDropdown.classList.toggle('active');
+        });
+        
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!userDropdown.contains(e.target) && !userDropdownTrigger.contains(e.target)) {
+                userDropdown.classList.remove('active');
+            }
+        });
+        
+        // Close dropdown when clicking on a dropdown item
+        userDropdown.addEventListener('click', function(e) {
+            if (e.target.tagName === 'A' || e.target.tagName === 'BUTTON') {
+                userDropdown.classList.remove('active');
+            }
+        });
+    }
+});
+</script>
 {% endblock %}
