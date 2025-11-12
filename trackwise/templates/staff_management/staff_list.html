@@ -18,7 +18,7 @@
 }
 
 .staff-management-wrapper {
-  padding-top: 80px;
+  padding-top: 20px;
   min-height: 100vh;
   background-color: var(--bg-page);
 }
@@ -568,7 +568,7 @@
 
 {% block content %}
 <div class="staff-management-wrapper">
-    <!-- Navigation -->
+    {% comment %} <!-- Navigation -->
     <nav class="navbar">
         <div class="navbar-content">
             <a href="{% url 'dashboard:dashboard' %}" class="navbar-brand">
@@ -606,7 +606,7 @@
                 </div>
             </div>
         </div>
-    </nav>
+    </nav> {% endcomment %}
 
     <!-- Header Section -->
     <section class="staff-header">

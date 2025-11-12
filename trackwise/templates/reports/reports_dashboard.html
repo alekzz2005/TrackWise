@@ -32,7 +32,7 @@ body {
 
 /* --- WRAPPER --- */
 .reports-wrapper {
-  padding-top: 80px;
+  padding-top: 20px;
   min-height: 100vh;
   background-color: var(--bg-page);
 }
@@ -402,7 +402,7 @@ body {
 {% endblock %}
 
 {% block content %}
-<!-- Navigation -->
+{% comment %} <!-- Navigation -->
 <nav class="navbar">
     <div class="navbar-content">
         <a href="{% url 'dashboard:dashboard' %}" class="navbar-brand">
@@ -440,7 +440,7 @@ body {
             </div>
         </div>
     </div>
-</nav>
+</nav> {% endcomment %}
 
 <div class="reports-wrapper">
     <!-- HERO SECTION -->

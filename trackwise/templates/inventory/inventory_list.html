@@ -151,7 +151,7 @@
 
     /* Main Content */
     .dashboard-wrapper {
-        padding-top: 80px;
+        padding-top: 50px;
         min-height: 100vh;
         background-color: var(--bg-page);
     }
@@ -792,7 +792,7 @@
 {% block title %}Inventory - TrackWise{% endblock %}
 
 {% block content %}
-<!-- Navigation -->
+{% comment %} <!-- Navigation -->
 <nav class="navbar">
     <div class="navbar-content">
         <a href="{% url 'dashboard:dashboard' %}" class="navbar-brand">
@@ -830,7 +830,7 @@
             </div>
         </div>
     </div>
-</nav>
+</nav> {% endcomment %}
 
 <!-- Inventory Content -->
 <div class="dashboard-wrapper">
