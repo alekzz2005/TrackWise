@@ -7,6 +7,8 @@ from django.contrib.auth.models import User
 from accounts.models import UserProfile, Company
 from .models import StaffProfile
 from .forms import StaffUserCreationForm, StaffProfileForm, StaffSearchForm, StaffUpdateForm
+from django.utils import timezone
+from datetime import timedelta
 
 @login_required
 def staff_list(request):

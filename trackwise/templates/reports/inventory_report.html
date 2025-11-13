@@ -495,9 +495,9 @@ body {
                 <i class="stat-icon fas fa-times-circle"></i>
             </div>
             <div class="stat-card">
-                <div class="stat-number">${{ inventory_data.total_value|floatformat:2 }}</div>
+                <div class="stat-number">₱{{ inventory_data.total_value|floatformat:2 }}</div>
                 <div class="stat-label">Total Inventory Value</div>
-                <i class="stat-icon fas fa-dollar-sign"></i>
+                <i class="stat-icon fas fa-peso-sign"></i>
             </div>
         </div>
 
@@ -546,8 +546,8 @@ body {
                                         <td>{{ item.category }}</td>
                                         <td>{{ item.current_stock }}</td>
                                         <td>{{ item.unit }}</td>
-                                        <td>${{ item.price|floatformat:2 }}</td>
-                                        <td><strong>${{ item.total_value|floatformat:2 }}</strong></td>
+                                        <td>₱{{ item.price|floatformat:2 }}</td>
+                                        <td><strong>₱{{ item.total_value|floatformat:2 }}</strong></td>
                                         <td>
                                             {% if item.status == 'Out of Stock' %}
                                                 <span class="badge stock-out">Out of Stock</span>

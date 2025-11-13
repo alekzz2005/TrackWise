@@ -6,109 +6,159 @@
 :root {
   --primary-blue: #4a6fa5;
   --primary-dark: #2c5282;
+  --primary-darker: #1a365d;
   --accent-light: #a7c5eb;
   --bg-light: #dbe4f0;
   --bg-page: #f0f4f8;
   --text-white: #ffffff;
-  --shadow-md: 0 8px 25px rgba(0, 0, 0, 0.2);
-  --transition: all 0.3s ease;
   --success: #38a169;
   --warning: #ed8936;
   --danger: #e53e3e;
+  --info: #4a6fa5;
+  --shadow-sm: 0 2px 5px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 8px 25px rgba(0, 0, 0, 0.15);
+  --shadow-lg: 0 15px 35px rgba(0, 0, 0, 0.2);
+  --transition: all 0.3s ease;
 }
 
 .staff-management-wrapper {
-  padding-top: 20px;
+  padding: 2rem;
   min-height: 100vh;
   background-color: var(--bg-page);
+  max-width: 1400px;
+  margin: 0 auto;
 }
 
-/* Header Section */
+/* Header Section - Enhanced */
 .staff-header {
-  background: var(--bg-light);
-  margin: 2rem auto;
-  padding: 2rem;
+  background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-dark) 100%);
   border-radius: 20px;
-  max-width: 1200px;
-  box-shadow: var(--shadow-md);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 1rem;
+  padding: 2.5rem;
+  margin-bottom: 2rem;
+  box-shadow: var(--shadow-lg);
+  position: relative;
+  overflow: hidden;
+}
+
+.staff-header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 300px;
+  height: 300px;
+  background: radial-gradient(circle, rgba(167, 197, 235, 0.2) 0%, transparent 70%);
+  border-radius: 50%;
+  transform: translate(30%, -30%);
+}
+
+.header-content {
+  position: relative;
+  z-index: 1;
+  margin-bottom: 1rem;
 }
 
 .header-content h1 {
-  font-size: 2rem;
-  font-weight: 800;
-  color: var(--primary-dark);
+  color: var(--text-white);
+  font-size: 2.5rem;
+  font-weight: 700;
   margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 15px;
 }
 
 .header-content p {
-  color: #555;
-  margin-bottom: 0;
+  color: var(--accent-light);
+  font-size: 1.1rem;
+  margin: 0;
+  opacity: 0.9;
 }
 
 .header-actions {
-  display: flex;
-  gap: 1rem;
-  align-items: center;
+  position: relative;
+  z-index: 1;
 }
 
-/* KPI Cards */
+/* KPI Cards - Enhanced */
 .staff-kpi-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 1rem;
-  max-width: 1200px;
-  margin: 0 auto 2rem;
-  padding: 0 2rem;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+  margin-bottom: 2rem;
 }
 
 .kpi-card {
   background: linear-gradient(135deg, var(--primary-blue), var(--primary-dark));
+  border-radius: 16px;
+  padding: 2rem;
   color: var(--text-white);
-  padding: 1.5rem;
-  border-radius: 15px;
-  text-align: center;
   box-shadow: var(--shadow-md);
   transition: var(--transition);
+  position: relative;
+  overflow: hidden;
+  text-align: center;
+}
+
+.kpi-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 100px;
+  height: 100px;
+  background: radial-gradient(circle, rgba(167, 197, 235, 0.3) 0%, transparent 70%);
+  border-radius: 50%;
+  transform: translate(30%, -30%);
 }
 
 .kpi-card:hover {
   transform: translateY(-5px);
+  box-shadow: var(--shadow-lg);
 }
 
 .kpi-value {
-  font-size: 2rem;
+  font-size: 2.5rem;
   font-weight: 700;
-  margin-bottom: 0.3rem;
+  color: var(--text-white);
+  margin-bottom: 0.5rem;
+  position: relative;
+  z-index: 1;
 }
 
 .kpi-label {
   font-size: 0.95rem;
   color: var(--accent-light);
+  font-weight: 500;
+  position: relative;
+  z-index: 1;
 }
 
-/* Search and Filter Section */
+.kpi-icon {
+  position: absolute;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  font-size: 2rem;
+  color: rgba(255, 255, 255, 0.2);
+  z-index: 1;
+}
+
+/* Search and Filter Section - Enhanced */
 .search-section {
-  max-width: 1200px;
-  margin: 0 auto 2rem;
-  padding: 0 2rem;
+  margin-bottom: 2rem;
 }
 
 .search-card {
-  background: white;
-  border-radius: 15px;
-  padding: 1.5rem;
+  background: var(--text-white);
+  border-radius: 16px;
+  padding: 2rem;
   box-shadow: var(--shadow-md);
 }
 
 .search-form {
   display: grid;
   grid-template-columns: 2fr 1fr 1fr auto;
-  gap: 1rem;
+  gap: 1.5rem;
   align-items: end;
 }
 
@@ -119,55 +169,94 @@
 
 .form-label {
   font-weight: 600;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.75rem;
   color: var(--primary-dark);
+  font-size: 0.95rem;
 }
 
 .form-control {
-  padding: 0.75rem;
+  padding: 1rem;
   border: 2px solid #e2e8f0;
-  border-radius: 8px;
+  border-radius: 12px;
   font-size: 1rem;
   transition: var(--transition);
+  background: var(--bg-light);
 }
 
 .form-control:focus {
   outline: none;
   border-color: var(--primary-blue);
   box-shadow: 0 0 0 3px rgba(74, 111, 165, 0.1);
+  background: var(--text-white);
 }
 
+/* Buttons - Consistent with Dashboard */
 .btn {
-  padding: 0.75rem 1.5rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem 2rem;
   border: none;
-  border-radius: 8px;
+  border-radius: 12px;
   font-weight: 600;
   cursor: pointer;
   transition: var(--transition);
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
   text-decoration: none;
-  font-size: 0.9rem;
+  font-size: 1rem;
+  box-shadow: var(--shadow-sm);
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, var(--primary-blue), var(--primary-dark));
-  color: var(--text-white);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem 2rem;
+  background: var(--accent-light);
+  color: var(--primary-dark);
+  text-decoration: none;
+  border-radius: 12px;
+  font-weight: 600;
+  transition: var(--transition);
+  box-shadow: var(--shadow-sm);
+  border: none;
+  cursor: pointer;
 }
 
 .btn-primary:hover {
+  background: var(--text-white);
   transform: translateY(-2px);
   box-shadow: var(--shadow-md);
 }
 
 .btn-success {
-  background: var(--success);
+  background: linear-gradient(135deg, var(--success), #2f855a);
   color: var(--text-white);
 }
 
 .btn-success:hover {
-  background: #2f855a;
+  background: linear-gradient(135deg, #2f855a, #276749);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.btn-warning {
+  background: linear-gradient(135deg, var(--warning), #dd6b20);
+  color: var(--text-white);
+}
+
+.btn-warning:hover {
+  background: linear-gradient(135deg, #dd6b20, #c05621);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.btn-danger {
+  background: linear-gradient(135deg, var(--danger), #c53030);
+  color: var(--text-white);
+}
+
+.btn-danger:hover {
+  background: linear-gradient(135deg, #c53030, #9b2c2c);
   transform: translateY(-2px);
   box-shadow: var(--shadow-md);
 }
@@ -184,76 +273,80 @@
   transform: translateY(-2px);
 }
 
-.btn-warning {
-  background: var(--warning);
-  color: var(--text-white);
+.btn-sm {
+  padding: 0.75rem 1.5rem;
+  font-size: 0.9rem;
 }
 
-.btn-warning:hover {
-  background: #dd6b20;
-  transform: translateY(-2px);
-}
-
-.btn-danger {
-  background: var(--danger);
-  color: var(--text-white);
-}
-
-.btn-danger:hover {
-  background: #c53030;
-  transform: translateY(-2px);
-}
-
-/* Staff Grid */
+/* Staff Grid - Enhanced Cards */
 .staff-grid {
-  max-width: 1200px;
-  margin: 0 auto 4rem;
-  padding: 0 2rem;
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-  gap: 1.5rem;
+  grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+  gap: 2rem;
+  margin-bottom: 2rem;
 }
 
 .staff-card {
-  background: white;
-  border-radius: 15px;
-  padding: 1.5rem;
+  background: var(--text-white);
+  border-radius: 16px;
+  padding: 2rem;
   box-shadow: var(--shadow-md);
   transition: var(--transition);
   border-left: 4px solid var(--primary-blue);
   cursor: pointer;
   position: relative;
+  overflow: hidden;
+}
+
+.staff-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 80px;
+  height: 80px;
+  background: radial-gradient(circle, rgba(167, 197, 235, 0.1) 0%, transparent 70%);
+  border-radius: 50%;
+  transform: translate(30%, -30%);
 }
 
 .staff-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.25);
+  transform: translateY(-8px);
+  box-shadow: var(--shadow-lg);
 }
 
 .staff-card.inactive {
-  opacity: 0.7;
+  opacity: 0.8;
   border-left-color: #a0aec0;
 }
 
+.staff-card.inactive::before {
+  background: radial-gradient(circle, rgba(160, 174, 192, 0.1) 0%, transparent 70%);
+}
+
+/* Staff Card Header - Enhanced */
 .staff-card-header {
   display: flex;
   align-items: flex-start;
-  margin-bottom: 1rem;
+  margin-bottom: 1.5rem;
+  position: relative;
+  z-index: 1;
 }
 
 .staff-avatar {
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
-  background: var(--bg-light);
+  width: 70px;
+  height: 70px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, var(--primary-blue), var(--primary-dark));
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--primary-dark);
+  color: var(--text-white);
   font-weight: bold;
-  font-size: 1.2rem;
-  margin-right: 1rem;
+  font-size: 1.5rem;
+  margin-right: 1.5rem;
   flex-shrink: 0;
+  box-shadow: var(--shadow-sm);
 }
 
 .staff-info {
@@ -261,51 +354,71 @@
 }
 
 .staff-name {
-  font-size: 1.2rem;
+  font-size: 1.3rem;
   font-weight: 700;
   color: var(--primary-dark);
-  margin-bottom: 0.25rem;
+  margin-bottom: 0.5rem;
+  line-height: 1.2;
 }
 
 .staff-position {
-  color: #666;
-  font-size: 0.9rem;
-  margin-bottom: 0.5rem;
+  color: var(--primary-blue);
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
 }
 
 .staff-status {
-  display: inline-block;
-  padding: 0.3rem 0.8rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
   border-radius: 20px;
-  font-size: 0.8rem;
+  font-size: 0.85rem;
   font-weight: 600;
   text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .status-active {
   background: #c6f6d5;
   color: #22543d;
+  border: 1px solid #9ae6b4;
 }
 
 .status-inactive {
   background: #fed7d7;
   color: #742a2a;
+  border: 1px solid #feb2b2;
 }
 
 .status-on_leave {
   background: #feebcb;
   color: #744210;
+  border: 1px solid #fbd38d;
 }
 
+/* Staff Details - Enhanced */
 .staff-details {
-  margin: 1rem 0;
+  margin: 1.5rem 0;
+  position: relative;
+  z-index: 1;
 }
 
 .detail-item {
   display: flex;
   justify-content: space-between;
-  padding: 0.5rem 0;
+  align-items: center;
+  padding: 0.75rem 0;
   border-bottom: 1px solid #f0f0f0;
+  transition: var(--transition);
+}
+
+.detail-item:hover {
+  background: rgba(219, 228, 240, 0.3);
+  margin: 0 -0.5rem;
+  padding: 0.75rem 0.5rem;
+  border-radius: 8px;
 }
 
 .detail-item:last-child {
@@ -316,26 +429,38 @@
   font-weight: 600;
   color: #666;
   font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 .detail-value {
-  color: #333;
+  color: var(--primary-dark);
+  font-weight: 500;
   font-size: 0.9rem;
   text-align: right;
 }
 
-.staff-actions {
-  display: flex;
-  gap: 0.5rem;
-  margin-top: 1rem;
-  flex-wrap: wrap;
+.detail-value.employee-id {
+  font-family: 'Courier New', monospace;
+  background: var(--bg-light);
+  padding: 0.25rem 0.5rem;
+  border-radius: 6px;
+  font-weight: 600;
 }
 
-.btn-sm {
-  padding: 0.5rem 1rem;
-  font-size: 0.875rem;
+/* Staff Actions - Enhanced */
+.staff-actions {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+  position: relative;
+  z-index: 1;
+}
+
+.staff-actions .btn-sm {
   flex: 1;
-  min-width: 80px;
+  min-width: 120px;
   justify-content: center;
 }
 
@@ -343,188 +468,139 @@
 .staff-card::after {
   content: 'Click to view/edit details';
   position: absolute;
-  bottom: 10px;
-  right: 10px;
-  font-size: 0.7rem;
+  bottom: 1rem;
+  right: 1rem;
+  font-size: 0.75rem;
   color: var(--primary-blue);
   opacity: 0;
   transition: var(--transition);
+  font-weight: 500;
 }
 
 .staff-card:hover::after {
   opacity: 1;
 }
 
-/* Empty State */
+/* Empty State - Enhanced */
 .empty-state {
   grid-column: 1 / -1;
   text-align: center;
-  padding: 3rem;
-  color: #666;
-  background: white;
-  border-radius: 15px;
+  padding: 4rem 2rem;
+  background: var(--text-white);
+  border-radius: 16px;
   box-shadow: var(--shadow-md);
 }
 
-.empty-state i {
-  font-size: 3rem;
-  margin-bottom: 1rem;
-  color: #cbd5e0;
+.empty-icon {
+  font-size: 4rem;
+  color: var(--accent-light);
+  margin-bottom: 1.5rem;
 }
 
 .empty-state h3 {
-  margin-bottom: 0.5rem;
+  font-size: 1.5rem;
   color: var(--primary-dark);
+  margin-bottom: 1rem;
+  font-weight: 600;
 }
 
-/* NAVBAR */
-.navbar {
-  background: linear-gradient(135deg, var(--primary-blue), var(--primary-dark));
-  padding: 1rem 2rem;
-  color: var(--text-white);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  box-shadow: var(--shadow-md);
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  z-index: 1000;
+.empty-state p {
+  color: #666;
+  margin-bottom: 2rem;
+  font-size: 1.1rem;
 }
 
-.navbar-content {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  width: 100%;
-  max-width: 1400px;
-  margin: 0 auto;
+/* Buttons - Consistent with Dashboard */
+.btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem 2rem;
+    background: var(--accent-light);
+    color: var(--primary-dark);
+    text-decoration: none;
+    border-radius: 12px;
+    font-weight: 600;
+    transition: var(--transition);
+    box-shadow: var(--shadow-sm);
+    border: none;
+    cursor: pointer;
 }
 
-.navbar-brand {
-  font-weight: 700;
-  font-size: 1.3rem;
-  color: var(--text-white);
-  text-decoration: none;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
+.btn-primary:hover {
+    background: var(--text-white);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
 }
 
-.navbar-menu {
-  display: flex;
-  gap: 1.5rem;
+.btn-outline {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem 2rem;
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text-white);
+    text-decoration: none;
+    border-radius: 12px;
+    font-weight: 600;
+    transition: var(--transition);
+    box-shadow: var(--shadow-sm);
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
 }
 
-.nav-link {
-  color: var(--text-white);
-  text-decoration: none;
-  transition: var(--transition);
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.5rem 1rem;
-  border-radius: 5px;
-}
-
-.nav-link:hover, .nav-link.active {
-  color: var(--accent-light);
-  background: rgba(255, 255, 255, 0.1);
-}
-
-/* User Section */
-.user-section {
-  position: relative;
-}
-
-.user-info {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  cursor: pointer;
-  padding: 0.5rem;
-  border-radius: 5px;
-  transition: var(--transition);
-}
-
-.user-info:hover {
-  background: rgba(255, 255, 255, 0.1);
-}
-
-.user-avatar {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  background: var(--accent-light);
-  color: var(--primary-dark);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: bold;
-}
-
-.user-dropdown {
-  position: absolute;
-  top: 100%;
-  right: 0;
-  background: white;
-  color: #333;
-  border-radius: 8px;
-  box-shadow: var(--shadow-md);
-  width: 200px;
-  padding: 0.5rem 0;
-  z-index: 100;
-  display: none;
-}
-
-.user-dropdown.active {
-  display: block;
-}
-
-.user-dropdown-item {
-  padding: 0.75rem 1rem;
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  cursor: pointer;
-  transition: var(--transition);
-  border: none;
-  background: none;
-  width: 100%;
-  text-align: left;
-  font-size: 0.9rem;
-}
-
-.user-dropdown-item:hover {
-  background: var(--bg-light);
-}
-
-.user-dropdown-divider {
-  height: 1px;
-  background: #e0e0e0;
-  margin: 0.5rem 0;
+.btn-outline:hover {
+    background: var(--accent-light);
+    color: var(--primary-dark);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
 }
 
 /* Responsive Design */
+@media (max-width: 1200px) {
+  .staff-kpi-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  
+  .staff-grid {
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  }
+}
+
 @media (max-width: 768px) {
+  .staff-management-wrapper {
+    padding: 1rem;
+  }
+  
   .staff-header {
-    flex-direction: column;
+    padding: 2rem;
     text-align: center;
+  }
+  
+  .header-content h1 {
+    font-size: 2rem;
+    justify-content: center;
   }
   
   .search-form {
     grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  .staff-kpi-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
   }
   
   .staff-grid {
     grid-template-columns: 1fr;
-    padding: 0 1rem;
+    gap: 1.5rem;
   }
   
   .staff-card-header {
     flex-direction: column;
     text-align: center;
+    align-items: center;
   }
   
   .staff-avatar {
@@ -532,33 +608,39 @@
     margin-bottom: 1rem;
   }
   
-  .staff-kpi-grid {
-    padding: 0 1rem;
-    grid-template-columns: repeat(2, 1fr);
-  }
-  
-  .search-section {
-    padding: 0 1rem;
-  }
-}
-
-@media (max-width: 480px) {
-  .staff-kpi-grid {
-    grid-template-columns: 1fr;
-  }
-  
   .staff-actions {
     flex-direction: column;
   }
   
-  .btn-sm {
-    flex: none;
+  .staff-actions .btn-sm {
     width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .staff-header {
+    padding: 1.5rem;
+  }
+  
+  .header-content h1 {
+    font-size: 1.75rem;
+  }
+  
+  .kpi-card {
+    padding: 1.5rem;
+  }
+  
+  .kpi-value {
+    font-size: 2rem;
+  }
+  
+  .staff-card {
+    padding: 1.5rem;
   }
   
   .staff-card::after {
     content: 'Tap to view/edit';
-    font-size: 0.6rem;
+    font-size: 0.7rem;
   }
 }
 </style>
@@ -568,54 +650,17 @@
 
 {% block content %}
 <div class="staff-management-wrapper">
-    {% comment %} <!-- Navigation -->
-    <nav class="navbar">
-        <div class="navbar-content">
-            <a href="{% url 'dashboard:dashboard' %}" class="navbar-brand">
-                <i class="fas fa-chart-line"></i>
-                TrackWise
-            </a>
-
-            <div class="navbar-menu">
-                <a href="{% url 'dashboard:dashboard' %}" class="nav-link"><i class="fas fa-home"></i> Dashboard</a>
-                <a href="{% url 'inventory:inventory_list' %}" class="nav-link"><i class="fas fa-boxes"></i> Inventory</a>
-                <a href="{% url 'reports:reports_dashboard' %}" class="nav-link"><i class="fas fa-chart-bar"></i> Reports</a>
-                <a href="{% url 'staff_management:staff_list' %}" class="nav-link active"><i class="fas fa-users"></i> Staff</a>
-            </div>
-
-            <div class="user-section">
-                <div class="user-info" id="userDropdownTrigger">
-                    <span>{{ user.first_name }} {{ user.last_name }}</span>
-                    <div class="user-avatar">{{ user.first_name|first }}{{ user.last_name|first }}</div>
-                    <i class="fas fa-chevron-down" style="font-size: 0.8rem;"></i>
-                </div>
-                
-                <div class="user-dropdown" id="userDropdown">
-                    <a href="{% url 'accounts:edit_profile' %}" class="user-dropdown-item">
-                        <i class="fas fa-user-edit"></i>
-                        <span>Edit Profile</span>
-                    </a>
-                    <div class="user-dropdown-divider"></div>
-                    <form method="post" action="{% url 'accounts:logout' %}" style="display: inline;">
-                        {% csrf_token %}
-                        <button type="submit" class="user-dropdown-item">
-                            <i class="fas fa-sign-out-alt"></i>
-                            <span>Logout</span>
-                        </button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </nav> {% endcomment %}
-
     <!-- Header Section -->
     <section class="staff-header">
         <div class="header-content">
-            <h1>Staff Management</h1>
-            <p>Manage your team members and their permissions</p>
+            <h1>
+                <i class="fas fa-users"></i>
+                Staff Management
+            </h1>
+            <p>Manage your team members and their permissions efficiently</p>
         </div>
         <div class="header-actions">
-            <a href="{% url 'staff_management:staff_create' %}" class="btn btn-success">
+            <a href="{% url 'staff_management:staff_create' %}" class="btn-primary">
                 <i class="fas fa-user-plus"></i> Add New Staff
             </a>
         </div>
@@ -626,14 +671,17 @@
         <div class="kpi-card">
             <div class="kpi-value">{{ total_staff }}</div>
             <div class="kpi-label">Total Staff</div>
+            <i class="kpi-icon fas fa-users"></i>
         </div>
         <div class="kpi-card">
             <div class="kpi-value">{{ active_staff }}</div>
             <div class="kpi-label">Active Staff</div>
+            <i class="kpi-icon fas fa-user-check"></i>
         </div>
         <div class="kpi-card">
             <div class="kpi-value">{{ total_staff|add:"-active_staff" }}</div>
             <div class="kpi-label">Inactive Staff</div>
+            <i class="kpi-icon fas fa-user-times"></i>
         </div>
     </div>
 
@@ -642,15 +690,21 @@
         <div class="search-card">
             <form method="get" class="search-form">
                 <div class="form-group">
-                    <label class="form-label" for="id_search_query">Search Staff</label>
+                    <label class="form-label" for="id_search_query">
+                        <i class="fas fa-search"></i> Search Staff
+                    </label>
                     {{ search_form.search_query }}
                 </div>
                 <div class="form-group">
-                    <label class="form-label" for="id_department">Department</label>
+                    <label class="form-label" for="id_department">
+                        <i class="fas fa-building"></i> Department
+                    </label>
                     {{ search_form.department }}
                 </div>
                 <div class="form-group">
-                    <label class="form-label" for="id_status">Status</label>
+                    <label class="form-label" for="id_status">
+                        <i class="fas fa-circle"></i> Status
+                    </label>
                     {{ search_form.status }}
                 </div>
                 <div class="form-group">
@@ -676,30 +730,47 @@
                     <div class="staff-info">
                         <div class="staff-name">{{ staff.user_profile.user.get_full_name }}</div>
                         <div class="staff-position">{{ staff.position }}</div>
-                        <span class="staff-status status-{{ staff.status }}">{{ staff.get_status_display }}</span>
+                        <span class="staff-status status-{{ staff.status }}">
+                            <i class="fas {% if staff.status == 'active' %}fa-play-circle{% elif staff.status == 'inactive' %}fa-pause-circle{% else %}fa-clock{% endif %}"></i>
+                            {{ staff.get_status_display }}
+                        </span>
                     </div>
                 </div>
                 
                 <div class="staff-details">
                     <div class="detail-item">
-                        <span class="detail-label">Employee ID:</span>
-                        <span class="detail-value">{{ staff.employee_id }}</span>
+                        <span class="detail-label">
+                            <i class="fas fa-id-card"></i> Employee ID:
+                        </span>
+                        <span class="detail-value employee-id">{{ staff.employee_id }}</span>
                     </div>
                     <div class="detail-item">
-                        <span class="detail-label">Department:</span>
+                        <span class="detail-label">
+                            <i class="fas fa-building"></i> Department:
+                        </span>
                         <span class="detail-value">{{ staff.department }}</span>
                     </div>
                     <div class="detail-item">
-                        <span class="detail-label">Email:</span>
+                        <span class="detail-label">
+                            <i class="fas fa-envelope"></i> Email:
+                        </span>
                         <span class="detail-value">{{ staff.user_profile.user.email }}</span>
                     </div>
                     <div class="detail-item">
-                        <span class="detail-label">Hire Date:</span>
+                        <span class="detail-label">
+                            <i class="fas fa-calendar-alt"></i> Hire Date:
+                        </span>
                         <span class="detail-value">{{ staff.hire_date }}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">
+                            <i class="fas fa-map-marker-alt"></i> Location:
+                        </span>
+                        <span class="detail-value">{{ staff.user_profile.assigned_location }}</span>
                     </div>
                 </div>
                 
-                <!-- Only keep the status toggle button -->
+                <!-- Status toggle button -->
                 <div class="staff-actions">
                     <button class="btn {% if staff.status == 'active' %}btn-warning{% else %}btn-success{% endif %} btn-sm toggle-status" 
                             data-staff-id="{{ staff.id }}"
@@ -713,9 +784,11 @@
             {% endfor %}
         {% else %}
             <div class="empty-state">
-                <i class="fas fa-users"></i>
+                <div class="empty-icon">
+                    <i class="fas fa-users"></i>
+                </div>
                 <h3>No Staff Members Found</h3>
-                <p>Get started by adding your first staff member.</p>
+                <p>Get started by adding your first staff member to your team.</p>
                 <a href="{% url 'staff_management:staff_create' %}" class="btn btn-success">
                     <i class="fas fa-user-plus"></i> Add New Staff
                 </a>
@@ -726,23 +799,6 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // User dropdown functionality
-    const userDropdownTrigger = document.getElementById('userDropdownTrigger');
-    const userDropdown = document.getElementById('userDropdown');
-    
-    if (userDropdownTrigger && userDropdown) {
-        userDropdownTrigger.addEventListener('click', function(e) {
-            e.stopPropagation();
-            userDropdown.classList.toggle('active');
-        });
-        
-        document.addEventListener('click', function(e) {
-            if (!userDropdown.contains(e.target) && !userDropdownTrigger.contains(e.target)) {
-                userDropdown.classList.remove('active');
-            }
-        });
-    }
-
     // Toggle staff status
     const toggleButtons = document.querySelectorAll('.toggle-status');
     toggleButtons.forEach(button => {
@@ -750,10 +806,16 @@ document.addEventListener('DOMContentLoaded', function() {
             e.stopPropagation(); // Prevent card click event
             const staffId = this.dataset.staffId;
             const staffName = this.dataset.staffName;
+            const currentAction = this.textContent.trim();
             
-            if (confirm(`Are you sure you want to change the status for ${staffName}?`)) {
+            if (confirm(`Are you sure you want to ${currentAction.toLowerCase()} ${staffName}?`)) {
                 // Create CSRF token
                 const csrftoken = getCookie('csrftoken');
+                
+                // Show loading state
+                const originalText = this.innerHTML;
+                this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+                this.disabled = true;
                 
                 fetch(`/staff/${staffId}/toggle-status/`, {
                     method: 'POST',
@@ -766,13 +828,31 @@ document.addEventListener('DOMContentLoaded', function() {
                 .then(data => {
                     if (data.status === 'success') {
                         location.reload();
+                    } else {
+                        alert('Error updating staff status');
+                        this.innerHTML = originalText;
+                        this.disabled = false;
                     }
                 })
                 .catch(error => {
                     console.error('Error:', error);
                     alert('Error updating staff status');
+                    this.innerHTML = originalText;
+                    this.disabled = false;
                 });
             }
+        });
+    });
+
+    // Add hover animations to cards
+    const staffCards = document.querySelectorAll('.staff-card');
+    staffCards.forEach(card => {
+        card.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-8px)';
+        });
+        
+        card.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0)';
         });
     });
 
