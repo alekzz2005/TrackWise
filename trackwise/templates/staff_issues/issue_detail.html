@@ -1,0 +1,178 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ issue.title }} - TrackWise{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8">
+            <!-- Issue Header -->
+            <div class="card mb-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h4 class="mb-0">{{ issue.title }}</h4>
+                    <div class="d-flex gap-2">
+                        {% if can_update_status %}
+                        <div class="dropdown">
+                            <button class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown">
+                                Update Status
+                            </button>
+                            <div class="dropdown-menu">
+                                <form method="post" action="{% url 'staff_issues:update_issue_status' issue.id %}">
+                                    {% csrf_token %}
+                                    {% for status_value, status_label in issue.STATUS_CHOICES %}
+                                    <button type="submit" name="status" value="{{ status_value }}" class="dropdown-item">
+                                        {{ status_label }}
+                                    </button>
+                                    {% endfor %}
+                                </form>
+                            </div>
+                        </div>
+                        {% endif %}
+                        <a href="{% url 'staff_issues:issue_list' %}" class="btn btn-sm btn-outline-primary">
+                            Back to List
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <strong>Status:</strong>
+                            <span class="badge badge-{{ issue.status }}">{{ issue.get_status_display }}</span>
+                        </div>
+                        <div class="col-md-6">
+                            <strong>Priority:</strong>
+                            <span class="badge badge-priority-{{ issue.priority }}">{{ issue.get_priority_display }}</span>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <strong>Type:</strong> {{ issue.get_issue_type_display }}
+                        </div>
+                        <div class="col-md-6">
+                            <strong>Reported by:</strong> {{ issue.reporter.user.get_full_name }}
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <strong>Created:</strong> {{ issue.created_at|date:"M d, Y H:i" }}
+                        </div>
+                        {% if issue.resolved_at %}
+                        <div class="col-md-6">
+                            <strong>Resolved:</strong> {{ issue.resolved_at|date:"M d, Y H:i" }}
+                        </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="issue-description">
+                        <strong>Description:</strong>
+                        <p class="mt-2">{{ issue.description|linebreaks }}</p>
+                    </div>
+
+                    {% if issue.attachment or issue.image %}
+                    <div class="attachments mt-3">
+                        <strong>Attachments:</strong>
+                        <div class="mt-2">
+                            {% if issue.attachment %}
+                            <a href="{{ issue.attachment.url }}" class="btn btn-sm btn-outline-primary" target="_blank">
+                                <i class="fas fa-file"></i> Download Attachment
+                            </a>
+                            {% endif %}
+                            {% if issue.image %}
+                            <a href="{{ issue.image.url }}" class="btn btn-sm btn-outline-primary" target="_blank">
+                                <i class="fas fa-image"></i> View Image
+                            </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Comments Section -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Comments</h5>
+                </div>
+                <div class="card-body">
+                    {% if comments %}
+                        {% for comment in comments %}
+                        <div class="comment {% if comment.is_business_owner_note %}business-note{% endif %}">
+                            <div class="comment-header">
+                                <strong>{{ comment.author.user.get_full_name }}</strong>
+                                {% if comment.is_business_owner_note %}
+                                <span class="badge bg-warning">Business Owner</span>
+                                {% endif %}
+                                <span class="text-muted">{{ comment.created_at|date:"M d, Y H:i" }}</span>
+                            </div>
+                            <div class="comment-body">
+                                {{ comment.comment|linebreaks }}
+                            </div>
+                        </div>
+                        {% if not forloop.last %}<hr>{% endif %}
+                        {% endfor %}
+                    {% else %}
+                        <p class="text-muted">No comments yet.</p>
+                    {% endif %}
+
+                    <!-- Add Comment Form -->
+                    <div class="add-comment mt-4">
+                        <form method="post">
+                            {% csrf_token %}
+                            <div class="mb-3">
+                                {{ comment_form.comment }}
+                            </div>
+                            {% if comment_form.is_business_owner_note %}
+                            <div class="mb-3 form-check">
+                                {{ comment_form.is_business_owner_note }}
+                                <label class="form-check-label" for="{{ comment_form.is_business_owner_note.id_for_label }}">
+                                    Mark as Business Owner Note
+                                </label>
+                            </div>
+                            {% endif %}
+                            <button type="submit" class="btn btn-primary">Add Comment</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+/* PLACEHOLDER CSS - REPLACE WITH ACTUAL STYLING */
+.comment {
+    padding: 1rem 0;
+}
+.comment-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+.business-note {
+    background: #fff3cd;
+    border-left: 4px solid #ffc107;
+    padding: 1rem;
+    margin: 0 -1rem;
+}
+.badge {
+    padding: 0.25rem 0.5rem;
+    border-radius: 12px;
+    font-size: 0.75rem;
+}
+.badge-pending { background: #ffc107; color: black; }
+.badge-in_progress { background: #17a2b8; color: white; }
+.badge-resolved { background: #28a745; color: white; }
+.badge-closed { background: #6c757d; color: white; }
+.badge-priority-low { background: #6c757d; color: white; }
+.badge-priority-medium { background: #17a2b8; color: white; }
+.badge-priority-high { background: #ffc107; color: black; }
+.badge-priority-urgent { background: #dc3545; color: white; }
+.form-check {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+</style>
+{% endblock %}

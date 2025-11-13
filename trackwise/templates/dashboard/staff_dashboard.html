@@ -22,7 +22,7 @@
             <a href="{% url 'dashboard:dashboard' %}" class="nav-link active"><i class="fas fa-home"></i> Dashboard</a>
             <a href="{% url 'inventory:inventory_list' %}" class="nav-link"><i class="fas fa-boxes"></i> Inventory</a>
             <a href="#" class="nav-link"><i class="fas fa-history"></i> Activity Log</a>
-            <a href="#" class="nav-link"><i class="fas fa-flag"></i> Report Issues</a>
+            <a href="{% url 'staff_issues:issue_list' %}" class="nav-link"><i class="fas fa-flag"></i> Report Issues</a>
         </div>
 
         <!-- Profile with dropdown on the right -->
