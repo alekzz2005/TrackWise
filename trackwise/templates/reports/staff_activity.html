@@ -9,11 +9,20 @@
 :root {
   --primary-blue: #4a6fa5;
   --primary-dark: #2c5282;
+  --primary-darker: #1a365d;
   --accent-light: #a7c5eb;
   --bg-light: #dbe4f0;
   --bg-page: #f0f4f8;
+  --success: #4CAF50;
+  --success-dark: #45a049;
+  --danger: #f44336;
+  --danger-dark: #da3226;
+  --warning: #ff9800;
+  --warning-dark: #f57c00;
   --text-white: #ffffff;
-  --shadow-md: 0 6px 20px rgba(0, 0, 0, 0.15);
+  --shadow-sm: 0 2px 5px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 8px 25px rgba(0, 0, 0, 0.2);
+  --shadow-lg: 0 15px 35px rgba(0, 0, 0, 0.2);
   --transition: all 0.3s ease;
 }
 
@@ -29,57 +38,216 @@ body {
   background-color: var(--bg-page);
 }
 
-/* Header */
-h1 {
-  color: var(--primary-dark);
-  font-weight: 800;
+/* Header Section */
+.report-header {
+  background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-dark) 100%);
+  border-radius: 20px;
+  padding: 2.5rem;
+  margin-bottom: 2rem;
+  box-shadow: var(--shadow-lg);
+  position: relative;
+  overflow: hidden;
 }
 
+.report-header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 300px;
+  height: 300px;
+  background: radial-gradient(circle, rgba(167, 197, 235, 0.2) 0%, transparent 70%);
+  border-radius: 50%;
+  transform: translate(30%, -30%);
+}
+
+.header-content {
+  position: relative;
+  z-index: 1;
+  margin-bottom: 2rem;
+}
+
+.welcome-text {
+  color: var(--text-white);
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.welcome-text i {
+  color: var(--accent-light);
+}
+
+.subtitle {
+  color: var(--accent-light);
+  font-size: 1.1rem;
+  margin: 0;
+}
+
+.header-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 2rem;
+  position: relative;
+  z-index: 1;
+}
+
+/* Back Button */
 .btn-outline-secondary {
-  color: var(--primary-dark);
-  border-color: var(--primary-dark);
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 1rem 1.5rem;
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--text-white);
+  text-decoration: none;
+  border-radius: 12px;
+  font-weight: 600;
   transition: var(--transition);
+  box-shadow: var(--shadow-sm);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
 }
 
 .btn-outline-secondary:hover {
-  background: var(--primary-dark);
-  color: var(--text-white);
-}
-
-/* Debug Alert */
-.debug-alert {
   background: var(--accent-light);
-  border: 1px solid var(--primary-blue);
-  border-radius: 8px;
-  padding: 0.8rem 1rem;
   color: var(--primary-dark);
-  font-weight: 500;
-  margin-bottom: 1.5rem;
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
 }
 
 /* Statistic Cards */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
 .stat-card {
-  background: var(--text-white);
-  border-radius: 15px;
+  background: linear-gradient(135deg, var(--primary-blue), var(--primary-dark));
+  border-radius: 16px;
+  padding: 2rem;
+  color: var(--text-white);
   box-shadow: var(--shadow-md);
-  text-align: center;
-  padding: 1.5rem;
   transition: var(--transition);
-  border-top: 5px solid transparent;
+  position: relative;
+  overflow: hidden;
+  text-align: center;
+}
+
+.stat-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 100px;
+  height: 100px;
+  background: radial-gradient(circle, rgba(167, 197, 235, 0.3) 0%, transparent 70%);
+  border-radius: 50%;
+  transform: translate(30%, -30%);
 }
 
 .stat-card:hover {
   transform: translateY(-5px);
+  box-shadow: var(--shadow-lg);
 }
 
 .stat-number {
-  font-size: 2rem;
+  font-size: 2.5rem;
   font-weight: 700;
+  color: var(--text-white);
+  margin-bottom: 0.5rem;
+  position: relative;
+  z-index: 1;
 }
 
 .stat-label {
-  color: #666;
-  font-size: 0.9rem;
+  font-size: 0.95rem;
+  color: var(--accent-light);
+  font-weight: 500;
+  position: relative;
+  z-index: 1;
+}
+
+.stat-icon {
+  position: absolute;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  font-size: 2rem;
+  color: rgba(255, 255, 255, 0.2);
+  z-index: 1;
+}
+
+/* Table Layout */
+.inventory-view {
+  width: 100%;
+  background-color: var(--text-white);
+  border-radius: 16px;
+  box-shadow: var(--shadow-md);
+  overflow: hidden;
+  margin-bottom: 2rem;
+}
+
+/* Card Header */
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem 2rem;
+  background: linear-gradient(135deg, var(--primary-dark), var(--primary-darker));
+  color: var(--text-white);
+  font-weight: 600;
+}
+
+.card-title {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Export Buttons */
+.export-buttons {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.export-buttons .btn {
+  font-size: 0.8rem;
+  padding: 0.45rem 0.9rem;
+  border-radius: 8px;
+  font-weight: 500;
+  transition: var(--transition);
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.export-buttons .btn-success {
+  background: linear-gradient(135deg, #48bb78, #38a169);
+  border: none;
+}
+
+.export-buttons .btn-danger {
+  background: linear-gradient(135deg, #e53e3e, #c53030);
+  border: none;
+}
+
+.export-buttons .btn-info {
+  background: linear-gradient(135deg, var(--primary-blue), var(--primary-dark));
+  border: none;
+}
+
+.export-buttons .btn:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
 }
 
 /* Table */
@@ -87,7 +255,8 @@ h1 {
   border-radius: 10px;
   overflow: hidden;
   background: var(--text-white);
-  box-shadow: var(--shadow-md);
+  box-shadow: none;
+  margin: 0;
 }
 
 .table thead.table-dark th {
@@ -95,6 +264,7 @@ h1 {
   color: var(--text-white);
   font-weight: 600;
   border: none;
+  padding: 1rem 1.5rem;
 }
 
 .table-striped tbody tr:nth-of-type(odd) {
@@ -103,6 +273,11 @@ h1 {
 
 .table-hover tbody tr:hover {
   background-color: #e8f0fa;
+}
+
+.table td {
+  padding: 1rem 1.5rem;
+  vertical-align: middle;
 }
 
 /* Performance Badges */
@@ -133,152 +308,27 @@ h1 {
   color: #742a2a;
 }
 
-/* Metric Bars */
-.metric-bar {
-  height: 8px;
-  background: #e2e8f0;
-  border-radius: 4px;
-  width: 90px;
-  margin-right: 10px;
-  box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
-}
-
-.tasks-fill {
-  background: linear-gradient(90deg, #38a169, #2f855a);
-}
-
-.attendance-fill {
-  background: linear-gradient(90deg, var(--primary-blue), var(--primary-dark));
-}
-
-/* Export Buttons */
-.export-buttons {
-  gap: 10px;
-  align-items: center;
-}
-
-.export-buttons .btn {
+/* Status Badges */
+.badge {
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
   font-size: 0.8rem;
-  padding: 0.45rem 0.9rem;
-  border-radius: 8px;
-  font-weight: 500;
-  transition: var(--transition);
-  box-shadow: var(--shadow-md);
+  font-weight: 600;
 }
-
-.export-buttons .btn-success {
-  background: linear-gradient(135deg, #48bb78, #38a169);
-  border: none;
-}
-
-.export-buttons .btn-danger {
-  background: linear-gradient(135deg, #e53e3e, #c53030);
-  border: none;
-}
-
-.export-buttons .btn-info {
-  background: linear-gradient(135deg, var(--primary-blue), var(--primary-dark));
-  border: none;
-}
-
-.export-buttons .btn:hover {
-  transform: translateY(-2px);
-}
-
-.btn-outline-secondary {
-    position: relative;
-    overflow: hidden;
-    padding: 16px 24px;
-    border-radius: 10px;
-    background: transparent;
-    color: var(--primary-dark);
-    cursor: pointer;
-    font-weight: 600;
-    text-transform: uppercase;
-    transition: var(--transition);
-    font-size: 14px;
-    letter-spacing: 0.5px;
-    box-shadow: var(--shadow-sm);
-    text-decoration: none; /* ← removes underline */
-}
-
-/* Ripple effect */
-.btn-outline-secondary::before {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 0;
-    height: 0;
-    border-radius: 50%;
-    background: rgba(42, 82, 130, 0.25);
-    transform: translate(-50%, -50%);
-    transition: width 0.6s, height 0.6s;
-    z-index: 0;
-}
-
-.btn-outline-secondary:hover::before {
-    width: 300px;
-    height: 300px;
-}
-
-/* Hover lift + glow */
-.btn-outline-secondary:hover {
-    background: linear-gradient(135deg, var(--primary-blue), var(--primary-dark));
-    color: var(--text-white);
-    transform: translateY(-3px);
-    box-shadow: 0 8px 20px rgba(42, 82, 130, 0.4);
-    border-color: transparent;
-    text-decoration: none; /* ← removes underline */
-}
-
-/* Keep the text above the ripple */
-.btn-outline-secondary span {
-    position: relative;
-    z-index: 1;
-}
-
-/* Active click feedback */
-.btn-outline-secondary:active {
-    transform: translateY(-1px);
-    box-shadow: 0 4px 10px rgba(42, 82, 130, 0.3);
-}
-
-
 
 /* Summary Box */
 .bg-light.rounded {
   background: var(--bg-light) !important;
   border: 1px solid #e2e8f0;
   box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
-}
-
-/* Cards */
-.card {
-  border: none;
+  padding: 1.5rem;
   border-radius: 12px;
-  box-shadow: var(--shadow-md);
-  overflow: hidden;
-}
-
-.card-header {
-  background: linear-gradient(135deg, var(--primary-blue), var(--primary-dark));
-  color: var(--text-white);
-  font-weight: 600;
-}
-
-.card-body {
-  background: var(--text-white);
 }
 
 /* Responsive */
-@media (max-width: 992px) {
-  .stat-card {
-    margin-bottom: 1rem;
-  }
-
-  .export-buttons {
-    flex-wrap: wrap;
+@media (max-width: 1200px) {
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
   }
 }
 
@@ -287,13 +337,65 @@ h1 {
     padding: 1rem;
   }
 
-  .stat-number {
-    font-size: 1.6rem;
+  .report-header {
+    padding: 1.5rem;
   }
+  
+  .header-actions {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1rem;
+  }
+  
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .stat-number {
+    font-size: 2rem;
+  }
+  
+  .export-buttons {
+    flex-wrap: wrap;
+  }
+  
+  .card-header {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: flex-start;
+  }
+  
+  .table-responsive {
+    font-size: 0.9rem;
+  }
+  
+  .table thead.table-dark th,
+  .table td {
+    padding: 0.75rem 1rem;
+  }
+}
 
+@media (max-width: 480px) {
+  .welcome-text {
+    font-size: 1.5rem;
+  }
+  
+  .subtitle {
+    font-size: 0.95rem;
+  }
+  
+  .stat-card {
+    padding: 1.5rem;
+  }
+  
+  .stat-number {
+    font-size: 2rem;
+  }
+  
   .export-buttons .btn {
     width: 100%;
     text-align: center;
+    justify-content: center;
   }
 }
 </style>
@@ -304,60 +406,54 @@ h1 {
 <div class="staff-report-wrapper">
     <div class="container-fluid">
         <!-- Header -->
-        <div class="row mb-4">
-            <div class="col-12">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <h1><i class="fas fa-user-clock me-2"></i>Staff Activity Report</h1>
-                        <p class="text-muted">Staff performance metrics and activity overview</p>
-                    </div>
-                    <a href="{% url 'reports:reports_dashboard' %}" class="btn-outline-secondary">
-                        <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
-                    </a>
-                </div>
+        <div class="report-header">
+            <div class="header-content">
+                <h1 class="welcome-text">
+                    <i class="fas fa-user-clock"></i>
+                    Staff Activity Report
+                </h1>
+                <p class="subtitle">Staff performance metrics and activity overview</p>
             </div>
-        </div>
-
-        <!-- Debug Info -->
-        <div class="debug-alert">
-            <strong>✓ Data Loaded Successfully:</strong> Found {{ activity_data.total_staff }} staff members in database
+            
+            <div class="header-actions">
+                <div></div> <!-- Empty div for spacing -->
+                {% comment %} <a href="{% url 'reports:reports_dashboard' %}" class="btn-outline-secondary">
+                    <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+                </a> {% endcomment %}
+            </div>
         </div>
 
         {% if activity_data %}
         <!-- Statistics Cards -->
-        <div class="row mb-4">
-            <div class="col-md-3">
-                <div class="stat-card" style="border-left: 4px solid #4a6fa5;">
-                    <div class="stat-number text-primary">{{ activity_data.total_staff }}</div>
-                    <div class="stat-label">Total Staff</div>
-                </div>
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-number">{{ activity_data.total_staff }}</div>
+                <div class="stat-label">Total Staff</div>
+                <i class="stat-icon fas fa-users"></i>
             </div>
-            <div class="col-md-3">
-                <div class="stat-card" style="border-left: 4px solid #38a169;">
-                    <div class="stat-number text-success">{{ activity_data.active_staff }}</div>
-                    <div class="stat-label">Active Staff</div>
-                </div>
+            <div class="stat-card">
+                <div class="stat-number">{{ activity_data.active_staff }}</div>
+                <div class="stat-label">Active Staff</div>
+                <i class="stat-icon fas fa-user-check"></i>
             </div>
-            <div class="col-md-3">
-                <div class="stat-card" style="border-left: 4px solid #e53e3e;">
-                    <div class="stat-number text-danger">{{ activity_data.inactive_staff }}</div>
-                    <div class="stat-label">Inactive Staff</div>
-                </div>
+            <div class="stat-card">
+                <div class="stat-number">{{ activity_data.inactive_staff }}</div>
+                <div class="stat-label">Inactive Staff</div>
+                <i class="stat-icon fas fa-user-times"></i>
             </div>
-            <div class="col-md-3">
-                <div class="stat-card" style="border-left: 4px solid #ed8936;">
-                    <div class="stat-number text-warning">{{ activity_data.on_leave_staff }}</div>
-                    <div class="stat-label">On Leave</div>
-                </div>
+            <div class="stat-card">
+                <div class="stat-number">{{ activity_data.on_leave_staff }}</div>
+                <div class="stat-label">On Leave</div>
+                <i class="stat-icon fas fa-user-clock"></i>
             </div>
         </div>
 
         <!-- Staff Details Table -->
         <div class="row">
             <div class="col-12">
-                <div class="card">
-                    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-                        <h5 class="card-title mb-0">
+                <div class="inventory-view">
+                    <div class="card-header">
+                        <h5 class="card-title">
                             <i class="fas fa-users me-2"></i>Staff Performance Details
                             <span class="badge bg-light text-dark ms-2">{{ activity_data.staff_details|length }} staff members</span>
                         </h5>
@@ -385,9 +481,6 @@ h1 {
                                         <th>Department</th>
                                         <th>Status</th>
                                         <th>Tenure</th>
-                                        <th>Performance</th>
-                                        <th>Task Completion</th>
-                                        <th>Attendance</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -414,37 +507,6 @@ h1 {
                                             <strong>{{ staff.tenure_days }}</strong> days
                                             <br>
                                             <small class="text-muted">Since {{ staff.hire_date }}</small>
-                                        </td>
-                                        <td>
-                                            {% if staff.performance_class == 'success' %}
-                                                <span class="performance-badge badge-success-custom">
-                                            {% elif staff.performance_class == 'info' %}
-                                                <span class="performance-badge badge-info-custom">
-                                            {% elif staff.performance_class == 'warning' %}
-                                                <span class="performance-badge badge-warning-custom">
-                                            {% else %}
-                                                <span class="performance-badge badge-danger-custom">
-                                            {% endif %}
-                                                {{ staff.performance_level }}
-                                            </span>
-                                            <br>
-                                            <small class="text-muted">{{ staff.performance_score }}%</small>
-                                        </td>
-                                        <td>
-                                            <div class="d-flex align-items-center">
-                                                <div class="metric-bar">
-                                                    <div class="metric-fill tasks-fill" style="width: {{ staff.task_completion }}%;"></div>
-                                                </div>
-                                                <strong>{{ staff.task_completion }}%</strong>
-                                            </div>
-                                        </td>
-                                        <td>
-                                            <div class="d-flex align-items-center">
-                                                <div class="metric-bar">
-                                                    <div class="metric-fill attendance-fill" style="width: {{ staff.attendance_rate }}%;"></div>
-                                                </div>
-                                                <strong>{{ staff.attendance_rate }}%</strong>
-                                            </div>
                                         </td>
                                     </tr>
                                     {% endfor %}
@@ -484,7 +546,7 @@ h1 {
         <!-- No Data Available -->
         <div class="row">
             <div class="col-12">
-                <div class="card">
+                <div class="inventory-view">
                     <div class="card-body text-center py-5">
                         <i class="fas fa-users fa-4x text-muted mb-3"></i>
                         <h4>No Staff Activity Data Available</h4>

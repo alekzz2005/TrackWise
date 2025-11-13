@@ -24,131 +24,6 @@
         --transition: all 0.3s ease;
     }
 
-    /* NAVBAR */
-    .navbar {
-    background: linear-gradient(135deg, var(--primary-blue), var(--primary-dark));
-    padding: 1rem 2rem;
-    color: var(--text-white);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    box-shadow: var(--shadow-md);
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    z-index: 1000;
-    }
-
-    .navbar-content {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    width: 100%;
-    max-width: 1400px;
-    margin: 0 auto;
-    }
-
-    .navbar-brand {
-    font-weight: 700;
-    font-size: 1.3rem;
-    color: var(--text-white);
-    text-decoration: none;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    }
-
-    .navbar-menu {
-    display: flex;
-    gap: 1.5rem;
-    }
-
-    .nav-link {
-    color: var(--text-white);
-    text-decoration: none;
-    transition: var(--transition);
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    }
-
-    .nav-link:hover, .nav-link.active {
-    color: var(--accent-light);
-    }
-
-    /* User Section */
-    .user-section {
-    position: relative;
-    }
-
-    .user-info {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    cursor: pointer;
-    padding: 0.5rem;
-    border-radius: 5px;
-    transition: var(--transition);
-    }
-
-    .user-info:hover {
-    background: rgba(255, 255, 255, 0.1);
-    }
-
-    .user-avatar {
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    background: var(--accent-light);
-    color: var(--primary-dark);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: bold;
-    }
-
-    .user-dropdown {
-    position: absolute;
-    top: 100%;
-    right: 0;
-    background: white;
-    color: #333;
-    border-radius: 8px;
-    box-shadow: var(--shadow-md);
-    width: 200px;
-    padding: 0.5rem 0;
-    z-index: 100;
-    display: none;
-    }
-
-    .user-dropdown.active {
-    display: block;
-    }
-
-    .user-dropdown-item {
-    padding: 0.75rem 1rem;
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    cursor: pointer;
-    transition: var(--transition);
-    border: none;
-    background: none;
-    width: 100%;
-    text-align: left;
-    }
-
-    .user-dropdown-item:hover {
-    background: var(--bg-light);
-    }
-
-    .user-dropdown-divider {
-    height: 1px;
-    background: #e0e0e0;
-    margin: 0.5rem 0;
-    }
-
     /* Main Content */
     .dashboard-wrapper {
         padding-top: 50px;
@@ -388,34 +263,6 @@
         box-shadow: var(--shadow-md);
         overflow: hidden;
         margin-bottom: 2rem;
-    }
-
-    /* Search Section */
-    .search-section {
-        padding: 20px;
-        background-color: var(--bg-light);
-        border-bottom: 1px solid #ddd;
-    }
-
-    .table-search-input {
-        width: 100%;
-        padding: 12px 20px;
-        border: none;
-        border-radius: 8px;
-        font-size: 1rem;
-        color: #333;
-        background-color: var(--text-white);
-        box-shadow: var(--shadow-sm);
-        font-weight: 600;
-        letter-spacing: 0.5px;
-        text-transform: uppercase;
-    }
-
-    .table-search-input::placeholder {
-        color: #888;
-        text-transform: uppercase;
-        font-weight: 600;
-        letter-spacing: 0.5px;
     }
 
     /* List Header */
@@ -773,18 +620,6 @@
             height: 28px;
             font-size: 0.9rem;
         }
-
-        .navbar-menu {
-            gap: 0.5rem;
-        }
-
-        .nav-link span {
-            display: none;
-        }
-
-        .nav-link {
-            padding: 0.5rem;
-        }
     }
 </style>
 {% endblock %}
@@ -792,46 +627,6 @@
 {% block title %}Inventory - TrackWise{% endblock %}
 
 {% block content %}
-{% comment %} <!-- Navigation -->
-<nav class="navbar">
-    <div class="navbar-content">
-        <a href="{% url 'dashboard:dashboard' %}" class="navbar-brand">
-            <i class="fas fa-chart-line"></i>
-            TrackWise
-        </a>
-
-        <div class="navbar-menu">
-            <a href="{% url 'dashboard:dashboard' %}" class="nav-link"><i class="fas fa-home"></i> Dashboard</a>
-            <a href="{% url 'inventory:inventory_list' %}" class="nav-link active"><i class="fas fa-boxes"></i> Inventory</a>
-            <a href="{% url 'reports:reports_dashboard' %}" class="nav-link"><i class="fas fa-chart-bar"></i> Reports</a>
-            <a href="{% url 'staff_management:staff_list' %}" class="nav-link"><i class="fas fa-users"></i> Staff</a>
-        </div>
-
-        <div class="user-section">
-            <div class="user-info" id="userDropdownTrigger">
-                <span>{{ user.first_name }} {{ user.last_name }}</span>
-                <div class="user-avatar">{{ user.first_name|first }}{{ user.last_name|first }}</div>
-                <i class="fas fa-chevron-down" style="font-size: 0.8rem;"></i>
-            </div>
-            
-            <div class="user-dropdown" id="userDropdown">
-                <a href="{% url 'accounts:edit_profile' %}" class="user-dropdown-item">
-                    <i class="fas fa-user-edit"></i>
-                    <span>Edit Profile</span>
-                </a>
-                <div class="user-dropdown-divider"></div>
-                <form method="post" action="{% url 'accounts:logout' %}" style="display: inline;">
-                    {% csrf_token %}
-                    <button type="submit" class="user-dropdown-item">
-                        <i class="fas fa-sign-out-alt"></i>
-                        <span>Logout</span>
-                    </button>
-                </form>
-            </div>
-        </div>
-    </div>
-</nav> {% endcomment %}
-
 <!-- Inventory Content -->
 <div class="dashboard-wrapper">
     <div class="container">
@@ -870,7 +665,8 @@
             </div>
         </div>
 
-        {% comment %} <!-- Summary Cards -->
+        <!-- Summary Cards -->
+        {% if products %}
         <div class="stats-grid">
             <div class="stat-card">
                 <div class="stat-number">{{ products.count }}</div>
@@ -895,19 +691,13 @@
                 <div class="stat-label">Out of Stock</div>
                 <i class="stat-icon fas fa-times-circle"></i>
             </div>
-        </div> {% endcomment %}
+        </div>
+        {% endif %}
 
         <!-- Products List (Table Layout) -->
         <div class="inventory-content">
             {% if products %}
             <div class="inventory-view">
-                {% comment %} <!-- Search Section -->
-                <div class="search-section">
-                    <form method="get" class="search-form">
-                        <input type="search" class="table-search-input" placeholder="SEARCH" name="search" value="{{ search_query }}">
-                    </form>
-                </div> {% endcomment %}
-
                 <!-- List Header -->
                 <div class="list-header">
                     <div class="header-item"></div> 
