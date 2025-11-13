@@ -3,3 +3,6 @@
 
 # Ignore media uploads
 # media/
+
+__pycache__/
+*.pyc
