@@ -992,187 +992,92 @@
 </div>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const userDropdownTrigger = document.getElementById('userDropdownTrigger');
-    const userDropdown = document.getElementById('userDropdown');
-    
-    // Toggle dropdown on click
-    userDropdownTrigger.addEventListener('click', function(e) {
-        e.stopPropagation();
-        userDropdown.classList.toggle('active');
-    });
-    
-    // Close dropdown when clicking outside
-    document.addEventListener('click', function(e) {
-        if (!userDropdown.contains(e.target) && !userDropdownTrigger.contains(e.target)) {
-            userDropdown.classList.remove('active');
-        }
-    });
-    
-    // Close dropdown when pressing Escape key
-    document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape') {
-            userDropdown.classList.remove('active');
-        }
-    });
-    
-    // Real-time search for both search inputs
-    const searchInputs = document.querySelectorAll('.search-input, .table-search-input');
-    searchInputs.forEach(searchInput => {
-        if (searchInput) {
-            let searchTimeout;
-            searchInput.addEventListener('input', function() {
-                clearTimeout(searchTimeout);
-                searchTimeout = setTimeout(() => {
-                    this.form.submit();
-                }, 500);
-            });
-        }
-    });
+console.log('Script loading - testing basic JavaScript');
 
-    // AJAX for stock controls
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOM loaded - setting up event listeners');
+    
+    // Debug: Check if buttons exist
+    const increaseButtons = document.querySelectorAll('.qty-button.increase');
+    const decreaseButtons = document.querySelectorAll('.qty-button.decrease');
+    console.log('Found increase buttons:', increaseButtons.length);
+    console.log('Found decrease buttons:', decreaseButtons.length);
+    
+    // Simple stock update function
     function updateStock(productId, action) {
+        console.log(`Updating stock for product ${productId}, action: ${action}`);
+        
         const url = `/inventory/${productId}/${action}/`;
         const csrfToken = getCookie('csrftoken');
-        
-        // Get elements
         const quantityElement = document.getElementById(`quantity-${productId}`);
-        const decreaseBtn = document.querySelector(`.decrease[data-product-id="${productId}"]`);
-        const lowStockBadge = document.querySelector(`.item-row[data-product-id="${productId}"] .badge-low-stock`);
         
-        // Store original values for rollback in case of error
-        const originalQuantity = parseInt(quantityElement.textContent);
-        
-        // Optimistic update - update UI immediately
-        let newQuantity = originalQuantity;
-        if (action === 'increase') {
-            newQuantity = originalQuantity + 1;
-        } else if (action === 'decrease' && originalQuantity > 0) {
-            newQuantity = originalQuantity - 1;
+        if (!quantityElement) {
+            console.error('Quantity element not found for product:', productId);
+            return;
         }
         
-        // Update quantity display
-        const unitText = quantityElement.textContent.replace(originalQuantity, '');
-        quantityElement.textContent = newQuantity + unitText;
+        console.log('Making AJAX request to:', url);
         
-        // Update button states
-        if (decreaseBtn) {
-            decreaseBtn.disabled = newQuantity === 0;
-        }
-        
-        // Update low stock badge
-        if (lowStockBadge) {
-            if (newQuantity > 10) {
-                lowStockBadge.style.display = 'none';
-            } else if (newQuantity <= 10 && newQuantity > 0) {
-                lowStockBadge.style.display = 'block';
-            } else {
-                lowStockBadge.style.display = 'none';
-            }
-        } else if (newQuantity <= 10 && newQuantity > 0) {
-            // Create low stock badge if needed
-            const quantityControl = document.querySelector(`.item-row[data-product-id="${productId}"] .quantity-control`);
-            if (quantityControl) {
-                const badge = document.createElement('span');
-                badge.className = 'badge-low-stock';
-                badge.textContent = 'LOW STOCK';
-                quantityControl.insertBefore(badge, quantityControl.firstChild);
-            }
-        }
-        
-        // Send AJAX request
+        // Make the AJAX request
         fetch(url, {
             method: 'POST',
             headers: {
                 'X-CSRFToken': csrfToken,
-                'Content-Type': 'application/json',
             },
         })
-        .then(response => response.json())
+        .then(response => {
+            console.log('Response status:', response.status);
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
         .then(data => {
+            console.log('Response data:', data);
             if (data.success) {
-                // Update with actual server data
-                quantityElement.textContent = data.new_quantity + unitText;
+                // Update the quantity display - use display_quantity from server
+                quantityElement.textContent = data.display_quantity;
                 
-                // Update button states with server data
+                // Update button states
+                const decreaseBtn = document.querySelector(`.decrease[data-product-id="${productId}"]`);
                 if (decreaseBtn) {
                     decreaseBtn.disabled = data.new_quantity === 0;
                 }
                 
-                // Update low stock badge with server data
-                const updatedLowStockBadge = document.querySelector(`.item-row[data-product-id="${productId}"] .badge-low-stock`);
-                if (updatedLowStockBadge) {
-                    if (data.new_quantity > 10) {
-                        updatedLowStockBadge.style.display = 'none';
-                    } else if (data.new_quantity <= 10 && data.new_quantity > 0) {
-                        updatedLowStockBadge.style.display = 'block';
-                    } else {
-                        updatedLowStockBadge.style.display = 'none';
-                    }
-                }
+                // Update low stock badge
+                updateLowStockBadge(productId, data.new_quantity);
                 
+                console.log('Stock updated successfully');
             } else {
-                // Rollback optimistic update on error
-                quantityElement.textContent = originalQuantity + unitText;
-                if (decreaseBtn) {
-                    decreaseBtn.disabled = originalQuantity === 0;
-                }
-                
-                // Rollback low stock badge
-                const rollbackLowStockBadge = document.querySelector(`.item-row[data-product-id="${productId}"] .badge-low-stock`);
-                if (rollbackLowStockBadge) {
-                    if (originalQuantity > 10) {
-                        rollbackLowStockBadge.style.display = 'none';
-                    } else if (originalQuantity <= 10 && originalQuantity > 0) {
-                        rollbackLowStockBadge.style.display = 'block';
-                    } else {
-                        rollbackLowStockBadge.style.display = 'none';
-                    }
-                }
-                
-                alert('Error updating stock: ' + (data.error || 'Unknown error'));
+                console.error('Server error:', data.error);
+                alert('Error: ' + (data.error || 'Unknown error'));
             }
         })
         .catch(error => {
-            console.error('Error:', error);
-            // Rollback optimistic update on network error
-            quantityElement.textContent = originalQuantity + unitText;
-            if (decreaseBtn) {
-                decreaseBtn.disabled = originalQuantity === 0;
-            }
-            
-            // Rollback low stock badge
-            const networkLowStockBadge = document.querySelector(`.item-row[data-product-id="${productId}"] .badge-low-stock`);
-            if (networkLowStockBadge) {
-                if (originalQuantity > 10) {
-                    networkLowStockBadge.style.display = 'none';
-                } else if (originalQuantity <= 10 && originalQuantity > 0) {
-                    networkLowStockBadge.style.display = 'block';
-                } else {
-                    networkLowStockBadge.style.display = 'none';
-                }
-            }
-            
-            alert('Network error updating stock. Please try again.');
+            console.error('Fetch error:', error);
+            alert('Network error. Please try again.');
         });
     }
-
-    // Add event listeners to stock buttons
-    document.querySelectorAll('.qty-button.increase').forEach(button => {
-        button.addEventListener('click', function() {
-            const productId = this.getAttribute('data-product-id');
-            updateStock(productId, 'increase');
-        });
-    });
-
-    document.querySelectorAll('.qty-button.decrease').forEach(button => {
-        button.addEventListener('click', function() {
-            const productId = this.getAttribute('data-product-id');
-            updateStock(productId, 'decrease');
-        });
-    });
-
-    // CSRF token helper function
+    
+    function updateLowStockBadge(productId, quantity) {
+        const quantityControl = document.querySelector(`.item-row[data-product-id="${productId}"] .quantity-control`);
+        if (!quantityControl) return;
+        
+        let badge = quantityControl.querySelector('.badge-low-stock');
+        
+        if (quantity <= 10 && quantity > 0) {
+            if (!badge) {
+                badge = document.createElement('span');
+                badge.className = 'badge-low-stock';
+                badge.textContent = 'LOW STOCK';
+                quantityControl.insertBefore(badge, quantityControl.firstChild);
+            }
+        } else if (badge) {
+            badge.remove();
+        }
+    }
+    
+    // Get CSRF token
     function getCookie(name) {
         let cookieValue = null;
         if (document.cookie && document.cookie !== '') {
@@ -1187,6 +1092,31 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         return cookieValue;
     }
+    
+    // Add event listeners using a simpler approach
+    increaseButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const productId = this.getAttribute('data-product-id');
+            console.log('Increase button clicked for product:', productId);
+            updateStock(productId, 'increase');
+        });
+    });
+
+    decreaseButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const productId = this.getAttribute('data-product-id');
+            console.log('Decrease button clicked for product:', productId);
+            updateStock(productId, 'decrease');
+        });
+    });
+    
+    console.log('Event listeners setup complete');
 });
+
+// Test function that can be called from browser console
+window.testButtonClick = function(productId, action) {
+    console.log('Manual test:', productId, action);
+    updateStock(productId, action);
+};
 </script>
 {% endblock %}

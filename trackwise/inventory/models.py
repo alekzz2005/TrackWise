@@ -51,7 +51,7 @@ class Product(models.Model):
         return self.quantity * self.cost_price
     
     def get_display_quantity(self):
-        return f"{self.quantity} {self.get_unit_of_measure_display()}"
+        return f"{self.quantity} {self.unit_of_measure}"
     
     @property
     def singular_unit(self):
