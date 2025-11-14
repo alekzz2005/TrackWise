@@ -10,6 +10,10 @@ class Company(models.Model):
 
     def __str__(self):
         return self.name
+    
+    def staff_count(self):
+        """Count staff members in this company"""
+        return UserProfile.objects.filter(company=self, role='staff').count()
 
 class UserProfile(models.Model):
     ROLE_CHOICES = [
@@ -36,3 +40,13 @@ class UserProfile(models.Model):
     
     def __str__(self):
         return f"{self.user.username} - {self.role} - {self.company.name}"
+    
+    def is_business_owner(self):
+        return self.role == 'business_owner'
+    
+    def is_staff(self):
+        return self.role == 'staff'
+    
+    def get_display_role(self):
+        """Get the display name for the role"""
+        return dict(self.ROLE_CHOICES).get(self.role, 'User')
