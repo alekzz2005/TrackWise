@@ -3,64 +3,172 @@
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/inventory.css' %}">
+<link rel="stylesheet" href="{% static 'css/inventory/product_detail.css' %}">
+<style>
+    /* Staff detail specific styles */
+    .detail-value-static {
+        background-color: #fff;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        padding: 12px 15px;
+        font-size: 16px;
+        min-height: 50px;
+        display: flex;
+        align-items: center;
+        margin-bottom: 0;
+        color: #333;
+        box-shadow: var(--shadow-sm);
+    }
+    
+    .detail-form .form-group {
+        margin-bottom: 20px;
+    }
+    
+    .detail-form .form-label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 500;
+        color: rgba(255, 255, 255, 0.9) !important;
+    }
+</style>
 {% endblock %}
 
 {% block title %}{{ product.item_name }} - TrackWise{% endblock %}
 
 {% block content %}
-<div class="container py-4">
-    <div class="row">
-        <div class="col-md-6 mb-4">
-            {% if product.image %}
-            <img src="{{ product.image.url }}" alt="{{ product.item_name }}" class="product-detail-image">
-            {% else %}
-            <div class="product-detail-image bg-light d-flex align-items-center justify-content-center">
-                <i class="fas fa-box fa-5x text-muted"></i>
+<div class="auth-body">
+    <div class="auth-container product-detail-container">
+        <div class="logo-container">
+            <div class="logo-text">
+                <i class="fas fa-chart-line"></i>
+                TrackWise
             </div>
-            {% endif %}
         </div>
         
-        <div class="col-md-6">
-            <div class="detail-card">
-                <h2 class="mb-4">{{ product.item_name }}</h2>
-                
-                <div class="detail-item">
-                    <div class="detail-label">Product Name</div>
-                    <div class="detail-value">{{ product.item_name }}</div>
+        <div class="form-section product-detail-section">
+            <div class="auth-header">
+                <h2>Product Details</h2>
+                <p>View product information</p>
+            </div>
+
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+            
+            <div class="product-image-section">
+                {% if product.image %}
+                <img src="{{ product.image.url }}" alt="{{ product.item_name }}" class="product-detail-image">
+                {% else %}
+                <div class="product-detail-image-placeholder">
+                    <i class="fas fa-box fa-4x text-muted"></i>
+                    <p>No image available</p>
+                </div>
+                {% endif %}
+            </div>
+            
+            <div class="detail-form">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Product Name</label>
+                        <div class="detail-value-static">{{ product.item_name }}</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Category</label>
+                        <div class="detail-value-static">{{ product.get_category_display }}</div>
+                    </div>
                 </div>
                 
-                <div class="detail-item">
-                    <div class="detail-label">Category</div>
-                    <div class="detail-value">{{ product.get_category_display }}</div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Quantity</label>
+                        <div class="detail-value-static">{{ product.quantity }} {{ product.get_unit_of_measure_display }}</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Unit of Measure</label>
+                        <div class="detail-value-static">{{ product.get_unit_of_measure_display }}</div>
+                    </div>
                 </div>
                 
-                <div class="detail-item">
-                    <div class="detail-label">Current Stock</div>
-                    <div class="detail-value">{{ product.quantity }} {{ product.get_unit_of_measure_display }}</div>
+                <div class="form-group">
+                    <label class="form-label">Cost Price</label>
+                    <div class="detail-value-static">${{ product.cost_price }}</div>
                 </div>
                 
-                <div class="detail-item">
-                    <div class="detail-label">Cost Price</div>
-                    <div class="detail-value">${{ product.cost_price }}</div>
+                <div class="form-group">
+                    <label class="form-label">Total Value</label>
+                    <div class="detail-value-static">${{ product.total_value }}</div>
                 </div>
                 
-                <div class="detail-item">
-                    <div class="detail-label">Total Value</div>
-                    <div class="detail-value">${{ product.total_value }}</div>
+                <div class="form-group">
+                    <label class="form-label">Last Updated</label>
+                    <div class="detail-value-static">{{ product.updated_at|date:"M d, Y H:i" }}</div>
                 </div>
                 
-                <div class="detail-item">
-                    <div class="detail-label">Last Updated</div>
-                    <div class="detail-value">{{ product.updated_at|date:"M d, Y H:i" }}</div>
-                </div>
-                
-                <div class="d-flex gap-2 mt-4">
-                    <a href="{% url 'inventory:inventory_list' %}" class="btn btn-outline-secondary">
+                <div class="button-group">
+                    <a href="{% url 'inventory:inventory_list' %}" class="btn btn-danger">
                         <i class="fas fa-arrow-left"></i> Back to Inventory
                     </a>
                 </div>
             </div>
+            
+            <div class="auth-footer">
+                <p class="footer-content">
+                    {% comment %} <a href="{% url 'inventory:inventory_list' %}" class="footer-home-link">
+                        <i class="fas fa-arrow-left"></i> Back to Inventory
+                    </a>
+                    <a>|</a> {% endcomment %}
+                    {% comment %} <span class="footer-spacer"></span> {% endcomment %}
+                    <a href="#" class="footer-support-link">Contact Support</a>
+                </p>
+            </div>
         </div>
+
+        <div class="particles-section product-detail-particles" id="particles-js"></div>
     </div>
 </div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/particles.js/2.0.0/particles.min.js"></script>
+<script>
+    // Particles configuration
+    particlesJS('particles-js', {
+        particles: {
+            number: { value: 60, density: { enable: true, value_area: 600 } },
+            color: { value: '#7aa7e0' },
+            shape: { type: 'circle' },
+            opacity: { value: 0.7, random: true },
+            size: { value: 15, random: true },
+            line_linked: {
+                enable: true,
+                distance: 120,
+                color: '#7aa7e0',
+                opacity: 0.5,
+                width: 1.5
+            },
+            move: {
+                enable: true,
+                speed: 1.2,
+                direction: 'none',
+                random: true,
+                out_mode: 'out'
+            }
+        },
+        interactivity: {
+            detect_on: 'canvas',
+            events: {
+                onhover: { enable: true, mode: 'grab' },
+                resize: true
+            },
+            modes: {
+                grab: { distance: 140, line_linked: { opacity: 0.8 } }
+            }
+        },
+        retina_detect: true
+    });
+</script>
 {% endblock %}

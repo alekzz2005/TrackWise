@@ -2,102 +2,979 @@
 {% load static %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/inventory.css' %}">
+<style>
+    /* Base Theme Variables */
+    :root {
+        --primary-blue: #4a6fa5;
+        --primary-dark: #2c5282;
+        --primary-darker: #1a365d;
+        --accent-light: #a7c5eb;
+        --bg-light: #dbe4f0;
+        --bg-page: #f0f4f8;
+        --success: #4CAF50;
+        --success-dark: #45a049;
+        --danger: #f44336;
+        --danger-dark: #da3226;
+        --warning: #ff9800;
+        --warning-dark: #f57c00;
+        --text-white: #ffffff;
+        --shadow-sm: 0 2px 5px rgba(0, 0, 0, 0.1);
+        --shadow-md: 0 8px 25px rgba(0, 0, 0, 0.2);
+        --shadow-lg: 0 15px 35px rgba(0, 0, 0, 0.2);
+        --transition: all 0.3s ease;
+    }
+
+    /* Layout */
+    body {
+        background: var(--bg-page);
+        color: #333;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .inventory-wrapper {
+        padding: 2rem;
+        background-color: var(--bg-page);
+    }
+
+    .container-fluid {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 0 2rem;
+    }
+
+    /* Header Section */
+    .inventory-header {
+        background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-dark) 100%);
+        border-radius: 20px;
+        padding: 2.5rem;
+        margin-bottom: 2rem;
+        box-shadow: var(--shadow-lg);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .inventory-header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 300px;
+        height: 300px;
+        background: radial-gradient(circle, rgba(167, 197, 235, 0.2) 0%, transparent 70%);
+        border-radius: 50%;
+        transform: translate(30%, -30%);
+    }
+
+    .header-content {
+        position: relative;
+        z-index: 1;
+        margin-bottom: 2rem;
+    }
+
+    .welcome-text {
+        color: var(--text-white);
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .welcome-text i {
+        color: var(--accent-light);
+    }
+
+    .subtitle {
+        color: var(--accent-light);
+        font-size: 1.1rem;
+        margin: 0;
+    }
+
+    .header-actions {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 2rem;
+        position: relative;
+        z-index: 1;
+    }
+
+    /* Search Box */
+    .search-container {
+        flex: 1;
+        max-width: 400px;
+    }
+
+    .search-form {
+        width: 100%;
+    }
+
+    .search-box {
+        position: relative;
+        width: 100%;
+    }
+
+    .search-box i {
+        position: absolute;
+        left: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--accent-light);
+        z-index: 2;
+    }
+
+    .search-input {
+        width: 100%;
+        padding: 1rem 1rem 1rem 3rem;
+        background: rgba(255, 255, 255, 0.1);
+        border: 2px solid rgba(255, 255, 255, 0.2);
+        border-radius: 12px;
+        color: var(--text-white);
+        font-size: 1rem;
+        transition: var(--transition);
+        backdrop-filter: blur(10px);
+    }
+
+    .search-input::placeholder {
+        color: rgba(255, 255, 255, 0.7);
+    }
+
+    .search-input:focus {
+        outline: none;
+        background: rgba(255, 255, 255, 0.15);
+        border-color: var(--accent-light);
+        box-shadow: 0 0 0 3px rgba(167, 197, 235, 0.3);
+    }
+
+    /* Filter Actions */
+    .filter-actions {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .filter-select {
+        padding: 1rem 1.5rem;
+        background: rgba(255, 255, 255, 0.1);
+        border: 2px solid rgba(255, 255, 255, 0.2);
+        border-radius: 12px;
+        color: var(--text-white);
+        font-size: 1rem;
+        cursor: pointer;
+        transition: var(--transition);
+        backdrop-filter: blur(10px);
+    }
+
+    .filter-select:focus {
+        outline: none;
+        background: rgba(255, 255, 255, 0.15);
+        border-color: var(--accent-light);
+    }
+
+    .filter-select option {
+        background: var(--primary-dark);
+        color: var(--text-white);
+    }
+
+    .btn-primary {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        padding: 1rem 1.5rem;
+        background: var(--accent-light);
+        color: var(--primary-dark);
+        text-decoration: none;
+        border-radius: 12px;
+        font-weight: 600;
+        transition: var(--transition);
+        box-shadow: var(--shadow-sm);
+        border: none;
+    }
+
+    .btn-primary:hover {
+        background: var(--text-white);
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+        color: var(--primary-dark);
+    }
+
+    /* Statistic Cards */
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .stat-card {
+        background: linear-gradient(135deg, var(--primary-blue), var(--primary-dark));
+        border-radius: 16px;
+        padding: 2rem;
+        color: var(--text-white);
+        box-shadow: var(--shadow-md);
+        transition: var(--transition);
+        position: relative;
+        overflow: hidden;
+        text-align: center;
+    }
+
+    .stat-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 100px;
+        height: 100px;
+        background: radial-gradient(circle, rgba(167, 197, 235, 0.3) 0%, transparent 70%);
+        border-radius: 50%;
+        transform: translate(30%, -30%);
+    }
+
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--shadow-lg);
+    }
+
+    .stat-number {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: var(--text-white);
+        margin-bottom: 0.5rem;
+        position: relative;
+        z-index: 1;
+    }
+
+    .stat-label {
+        font-size: 0.95rem;
+        color: var(--accent-light);
+        font-weight: 500;
+        position: relative;
+        z-index: 1;
+    }
+
+    .stat-icon {
+        position: absolute;
+        bottom: 1.5rem;
+        right: 1.5rem;
+        font-size: 2rem;
+        color: rgba(255, 255, 255, 0.2);
+        z-index: 1;
+    }
+
+    /* Table Layout */
+    .inventory-view {
+        width: 100%;
+        background-color: var(--text-white);
+        border-radius: 16px;
+        box-shadow: var(--shadow-md);
+        overflow: hidden;
+        margin-bottom: 2rem;
+    }
+
+    /* Card Header */
+    .card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1.5rem 2rem;
+        background: linear-gradient(135deg, var(--primary-dark), var(--primary-darker));
+        color: var(--text-white);
+        font-weight: 600;
+    }
+
+    .card-title {
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    /* Table Header Fix */
+    .table thead.table-dark th {
+        background: linear-gradient(135deg, var(--primary-blue), var(--primary-dark)) !important;
+        color: var(--text-white);
+        font-weight: 600;
+        border: none;
+        padding: 1rem 0.75rem;
+        font-size: 0.85rem;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        overflow: hidden;
+    }
+
+    /* Specific column width adjustments */
+    .table thead.table-dark th:nth-child(1) { width: 60px; min-width: 60px; max-width: 60px; }
+    .table thead.table-dark th:nth-child(2) { width: 200px; min-width: 150px; text-align: left; }
+    .table thead.table-dark th:nth-child(3) { width: 120px; min-width: 100px; text-align: left; }
+    .table thead.table-dark th:nth-child(4) { width: 140px; min-width: 120px; text-align: center; }
+    .table thead.table-dark th:nth-child(5) { width: 80px; min-width: 70px; text-align: left; }
+    .table thead.table-dark th:nth-child(6) { width: 120px; min-width: 100px; text-align: right; }
+    .table thead.table-dark th:nth-child(7) { width: 110px; min-width: 90px; text-align: center; }
+    .table thead.table-dark th:nth-child(8) { width: 90px; min-width: 80px; text-align: center; }
+
+    /* Table */
+    .table {
+        border-radius: 10px;
+        overflow: hidden;
+        background: var(--text-white);
+        box-shadow: none;
+        margin: 0;
+        width: 100%;
+    }
+
+    .table-striped tbody tr:nth-of-type(odd) {
+        background-color: var(--bg-light);
+    }
+
+    .table-hover tbody tr:hover {
+        background-color: #e8f0fa;
+    }
+
+    .table td {
+        padding: 1rem 0.75rem;
+        vertical-align: middle;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        overflow: hidden;
+    }
+
+    /* Specific cell width adjustments to match headers */
+    .table td:nth-child(1) { width: 60px; min-width: 60px; max-width: 60px; }
+    .table td:nth-child(2) { width: 200px; min-width: 150px; text-align: left; }
+    .table td:nth-child(3) { width: 120px; min-width: 100px; text-align: left; }
+    .table td:nth-child(4) { width: 140px; min-width: 120px; text-align: center; }
+    .table td:nth-child(5) { width: 80px; min-width: 70px; text-align: left; }
+    .table td:nth-child(6) { width: 120px; min-width: 100px; text-align: right; }
+    .table td:nth-child(7) { width: 110px; min-width: 90px; text-align: center; }
+    .table td:nth-child(8) { width: 90px; min-width: 80px; text-align: center; }
+
+    /* Allow product name to show full text on hover */
+    .table td:nth-child(2):hover {
+        overflow: visible;
+        white-space: normal;
+        position: relative;
+        z-index: 1;
+        background: var(--text-white);
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+
+    /* Product Image */
+    .product-image-container {
+        width: 50px;
+        height: 50px;
+        border-radius: 8px;
+        overflow: hidden;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-shrink: 0;
+    }
+
+    .product-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .product-image-placeholder {
+        width: 100%;
+        height: 100%;
+        background: var(--bg-light);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        color: var(--primary-blue);
+        font-size: 1.2rem;
+        border-radius: 8px;
+    }
+
+    /* Quantity Controls */
+    .quantity-control {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        font-size: 1rem;
+        color: var(--primary-dark);
+        position: relative;
+    }
+
+    .quantity-text {
+        white-space: nowrap;
+        font-weight: 600;
+        min-width: 80px;
+        text-align: center;
+    }
+
+    .qty-button {
+        background: var(--primary-blue);
+        color: var(--text-white);
+        border: none;
+        width: 32px;
+        height: 32px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 1rem;
+        line-height: 1;
+        transition: var(--transition);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .qty-button:hover:not(:disabled) {
+        background: var(--primary-dark);
+        transform: scale(1.1);
+    }
+
+    .qty-button:disabled {
+        background: #ccc;
+        cursor: not-allowed;
+        transform: none;
+    }
+
+    /* Low Stock Badge */
+    .badge-low-stock {
+        position: absolute;
+        top: -8px;
+        right: -5px;
+        background: linear-gradient(135deg, var(--warning), var(--warning-dark));
+        color: var(--text-white);
+        padding: 3px 8px;
+        border-radius: 4px;
+        font-size: 0.7rem;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+        box-shadow: var(--shadow-sm);
+        z-index: 2;
+    }
+
+    /* Status Badges */
+    .badge {
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+    }
+
+    .stock-low { 
+        background: #fed7d7; 
+        color: #742a2a; 
+    }
+
+    .stock-out { 
+        background: #e2e8f0; 
+        color: #4a5568; 
+    }
+
+    .stock-ok { 
+        background: #c6f6d5; 
+        color: #22543d; 
+    }
+
+    /* Cost Price */
+    .cost-price {
+        font-weight: 700;
+        color: var(--primary-darker);
+        font-size: 1.1rem;
+        white-space: nowrap;
+    }
+
+    /* Item Actions */
+    .item-actions {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+    }
+
+    .action-btn {
+        width: 36px;
+        height: 36px;
+        border: none;
+        border-radius: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: var(--transition);
+        font-size: 0.9rem;
+        text-decoration: none;
+    }
+
+    .action-btn.view {
+        background: var(--primary-blue);
+        color: var(--text-white);
+    }
+
+    .action-btn.view:hover {
+        background: var(--primary-dark);
+        transform: scale(1.1);
+    }
+
+    /* Empty State */
+    .empty-state {
+        text-align: center;
+        padding: 4rem 2rem;
+        background: var(--text-white);
+        border-radius: 16px;
+        box-shadow: var(--shadow-md);
+        margin-bottom: 2rem;
+    }
+
+    .empty-icon {
+        font-size: 4rem;
+        color: var(--accent-light);
+        margin-bottom: 1.5rem;
+    }
+
+    .empty-state h4 {
+        color: var(--primary-dark);
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+    }
+
+    .empty-state p {
+        color: #666;
+        margin-bottom: 2rem;
+        font-size: 1.1rem;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 1200px) {
+        .stats-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    @media (max-width: 768px) {
+        .inventory-wrapper {
+            padding: 1rem;
+        }
+
+        .inventory-header {
+            padding: 1.5rem;
+        }
+        
+        .header-actions {
+            flex-direction: column;
+            align-items: stretch;
+            gap: 1rem;
+        }
+        
+        .search-container {
+            max-width: none;
+        }
+        
+        .filter-actions {
+            justify-content: space-between;
+        }
+        
+        .stats-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .stat-number {
+            font-size: 2rem;
+        }
+        
+        .card-header {
+            flex-direction: column;
+            gap: 1rem;
+            align-items: flex-start;
+        }
+        
+        .table-responsive {
+            font-size: 0.9rem;
+        }
+        
+        .table thead.table-dark th,
+        .table td {
+            padding: 0.75rem 0.5rem;
+            font-size: 0.8rem;
+        }
+
+        /* Further reduce widths on mobile */
+        .table thead.table-dark th:nth-child(2),
+        .table td:nth-child(2) {
+            width: 150px;
+            min-width: 120px;
+        }
+
+        .table thead.table-dark th:nth-child(4),
+        .table td:nth-child(4) {
+            width: 120px;
+            min-width: 100px;
+        }
+
+        /* Hide category on mobile */
+        .table td:nth-child(3),
+        .table th:nth-child(3) {
+            display: none;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .welcome-text {
+            font-size: 1.5rem;
+        }
+        
+        .subtitle {
+            font-size: 0.95rem;
+        }
+        
+        .stat-card {
+            padding: 1.5rem;
+        }
+        
+        .stat-number {
+            font-size: 2rem;
+        }
+
+        .table thead.table-dark th,
+        .table td {
+            padding: 0.5rem 0.25rem;
+            font-size: 0.75rem;
+        }
+
+        /* Hide unit on very small screens */
+        .table td:nth-child(5),
+        .table th:nth-child(5) {
+            display: none;
+        }
+
+        .quantity-control {
+            flex-direction: column;
+            gap: 4px;
+        }
+        
+        .quantity-text {
+            min-width: auto;
+            font-size: 0.9rem;
+        }
+        
+        .qty-button {
+            width: 28px;
+            height: 28px;
+            font-size: 0.9rem;
+        }
+
+        .action-btn {
+            width: 32px;
+            height: 32px;
+            font-size: 0.8rem;
+        }
+    }
+</style>
 {% endblock %}
 
 {% block title %}Inventory - TrackWise{% endblock %}
 
 {% block content %}
-<div class="container py-4">
-    <div class="inventory-header">
-        <h2><i class="fas fa-boxes text-orange"></i> Inventory</h2>
-        <div class="d-flex gap-3">
-            <div class="search-box">
-                <i class="fas fa-search"></i>
-                <form method="get" class="d-inline">
-                    <input type="text" name="search" class="form-control" placeholder="Search products..." 
-                           value="{{ search_query }}">
-                </form>
+<div class="inventory-wrapper">
+    <div class="container-fluid">
+        <!-- Header Section -->
+        <div class="inventory-header">
+            <div class="header-content">
+                <h1 class="welcome-text">
+                    <i class="fas fa-boxes"></i>
+                    Inventory Management
+                </h1>
+                <p class="subtitle">Manage your products and stock levels efficiently</p>
             </div>
-            <div class="filters">
-                <select name="cost_filter" class="form-select" onchange="this.form.submit()">
-                    <option value="">Sort by Cost</option>
-                    <option value="low" {% if cost_filter == 'low' %}selected{% endif %}>Low to High</option>
-                    <option value="high" {% if cost_filter == 'high' %}selected{% endif %}>High to Low</option>
-                </select>
-                <a href="{% url 'inventory:product_add' %}" class="btn btn-orange">
-                    <i class="fas fa-plus"></i> Add Product
-                </a>
+            
+            <div class="header-actions">
+                <div class="search-container">
+                    <form method="get" class="search-form">
+                        <div class="search-box">
+                            <i class="fas fa-search"></i>
+                            <input type="text" name="search" class="search-input" placeholder="Search products..." 
+                                   value="{{ search_query }}">
+                        </div>
+                    </form>
+                </div>
+                
+                <div class="filter-actions">
+                    <select name="cost_filter" class="filter-select" onchange="this.form.submit()">
+                        <option value="">Sort by Cost</option>
+                        <option value="low" {% if cost_filter == 'low' %}selected{% endif %}>Low to High</option>
+                        <option value="high" {% if cost_filter == 'high' %}selected{% endif %}>High to Low</option>
+                    </select>
+                    
+                    <a href="{% url 'inventory:product_add' %}" class="btn-primary">
+                        <i class="fas fa-plus"></i> Add Product
+                    </a>
+                </div>
             </div>
         </div>
-    </div>
 
-    <!-- Products Grid -->
-    <div class="row">
-        {% for product in products %}
-        <div class="col-lg-4 col-md-6 mb-4">
-            <div class="product-card">
-                <div class="product-image-container">
-                    {% if product.image %}
-                    <img src="{{ product.image.url }}" alt="{{ product.item_name }}" class="product-image">
-                    {% else %}
-                    <div class="product-image bg-light d-flex align-items-center justify-content-center">
-                        <i class="fas fa-box fa-3x text-muted"></i>
-                    </div>
-                    {% endif %}
-                </div>
-                <div class="product-card-body">
-                    <div class="d-flex justify-content-between align-items-start mb-2">
-                        <h5 class="product-title">{{ product.item_name }}</h5>
-                        <span class="product-category">{{ product.get_category_display }}</span>
-                    </div>
-                    
-                    <div class="product-stats">
-                        <div class="stat">
-                            <div class="stat-value">{{ product.quantity }}</div>
-                            <div class="stat-label">In Stock</div>
-                        </div>
-                        <div class="stat">
-                            <div class="stat-value">${{ product.cost_price }}</div>
-                            <div class="stat-label">Cost Price</div>
-                        </div>
-                    </div>
-                    
-                    <div class="stock-actions">
-                        <form method="post" action="{% url 'inventory:increase_stock' product.pk %}">
-                            {% csrf_token %}
-                            <button type="submit" class="stock-btn stock-increase">
-                                <i class="fas fa-plus"></i>
-                            </button>
-                        </form>
-                        <form method="post" action="{% url 'inventory:decrease_stock' product.pk %}">
-                            {% csrf_token %}
-                            <button type="submit" class="stock-btn stock-decrease" {% if product.quantity == 0 %}disabled{% endif %}>
-                                <i class="fas fa-minus"></i>
-                            </button>
-                        </form>
-                    </div>
-                    
-                    <div class="mt-3">
-                        <a href="{% url 'inventory:product_detail' product.pk %}" class="btn btn-sm btn-outline-orange w-100">
-                            <i class="fas fa-eye"></i> View Details
-                        </a>
-                    </div>
+        {% if products %}
+        <!-- Statistics Cards -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-number">{{ products.count }}</div>
+                <div class="stat-label">Total Products</div>
+                <i class="stat-icon fas fa-boxes"></i>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-number">₱{{ total_inventory_value|floatformat:2 }}</div>
+                <div class="stat-label">Total Value</div>
+                <i class="stat-icon fas fa-peso-sign"></i>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-number">{{ low_stock_count|default:0 }}</div>
+                <div class="stat-label">Low Stock</div>
+                <i class="stat-icon fas fa-exclamation-triangle"></i>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-number">{{ out_of_stock_count|default:0 }}</div>
+                <div class="stat-label">Out of Stock</div>
+                <i class="stat-icon fas fa-times-circle"></i>
+            </div>
+        </div>
+
+        <!-- Products Table -->
+        <div class="inventory-view">
+            <div class="card-header">
+                <h5 class="card-title">
+                    <i class="fas fa-table me-2"></i>Product Inventory
+                    <span class="badge bg-light text-dark ms-2">{{ products.count }} items</span>
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover">
+                        <thead class="table-dark">
+                            <tr>
+                                <th></th>
+                                <th>Product Name</th>
+                                <th>Category</th>
+                                <th>Quantity</th>
+                                <th>Unit</th>
+                                <th>Cost Price</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for product in products %}
+                            <tr data-product-id="{{ product.pk }}">
+                                <!-- Product Image -->
+                                <td>
+                                    <div class="product-image-container">
+                                        {% if product.image %}
+                                        <img src="{{ product.image.url }}" alt="{{ product.item_name }}" class="product-image">
+                                        {% else %}
+                                        <div class="product-image-placeholder">
+                                            <i class="fas fa-box"></i>
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                                
+                                <!-- Item Name -->
+                                <td>
+                                    <strong>{{ product.item_name }}</strong>
+                                </td>
+                                
+                                <!-- Category -->
+                                <td>{{ product.get_category_display }}</td>
+                                
+                                <!-- Quantity Controls -->
+                                <td>
+                                    <div class="quantity-control">
+                                        {% if product.quantity <= 10 and product.quantity > 0 %}
+                                        <span class="badge-low-stock">LOW</span>
+                                        {% endif %}
+                                        <button type="button" class="qty-button decrease" data-product-id="{{ product.pk }}" {% if product.quantity == 0 %}disabled{% endif %}>
+                                            <i class="fas fa-minus"></i>
+                                        </button>
+                                        <span class="quantity-text" id="quantity-{{ product.pk }}">
+                                            {{ product.quantity }}
+                                        </span>
+                                        <button type="button" class="qty-button increase" data-product-id="{{ product.pk }}">
+                                            <i class="fas fa-plus"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                                
+                                <!-- Unit -->
+                                <td>{{ product.get_unit_of_measure_display }}</td>
+                                
+                                <!-- Cost Price -->
+                                <td>
+                                    <span class="cost-price">₱{{ product.cost_price }}</span>
+                                </td>
+                                
+                                <!-- Status -->
+                                <td>
+                                    {% if product.quantity == 0 %}
+                                        <span class="badge stock-out">Out of Stock</span>
+                                    {% elif product.quantity <= 10 %}
+                                        <span class="badge stock-low">Low Stock</span>
+                                    {% else %}
+                                        <span class="badge stock-ok">In Stock</span>
+                                    {% endif %}
+                                </td>
+                                
+                                <!-- Actions -->
+                                <td>
+                                    <div class="item-actions">
+                                        <a href="{% url 'inventory:product_detail' product.pk %}" class="action-btn view" title="View Details">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
-        {% empty %}
-        <div class="col-12">
-            <div class="empty-state">
-                <i class="fas fa-box-open fa-4x"></i>
-                <h3>No Products Found</h3>
-                <p>Get started by adding your first product to the inventory.</p>
-                <a href="{% url 'inventory:product_add' %}" class="btn btn-orange">
-                    <i class="fas fa-plus"></i> Add Your First Product
-                </a>
+        {% else %}
+        <!-- Empty State -->
+        <div class="empty-state">
+            <div class="empty-icon">
+                <i class="fas fa-box-open"></i>
             </div>
+            <h4>No Products Found</h4>
+            <p>Get started by adding your first product to the inventory.</p>
+            <a href="{% url 'inventory:product_add' %}" class="btn-primary">
+                <i class="fas fa-plus"></i> Add Your First Product
+            </a>
         </div>
-        {% endfor %}
+        {% endif %}
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOM loaded - setting up event listeners for staff inventory');
+    
+    const increaseButtons = document.querySelectorAll('.qty-button.increase');
+    const decreaseButtons = document.querySelectorAll('.qty-button.decrease');
+    
+    function updateStock(productId, action) {
+        console.log(`Updating stock for product ${productId}, action: ${action}`);
+        
+        const url = `/inventory/${productId}/${action}/`;
+        const csrfToken = getCookie('csrftoken');
+        const quantityElement = document.getElementById(`quantity-${productId}`);
+        
+        if (!quantityElement) {
+            console.error('Quantity element not found for product:', productId);
+            return;
+        }
+        
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': csrfToken,
+            },
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.success) {
+                quantityElement.textContent = data.display_quantity;
+                
+                const decreaseBtn = document.querySelector(`.decrease[data-product-id="${productId}"]`);
+                if (decreaseBtn) {
+                    decreaseBtn.disabled = data.new_quantity === 0;
+                }
+                
+                updateStatusBadge(productId, data.new_quantity);
+                updateLowStockBadge(productId, data.new_quantity);
+                
+                console.log('Stock updated successfully');
+            } else {
+                console.error('Server error:', data.error);
+                alert('Error: ' + (data.error || 'Unknown error'));
+            }
+        })
+        .catch(error => {
+            console.error('Fetch error:', error);
+            alert('Network error. Please try again.');
+        });
+    }
+    
+    function updateStatusBadge(productId, quantity) {
+        const row = document.querySelector(`tr[data-product-id="${productId}"]`);
+        if (!row) return;
+        
+        const statusCell = row.querySelector('td:nth-child(7)');
+        if (!statusCell) return;
+        
+        let badgeClass, badgeText;
+        
+        if (quantity === 0) {
+            badgeClass = 'stock-out';
+            badgeText = 'Out of Stock';
+        } else if (quantity <= 10) {
+            badgeClass = 'stock-low';
+            badgeText = 'Low Stock';
+        } else {
+            badgeClass = 'stock-ok';
+            badgeText = 'In Stock';
+        }
+        
+        statusCell.innerHTML = `<span class="badge ${badgeClass}">${badgeText}</span>`;
+    }
+    
+    function updateLowStockBadge(productId, quantity) {
+        const quantityControl = document.querySelector(`.decrease[data-product-id="${productId}"]`).closest('.quantity-control');
+        const existingBadge = quantityControl.querySelector('.badge-low-stock');
+        
+        if (existingBadge) {
+            existingBadge.remove();
+        }
+        
+        if (quantity <= 10 && quantity > 0) {
+            const lowStockBadge = document.createElement('span');
+            lowStockBadge.className = 'badge-low-stock';
+            lowStockBadge.textContent = 'LOW';
+            quantityControl.appendChild(lowStockBadge);
+        }
+    }
+    
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+    
+    increaseButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const productId = this.getAttribute('data-product-id');
+            updateStock(productId, 'increase');
+        });
+    });
+
+    decreaseButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const productId = this.getAttribute('data-product-id');
+            updateStock(productId, 'decrease');
+        });
+    });
+});
+</script>
 {% endblock %}
