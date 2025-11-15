@@ -1,8 +1,75 @@
-# Ignore environment variables
-# .env
-
-# Ignore media uploads
-# media/
-
+# Python
 __pycache__/
+*.py[cod]
+*$py.class
+*.pyo
+*.pyd
+.Python
 *.pyc
+
+# Virtual environment
+venv/
+env/
+.venv/
+
+# Django
+*.log
+*.pot
+*.sqlite3
+db.sqlite3
+
+# Media and static files
+media/
+staticfiles/
+
+# Environment variables
+.env
+*.env
+.env.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Coverage
+htmlcov/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+
+# Build/packaging
+*.egg
+*.egg-info/
+dist/
+build/
+eggs/
+parts/
+var/
+sdist/
+develop-eggs/
+.installed.cfg
+lib/
+lib64/
+
+# MyPy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+.pyre/
+.pytype/
+
+# Jupyter
+.ipynb_checkpoints
+
+# Local settings
+local_settings.py
