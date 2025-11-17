@@ -4,6 +4,11 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from .forms import BusinessOwnerRegistrationForm, StaffRegistrationForm, CustomAuthenticationForm, BusinessOwnerProfileForm, CustomPasswordChangeForm, CompanyForm
 from .models import UserProfile, Company
+from django.http import JsonResponse
+from django.contrib.auth.models import User
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_POST
+import json
 
 def role_selection(request):
     if request.user.is_authenticated:
@@ -88,6 +93,24 @@ def logout_view(request):
     logout(request)
     messages.info(request, 'You have been logged out successfully.')
     return redirect('accounts:login')
+
+@require_POST
+@csrf_exempt
+def check_email(request):
+    data = json.loads(request.body)
+    email = data.get('email', '')
+    
+    exists = User.objects.filter(email=email).exists()
+    return JsonResponse({'is_available': not exists})
+
+@require_POST
+@csrf_exempt
+def check_username(request):
+    data = json.loads(request.body)
+    username = data.get('username', '')
+    
+    exists = User.objects.filter(username=username).exists()
+    return JsonResponse({'is_available': not exists})
 
 @login_required
 def edit_profile(request):

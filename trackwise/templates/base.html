@@ -659,14 +659,14 @@
                         <span>Change Password</span>
                     </a>
                     
-                    <!-- Business Owner Only Links -->
+                    {% comment %} <!-- Business Owner Only Links -->
                     {% if is_business_owner %}
                     <div class="account-dropdown-divider"></div>
                     <a href="#" class="account-dropdown-item">
                         <i class="fas fa-cog"></i>
                         <span>Company Settings</span>
                     </a>
-                    {% endif %}
+                    {% endif %} {% endcomment %}
                     
                     <div class="account-dropdown-divider"></div>
                     <form method="post" action="{% url 'accounts:logout' %}" style="display: inline;">
@@ -742,7 +742,7 @@
     <div class="main-content {% if not user.is_authenticated %}no-sidebar{% endif %}" id="mainContent">
         <!-- Content Wrapper -->
         <div class="content-wrapper">
-            {% if messages and user.is_authenticated %}
+            {% comment %} {% if messages and user.is_authenticated %}
             <div class="container mt-3">
                 {% for message in messages %}
                 <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
@@ -751,7 +751,7 @@
                 </div>
                 {% endfor %}
             </div>
-            {% endif %}
+            {% endif %} {% endcomment %}
 
             {% block content %}
             {% endblock %}

@@ -95,6 +95,45 @@
     100% { transform: rotate(360deg); }
 }
 
+.password-strength {
+    margin-top: 5px;
+    font-size: 12px;
+    font-weight: bold;
+    padding: 3px 8px;
+    border-radius: 4px;
+    display: none;
+}
+
+.password-strength.very-weak {
+    background-color: #ffebee;
+    color: #c62828;
+    border: 1px solid #ffcdd2;
+}
+
+.password-strength.weak {
+    background-color: #fff3e0;
+    color: #ef6c00;
+    border: 1px solid #ffe0b2;
+}
+
+.password-strength.fair {
+    background-color: #fff8e1;
+    color: #f9a825;
+    border: 1px solid #ffecb3;
+}
+
+.password-strength.strong {
+    background-color: #e8f5e8;
+    color: #2e7d32;
+    border: 1px solid #c8e6c9;
+}
+
+.password-strength.very-strong {
+    background-color: #e3f2fd;
+    color: #1565c0;
+    border: 1px solid #bbdefb;
+}
+
 .processing-card h2 {
     margin-bottom: 1rem;
     font-weight: 600;

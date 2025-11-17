@@ -19,7 +19,8 @@ class BusinessOwnerRegistrationForm(UserCreationForm):
     
     # Company selection
     company_choice = forms.ChoiceField(
-        choices=[('new', 'New Company'), ('existing', 'Existing Company')],
+        choices=[('new', 'New Company')],
+        # choices=[('new', 'New Company'), ('existing', 'Existing Company')],
         widget=forms.RadioSelect(attrs={'class': 'radio-input'}),
         initial='new'
     )

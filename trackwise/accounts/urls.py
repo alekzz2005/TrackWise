@@ -12,4 +12,7 @@ urlpatterns = [
     path('logout/', views.logout_view, name='logout'),
     path('profile/edit/', views.edit_profile, name='edit_profile'),
     path('profile/change-password/', views.change_password, name='change_password'),
+
+    path('api/check-email/', views.check_email, name='check_email'),
+    path('api/check-username/', views.check_username, name='check_username'),
 ]

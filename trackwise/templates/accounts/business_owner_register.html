@@ -24,13 +24,13 @@
                 <p>Already have an account? <a href="{% url 'accounts:login' %}">Login</a></p>
             </div>
 
-            {% if messages %}
+            {% comment %} {% if messages %}
                 {% for message in messages %}
                     <div class="alert alert-{{ message.tags }}">
                         {{ message }}
                     </div>
                 {% endfor %}
-            {% endif %}
+            {% endif %} {% endcomment %}
 
             <div class="progress-indicator">
                 <div class="progress-step active" id="step1-indicator">1</div>
@@ -156,7 +156,23 @@
                     <div class="form-group">
                         <label class="form-label">Company Option *</label>
                         <div class="radio-group">
-                            {{ form.company_choice }}
+                            {% for radio in form.company_choice %}
+                                {% if radio.choice_label == 'Existing Company' %}
+                                    <div class="radio-option disabled">
+                                        {{ radio.tag }}
+                                        <label for="{{ radio.id_for_label }}" class="disabled">
+                                            {{ radio.choice_label }} <span class="disabled-text">(Temporarily Disabled)</span>
+                                        </label>
+                                    </div>
+                                {% else %}
+                                    <div class="radio-option">
+                                        {{ radio.tag }}
+                                        <label for="{{ radio.id_for_label }}">
+                                            {{ radio.choice_label }}
+                                        </label>
+                                    </div>
+                                {% endif %}
+                            {% endfor %}
                         </div>
                     </div>
                     
@@ -344,7 +360,7 @@
         }
     }
 
-    function validateStep1() {
+    async function validateStep1() {
         let isValid = true;
 
         // Clear all step 1 errors first
@@ -355,21 +371,21 @@
         clearError('{{ form.password1.id_for_label }}', '{{ form.password1.id_for_label }}_error');
         clearError('{{ form.password2.id_for_label }}', '{{ form.password2.id_for_label }}_error');
 
-        // First name
+        // First name validation
         const firstName = document.getElementById('{{ form.first_name.id_for_label }}').value.trim();
         if (!firstName) {
             showError('{{ form.first_name.id_for_label }}', '{{ form.first_name.id_for_label }}_error', 'First name is required');
             isValid = false;
         }
 
-        // Last name
+        // Last name validation
         const lastName = document.getElementById('{{ form.last_name.id_for_label }}').value.trim();
         if (!lastName) {
             showError('{{ form.last_name.id_for_label }}', '{{ form.last_name.id_for_label }}_error', 'Last name is required');
             isValid = false;
         }
 
-        // Email
+        // Email validation with uniqueness check
         const email = document.getElementById('{{ form.email.id_for_label }}').value.trim();
         if (!email) {
             showError('{{ form.email.id_for_label }}', '{{ form.email.id_for_label }}_error', 'Email is required');
@@ -377,9 +393,16 @@
         } else if (!validateEmail(email)) {
             showError('{{ form.email.id_for_label }}', '{{ form.email.id_for_label }}_error', 'Valid email is required');
             isValid = false;
+        } else {
+            // Check email uniqueness
+            const isEmailAvailable = await checkEmailUniqueness(email);
+            if (!isEmailAvailable) {
+                showError('{{ form.email.id_for_label }}', '{{ form.email.id_for_label }}_error', 'This email is already registered');
+                isValid = false;
+            }
         }
 
-        // Username
+        // Username validation with uniqueness check
         const username = document.getElementById('{{ form.username.id_for_label }}').value.trim();
         if (!username) {
             showError('{{ form.username.id_for_label }}', '{{ form.username.id_for_label }}_error', 'Username is required');
@@ -387,20 +410,36 @@
         } else if (username.length < 3) {
             showError('{{ form.username.id_for_label }}', '{{ form.username.id_for_label }}_error', 'Username must be at least 3 characters');
             isValid = false;
+        } else if (!/^[a-zA-Z0-9_]+$/.test(username)) {
+            showError('{{ form.username.id_for_label }}', '{{ form.username.id_for_label }}_error', 'Username can only contain letters, numbers, and underscores');
+            isValid = false;
+        } else {
+            // Check username uniqueness
+            const isUsernameAvailable = await checkUsernameUniqueness(username);
+            if (!isUsernameAvailable) {
+                showError('{{ form.username.id_for_label }}', '{{ form.username.id_for_label }}_error', 'This username is already taken');
+                isValid = false;
+            }
         }
 
-        // Password
+        // Password validation
         const password = document.getElementById('{{ form.password1.id_for_label }}').value;
+        const confirmPassword = document.getElementById('{{ form.password2.id_for_label }}').value;
+
+        // Check if password is provided
         if (!password) {
             showError('{{ form.password1.id_for_label }}', '{{ form.password1.id_for_label }}_error', 'Password is required');
             isValid = false;
-        } else if (password.length < 8) {
-            showError('{{ form.password1.id_for_label }}', '{{ form.password1.id_for_label }}_error', 'Password must be at least 8 characters');
-            isValid = false;
+        } else {
+            // Comprehensive password requirements check
+            const passwordErrors = validatePasswordRequirements(password);
+            if (passwordErrors.length > 0) {
+                showError('{{ form.password1.id_for_label }}', '{{ form.password1.id_for_label }}_error', passwordErrors.join(', '));
+                isValid = false;
+            }
         }
 
-        // Confirm password
-        const confirmPassword = document.getElementById('{{ form.password2.id_for_label }}').value;
+        // Confirm password validation
         if (!confirmPassword) {
             showError('{{ form.password2.id_for_label }}', '{{ form.password2.id_for_label }}_error', 'Please confirm your password');
             isValid = false;
@@ -445,9 +484,200 @@
         return isValid;
     }
 
+    // Real-time uniqueness validation
+    async function checkEmailUniqueness(email) {
+        try {
+            const response = await fetch('/api/check-email/', { // You'll need to create this endpoint
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                body: JSON.stringify({ email: email })
+            });
+            
+            const data = await response.json();
+            return data.is_available;
+        } catch (error) {
+            console.error('Error checking email:', error);
+            return true; // Assume available on error to not block user
+        }
+    }
+
+    async function checkUsernameUniqueness(username) {
+        try {
+            const response = await fetch('/api/check-username/', { // You'll need to create this endpoint
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                body: JSON.stringify({ username: username })
+            });
+            
+            const data = await response.json();
+            return data.is_available;
+        } catch (error) {
+            console.error('Error checking username:', error);
+            return true;
+        }
+    }
+
+    // Helper function to get CSRF token
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    function validatePasswordRequirements(password) {
+        const errors = [];
+        
+        // Check minimum length
+        if (password.length < 8) {
+            errors.push('Password must be at least 8 characters long');
+        }
+        
+        // Check if entirely numeric
+        if (/^\d+$/.test(password)) {
+            errors.push('Password cannot be entirely numeric');
+        }
+        
+        // Check for common patterns (optional but recommended)
+        if (password.toLowerCase().includes('password') || password.toLowerCase().includes('123')) {
+            errors.push('Password is too common or easily guessable');
+        }
+        
+        // Check for mixed case and numbers (optional enhancement)
+        if (!/(?=.*[a-z])(?=.*[A-Z])/.test(password)) {
+            errors.push('Password should contain both uppercase and lowercase letters');
+        }
+        
+        if (!/(?=.*\d)/.test(password)) {
+            errors.push('Password should contain at least one number');
+        }
+        
+        return errors;
+    }
+
+    // Real-time password strength indicator
+    function updatePasswordStrength(password) {
+        const strengthIndicator = document.getElementById('password-strength');
+        if (!strengthIndicator) return;
+        
+        let strength = 0;
+        let feedback = '';
+        
+        if (password.length >= 8) strength++;
+        if (!/^\d+$/.test(password)) strength++;
+        if (/(?=.*[a-z])(?=.*[A-Z])/.test(password)) strength++;
+        if (/(?=.*\d)/.test(password)) strength++;
+        if (/(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?])/.test(password)) strength++;
+        
+        switch(strength) {
+            case 0:
+            case 1:
+                feedback = 'Very Weak';
+                strengthIndicator.className = 'password-strength very-weak';
+                break;
+            case 2:
+                feedback = 'Weak';
+                strengthIndicator.className = 'password-strength weak';
+                break;
+            case 3:
+                feedback = 'Fair';
+                strengthIndicator.className = 'password-strength fair';
+                break;
+            case 4:
+                feedback = 'Strong';
+                strengthIndicator.className = 'password-strength strong';
+                break;
+            case 5:
+                feedback = 'Very Strong';
+                strengthIndicator.className = 'password-strength very-strong';
+                break;
+        }
+        
+        strengthIndicator.textContent = `Password Strength: ${feedback}`;
+        strengthIndicator.style.display = 'block';
+    }
+
+    // Real-time email validation
+    document.getElementById('{{ form.email.id_for_label }}').addEventListener('blur', async function() {
+        const email = this.value.trim();
+        if (email && validateEmail(email)) {
+            const isAvailable = await checkEmailUniqueness(email);
+            if (!isAvailable) {
+                showError('{{ form.email.id_for_label }}', '{{ form.email.id_for_label }}_error', 'This email is already registered');
+            } else {
+                clearError('{{ form.email.id_for_label }}', '{{ form.email.id_for_label }}_error');
+            }
+        }
+    });
+
+    // Real-time username validation
+    document.getElementById('{{ form.username.id_for_label }}').addEventListener('blur', async function() {
+        const username = this.value.trim();
+        if (username && username.length >= 3) {
+            const isAvailable = await checkUsernameUniqueness(username);
+            if (!isAvailable) {
+                showError('{{ form.username.id_for_label }}', '{{ form.username.id_for_label }}_error', 'This username is already taken');
+            } else {
+                clearError('{{ form.username.id_for_label }}', '{{ form.username.id_for_label }}_error');
+            }
+        }
+    });
+
+    // Real-time password validation
+    document.getElementById('{{ form.password1.id_for_label }}').addEventListener('input', function() {
+        const password = this.value;
+        
+        // Update password strength indicator
+        updatePasswordStrength(password);
+        
+        // Clear errors when user starts typing
+        if (password.length > 0) {
+            clearError('{{ form.password1.id_for_label }}', '{{ form.password1.id_for_label }}_error');
+            
+            // Basic validation in real-time
+            if (password.length < 8) {
+                showError('{{ form.password1.id_for_label }}', '{{ form.password1.id_for_label }}_error', 'Password must be at least 8 characters');
+            } else if (/^\d+$/.test(password)) {
+                showError('{{ form.password1.id_for_label }}', '{{ form.password1.id_for_label }}_error', 'Password cannot be entirely numeric');
+            } else {
+                clearError('{{ form.password1.id_for_label }}', '{{ form.password1.id_for_label }}_error');
+            }
+        }
+    });
+
+    // Real-time password confirmation validation
+    document.getElementById('{{ form.password2.id_for_label }}').addEventListener('input', function() {
+        const confirmPassword = this.value;
+        const password = document.getElementById('{{ form.password1.id_for_label }}').value;
+        
+        if (confirmPassword && password !== confirmPassword) {
+            showError('{{ form.password2.id_for_label }}', '{{ form.password2.id_for_label }}_error', 'Passwords must match');
+        } else {
+            clearError('{{ form.password2.id_for_label }}', '{{ form.password2.id_for_label }}_error');
+        }
+    });
+
     // Continue button - validate step 1 before proceeding
-    continueBtn.addEventListener('click', () => {
-        if (validateStep1()) {
+    continueBtn.addEventListener('click', async () => {
+        // Show loading state
+        continueBtn.disabled = true;
+        continueBtn.innerHTML = '<span>Checking...</span>';
+        
+        if (await validateStep1()) {
             step1.style.display = 'none';
             step2.style.display = 'block';
             step1Indicator.classList.add('completed');
@@ -462,7 +692,11 @@
                 firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
             }
         }
-    });
+        
+        // Reset button state
+        continueBtn.disabled = false;
+        continueBtn.innerHTML = '<span>Continue</span>';
+});
 
     // Back button
     backBtn.addEventListener('click', () => {
