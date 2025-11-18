@@ -156,23 +156,7 @@
                     <div class="form-group">
                         <label class="form-label">Company Option *</label>
                         <div class="radio-group">
-                            {% for radio in form.company_choice %}
-                                {% if radio.choice_label == 'Existing Company' %}
-                                    <div class="radio-option disabled">
-                                        {{ radio.tag }}
-                                        <label for="{{ radio.id_for_label }}" class="disabled">
-                                            {{ radio.choice_label }} <span class="disabled-text">(Temporarily Disabled)</span>
-                                        </label>
-                                    </div>
-                                {% else %}
-                                    <div class="radio-option">
-                                        {{ radio.tag }}
-                                        <label for="{{ radio.id_for_label }}">
-                                            {{ radio.choice_label }}
-                                        </label>
-                                    </div>
-                                {% endif %}
-                            {% endfor %}
+                            {{ form.company_choice }}
                         </div>
                     </div>
                     
@@ -242,6 +226,60 @@
         </div>
 
         <div class="particles-section" id="particles-js"></div>
+        <!-- OTP Verification Modal -->
+        <div id="otpModal" class="modal" style="display: none; position: fixed; z-index: 10000; left: 0; top: 0; width: 100%; height: 100%; animation: fadeIn 0.3s ease-out; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
+            <div class="modal-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(26, 54, 93, 0.7); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);"></div>
+            <div class="modal-container" style="position: relative; display: flex; justify-content: center; align-items: center; min-height: 100%; padding: 20px;">
+                <div class="modal-content" style="background: var(--text-white, #ffffff); border-radius: 12px; width: 100%; max-width: 400px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15); border: 1px solid var(--bg-light, #dbe4f0); overflow: hidden; animation: modalSlideIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); position: relative;">
+                    
+                    <div class="modal-header" style="padding: 30px 30px 20px; text-align: center; background: var(--bg-page, #f0f4f8); border-bottom: 1px solid var(--bg-light, #dbe4f0); position: relative;">
+                        <div class="modal-icon" style="width: 56px; height: 56px; background: var(--primary-dark, #2c5282); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px; box-shadow: 0 4px 15px rgba(44, 82, 130, 0.3);">
+                            <i class="fas fa-shield-alt" style="font-size: 24px; color: var(--text-white, #ffffff);"></i>
+                        </div>
+                        <h3 style="margin: 0 0 8px 0; color: var(--primary-darker, #1a365d); font-size: 1.4em; font-weight: 700;">Two-Factor Verification</h3>
+                        <p class="modal-subtitle" style="margin: 0; color: #6c757d; font-size: 0.9em;">A 6-digit code has been sent to your email.</p>
+                        <span class="close" style="position: absolute; top: 15px; right: 15px; font-size: 28px; font-weight: 300; color: #a7c5eb; cursor: pointer; transition: color 0.3s ease; line-height: 1; user-select: none;">&times;</span>
+                    </div>
+                    
+                    <div class="modal-body" style="padding: 30px;">
+                        <div class="email-info" style="display: flex; align-items: center; justify-content: center; gap: 10px; background: var(--bg-light, #dbe4f0); padding: 12px; border-radius: 8px; margin-bottom: 25px; border: 1px solid var(--accent-light, #a7c5eb);">
+                            <i class="fas fa-envelope-open-text" style="color: var(--primary-dark, #2c5282); font-size: 1em;"></i>
+                            <span id="verify-email-display" class="email-address" style="font-weight: 500; color: var(--primary-darker, #1a365d); font-size: 0.9em;"></span>
+                        </div>
+                        
+                        <div class="form-group" style="margin-bottom: 25px;">
+                            <label class="form-label" style="display: block; margin-bottom: 8px; color: var(--primary-darker, #1a365d); font-weight: 600; font-size: 0.9em;">Verification Code</label>
+                            <input type="text" id="otp-input" class="form-control otp-input" maxlength="6" placeholder=" _    _    _    _    _    _ " 
+                                pattern="[0-9]{6}" title="Please enter 6 digits" 
+                                style="width: 100%; text-align: center; font-size: 1.6em; letter-spacing: 0.7em; font-weight: 700; padding: 15px 20px; border: 2px solid var(--accent-light, #a7c5eb); border-radius: 8px; background: var(--text-white, #ffffff); transition: all 0.3s ease; color: var(--primary-darker, #1a365d); box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.08); box-sizing: border-box; outline: none;">
+                            <span class="error-message" id="otp-error" style="display: none; color: var(--danger, #f44336); font-size: 0.8em; margin-top: 5px;"></span>
+                        </div>
+                        
+                        <div class="resend-section" style="margin-top: 20px; text-align: center;">
+                            <p style="margin: 0 0 10px 0; color: #6c757d; font-size: 0.85em;">Trouble receiving the code?</p>
+                            <div class="resend-actions" style="display: flex; flex-direction: column; align-items: center; gap: 10px;">
+                                <a href="#" id="resend-code" class="resend-link" style="color: var(--primary-dark, #2c5282); text-decoration: none; display: inline-flex; align-items: center; gap: 6px; font-weight: 600; padding: 10px 20px; border-radius: 8px; transition: all 0.3s ease; background: var(--accent-light, #a7c5eb); border: 1px solid var(--primary-blue, #4a6fa5);">
+                                    <i class="fas fa-redo"></i> Resend Code
+                                </a>
+                                <span id="resend-timer" class="resend-timer" style="color: #6c757d; font-size: 0.8em; display: none; padding: 4px 8px; background: var(--bg-page, #f0f4f8); border-radius: 4px;">
+                                    Resend available in <span id="countdown">60</span>s
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="modal-footer" style="padding: 20px 30px; display: flex; gap: 10px; justify-content: space-between; background: var(--bg-page, #f0f4f8); border-top: 1px solid var(--bg-light, #dbe4f0);">
+                        <button type="button" class="btn btn-secondary" id="cancel-verify" style="flex: 1; padding: 10px 15px; border-radius: 8px; font-weight: 500; display: flex; align-items: center; justify-content: center; gap: 6px; transition: all 0.3s ease; border: 1px solid var(--primary-blue, #4a6fa5); cursor: pointer; background: var(--text-white, #ffffff); color: var(--primary-blue, #4a6fa5); font-size: 0.9em;">
+                            <i class="fas fa-arrow-left"></i> Back
+                        </button>
+                        <button type="button" class="btn btn-primary" id="verify-code" style="flex: 1; padding: 10px 15px; border-radius: 8px; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 6px; transition: all 0.3s ease; border: none; cursor: pointer; background: var(--primary-dark, #2c5282); color: var(--text-white, #ffffff); box-shadow: 0 4px 10px rgba(44, 82, 130, 0.4); font-size: 0.9em;">
+                            <span>Verify</span>
+                            <i class="fas fa-check"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -292,6 +330,19 @@
     const step1Indicator = document.getElementById('step1-indicator');
     const step2Indicator = document.getElementById('step2-indicator');
     const line1 = document.getElementById('line1');
+
+    const otpModal = document.getElementById('otpModal');
+    const closeModal = document.querySelector('.close');
+    const cancelVerify = document.getElementById('cancel-verify');
+    const verifyCodeBtn = document.getElementById('verify-code');
+    const resendCodeBtn = document.getElementById('resend-code');
+    const resendTimer = document.getElementById('resend-timer');
+    const countdownElement = document.getElementById('countdown');
+    const otpInput = document.getElementById('otp-input');
+    const otpError = document.getElementById('otp-error');
+
+    let resendCooldown = 60;
+    let countdownInterval = null;
 
     // Check if there are server-side errors and show appropriate step
     document.addEventListener('DOMContentLoaded', function() {
@@ -675,28 +726,225 @@
     continueBtn.addEventListener('click', async () => {
         // Show loading state
         continueBtn.disabled = true;
-        continueBtn.innerHTML = '<span>Checking...</span>';
+        continueBtn.innerHTML = '<span>Validating...</span>';
         
         if (await validateStep1()) {
-            step1.style.display = 'none';
-            step2.style.display = 'block';
-            step1Indicator.classList.add('completed');
-            step1Indicator.innerHTML = '<i class="fas fa-check"></i>';
-            step2Indicator.classList.add('active');
-            line1.classList.add('completed');
-            document.querySelector('.form-section').scrollTop = 0;
+            const email = document.getElementById('{{ form.email.id_for_label }}').value.trim();
+            await sendVerificationCode(email);
         } else {
             // Scroll to first error
             const firstError = document.querySelector('.error-message.show');
             if (firstError) {
                 firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
             }
+            // Reset button state
+            continueBtn.disabled = false;
+            continueBtn.innerHTML = '<span>Continue</span>';
+        }
+    });
+
+    // Send verification code
+    async function sendVerificationCode(email) {
+        try {
+            const response = await fetch("{% url 'accounts:send_verification_code' %}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                body: JSON.stringify({ email: email })
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                showOtpModal(email);
+            } else {
+                showError('{{ form.email.id_for_label }}', '{{ form.email.id_for_label }}_error', data.error || 'Failed to send verification code');
+            }
+        } catch (error) {
+            console.error('Error sending verification code:', error);
+            showError('{{ form.email.id_for_label }}', '{{ form.email.id_for_label }}_error', 'Network error. Please try again.');
+        } finally {
+            // Reset button state
+            continueBtn.disabled = false;
+            continueBtn.innerHTML = '<span>Continue</span>';
+        }
+    }
+
+    // Show OTP modal
+    function showOtpModal(email) {
+        document.getElementById('verify-email-display').textContent = email;
+        otpModal.style.display = 'block';
+        otpInput.value = '';
+        otpInput.focus();
+        otpError.textContent = '';
+        otpError.classList.remove('show');
+        
+        // Prevent background scrolling
+        document.body.style.overflow = 'hidden';
+        
+        // Start resend cooldown
+        startResendCooldown();
+    }
+
+    // Hide OTP modal
+    function hideOtpModal() {
+        otpModal.style.display = 'none';
+        // Restore background scrolling
+        document.body.style.overflow = '';
+        
+        if (countdownInterval) {
+            clearInterval(countdownInterval);
+            countdownInterval = null;
+        }
+    }
+
+    // Start resend cooldown timer
+    function startResendCooldown() {
+        resendCooldown = 60;
+        resendCodeBtn.style.display = 'none';
+        resendTimer.style.display = 'block';
+        countdownElement.textContent = resendCooldown;
+        
+        if (countdownInterval) {
+            clearInterval(countdownInterval);
         }
         
-        // Reset button state
-        continueBtn.disabled = false;
-        continueBtn.innerHTML = '<span>Continue</span>';
-});
+        countdownInterval = setInterval(() => {
+            resendCooldown--;
+            countdownElement.textContent = resendCooldown;
+            
+            if (resendCooldown <= 0) {
+                clearInterval(countdownInterval);
+                resendCodeBtn.style.display = 'inline';
+                resendTimer.style.display = 'none';
+            }
+        }, 1000);
+    }
+
+    // Verify OTP code
+    async function verifyOtpCode(email, code) {
+        try {
+            verifyCodeBtn.disabled = true;
+            verifyCodeBtn.classList.add('btn-loading');
+            otpInput.disabled = true;
+            
+            const response = await fetch("{% url 'accounts:verify_email_code' %}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                body: JSON.stringify({ 
+                    email: email,
+                    code: code
+                })
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                otpInput.classList.add('success');
+                // Add success animation
+                setTimeout(() => {
+                    hideOtpModal();
+                    proceedToStep2();
+                }, 800);
+            } else {
+                otpInput.classList.add('error');
+                otpError.textContent = data.error || 'Invalid verification code';
+                otpError.classList.add('show');
+                
+                // Clear input and focus for retry
+                setTimeout(() => {
+                    otpInput.value = '';
+                    otpInput.focus();
+                    otpInput.classList.remove('error');
+                }, 2000);
+            }
+        } catch (error) {
+            console.error('Error verifying OTP:', error);
+            otpError.textContent = 'Network error. Please try again.';
+            otpError.classList.add('show');
+        } finally {
+            verifyCodeBtn.disabled = false;
+            verifyCodeBtn.classList.remove('btn-loading');
+            otpInput.disabled = false;
+        }
+    }
+
+    // Proceed to step 2 after successful verification
+    function proceedToStep2() {
+        step1.style.display = 'none';
+        step2.style.display = 'block';
+        step1Indicator.classList.add('completed');
+        step1Indicator.innerHTML = '<i class="fas fa-check"></i>';
+        step2Indicator.classList.add('active');
+        line1.classList.add('completed');
+        document.querySelector('.form-section').scrollTop = 0;
+    }
+
+    // Event listeners for OTP modal
+    closeModal.addEventListener('click', hideOtpModal);
+    cancelVerify.addEventListener('click', hideOtpModal);
+
+    verifyCodeBtn.addEventListener('click', () => {
+        const email = document.getElementById('{{ form.email.id_for_label }}').value.trim();
+        const code = otpInput.value.trim();
+        
+        if (!code || code.length !== 6) {
+            otpError.textContent = 'Please enter a valid 6-digit code';
+            otpError.classList.add('show');
+            return;
+        }
+        
+        verifyOtpCode(email, code);
+    });
+
+    resendCodeBtn.addEventListener('click', async (e) => {
+        e.preventDefault();
+        const email = document.getElementById('{{ form.email.id_for_label }}').value.trim();
+        await sendVerificationCode(email);
+    });
+
+    // OTP input validation
+    otpInput.addEventListener('input', function() {
+        // Only allow numbers
+        this.value = this.value.replace(/\D/g, '');
+        
+        // Limit to 6 characters
+        if (this.value.length > 6) {
+            this.value = this.value.slice(0, 6);
+        }
+        
+        // Visual feedback
+        if (this.value.length === 6) {
+            this.classList.add('success');
+            this.classList.remove('error');
+            // Auto-verify when 6 digits are entered
+            setTimeout(() => {
+                if (this.value.length === 6) {
+                    verifyCodeBtn.click();
+                }
+            }, 300);
+        } else {
+            this.classList.remove('success', 'error');
+        }
+        
+        // Clear error when user types
+        if (this.value.length > 0) {
+            otpError.textContent = '';
+            otpError.classList.remove('show');
+        }
+    });
+
+    // Close modal when clicking outside
+    window.addEventListener('click', (e) => {
+        if (e.target === otpModal) {
+            hideOtpModal();
+        }
+    });
 
     // Back button
     backBtn.addEventListener('click', () => {

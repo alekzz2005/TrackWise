@@ -1,5 +1,8 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.db import models
+from django.utils import timezone
+from datetime import timedelta
 
 class Company(models.Model):
     name = models.CharField(max_length=200)
@@ -14,6 +17,28 @@ class Company(models.Model):
     def staff_count(self):
         """Count staff members in this company"""
         return UserProfile.objects.filter(company=self, role='staff').count()
+    
+class EmailVerification(models.Model):
+    email = models.EmailField()
+    otp = models.CharField(max_length=6)
+    created_at = models.DateTimeField(auto_now_add=True)
+    is_used = models.BooleanField(default=False)
+    
+    class Meta:
+        db_table = 'email_verification'
+        ordering = ['-created_at']
+        
+    def is_expired(self):
+        """Check if OTP is expired (10 minutes)"""
+        return timezone.now() > self.created_at + timedelta(minutes=10)
+    
+    def mark_used(self):
+        """Mark OTP as used"""
+        self.is_used = True
+        self.save()
+    
+    def __str__(self):
+        return f"{self.email} - {self.otp}"
 
 class UserProfile(models.Model):
     ROLE_CHOICES = [

@@ -143,6 +143,21 @@ LOGIN_REDIRECT_URL = 'dashboard:dashboard'
 LOGOUT_REDIRECT_URL = 'accounts:login'
 LOGIN_URL = 'accounts:login'
 
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'trackwisenet@gmail.com'  # Your Gmail address
+EMAIL_HOST_PASSWORD = 'hbigmxfodatgkrmn'    # You need to generate this
+DEFAULT_FROM_EMAIL = 'trackwisenet@gmail.com'
+
+# # For development, you can use console backend
+# if DEBUG:
+#     # This will print emails to console AND send them
+#     EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+#     # But also configure SMTP for when you want real emails
+#     REAL_EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+
 # Media files
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
