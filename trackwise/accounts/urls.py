@@ -15,4 +15,7 @@ urlpatterns = [
 
     path('api/check-email/', views.check_email, name='check_email'),
     path('api/check-username/', views.check_username, name='check_username'),
+
+    path('api/send-verification-code/', views.send_verification_code, name='send_verification_code'),
+    path('api/verify-email-code/', views.verify_email_code, name='verify_email_code'),
 ]
