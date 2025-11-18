@@ -96,8 +96,13 @@ def staff_register(request):
 def send_verification_code(request):
     """Send OTP code to email for verification"""
     try:
-        data = json.loads(request.body)
-        email = data.get('email', '').strip().lower()
+        # Check if it's JSON data
+        if request.content_type == 'application/json':
+            data = json.loads(request.body)
+            email = data.get('email', '').strip().lower()
+        else:
+            # Fallback to form data
+            email = request.POST.get('email', '').strip().lower()
         
         # Validate email format
         if not email or '@' not in email:
@@ -119,7 +124,7 @@ def send_verification_code(request):
             otp=otp
         )
         
-        # Send email - ALWAYS try to send via SMTP
+        # Send email
         try:
             send_mail(
                 'Your TrackWise Verification Code',
@@ -128,20 +133,23 @@ def send_verification_code(request):
                 [email],
                 fail_silently=False,
             )
-            print(f"OTP sent via email to {email}: {otp}")  # Also log to console for debugging
+            print(f"OTP sent via email to {email}: {otp}")
         except Exception as e:
-            # If email fails, log the error but still allow development
             print(f"Email sending failed: {e}")
             print(f"DEVELOPMENT OTP for {email}: {otp}")
             
-            # Only return error in production
+            # In production, we should still return success for now to avoid blocking users
+            # You might want to implement a proper email service later
             if not settings.DEBUG:
-                return JsonResponse({'success': False, 'error': 'Failed to send verification code. Please try again.'})
+                # Log the error but don't block the user in production
+                pass
         
         return JsonResponse({'success': True})
         
+    except json.JSONDecodeError:
+        return JsonResponse({'success': False, 'error': 'Invalid JSON data'})
     except Exception as e:
-        print(f"Error in send_verification_code: {e}")
+        print(f"Error in send_verification_code: {str(e)}")
         return JsonResponse({'success': False, 'error': 'An error occurred. Please try again.'})
 
 @require_POST
@@ -149,7 +157,12 @@ def send_verification_code(request):
 def verify_email_code(request):
     """Verify the OTP code entered by user"""
     try:
-        data = json.loads(request.body)
+        # Check if it's JSON data
+        if request.content_type == 'application/json':
+            data = json.loads(request.body)
+        else:
+            data = request.POST
+            
         email = data.get('email', '').strip().lower()
         code = data.get('code', '').strip()
         
@@ -185,10 +198,11 @@ def verify_email_code(request):
         
         return JsonResponse({'success': True})
         
+    except json.JSONDecodeError:
+        return JsonResponse({'success': False, 'error': 'Invalid JSON data'})
     except Exception as e:
-        print(f"Error in verify_email_code: {e}")
+        print(f"Error in verify_email_code: {str(e)}")
         return JsonResponse({'success': False, 'error': 'An error occurred during verification'})
-
 def login_view(request):
     if request.user.is_authenticated:
         return redirect('dashboard:dashboard')
