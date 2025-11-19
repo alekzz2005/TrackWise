@@ -132,8 +132,7 @@ def increase_stock(request, pk):
             product.save()
             return JsonResponse({
                 'success': True,
-                'new_quantity': product.quantity,
-                'display_quantity': product.get_display_quantity(),
+                    'new_quantity': product.quantity,
                 'total_value': float(product.total_value)
             })
         except (Product.DoesNotExist, UserProfile.DoesNotExist):
@@ -152,7 +151,6 @@ def decrease_stock(request, pk):
             return JsonResponse({
                 'success': True,
                 'new_quantity': product.quantity,
-                'display_quantity': product.get_display_quantity(),
                 'total_value': float(product.total_value)
             })
         except (Product.DoesNotExist, UserProfile.DoesNotExist):

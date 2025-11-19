@@ -358,13 +358,13 @@
                 <p>View staff member information</p>
             </div>
 
-            {% if messages %}
+            {% comment %} {% if messages %}
                 {% for message in messages %}
                     <div class="alert alert-{{ message.tags }}">
                         {{ message }}
                     </div>
                 {% endfor %}
-            {% endif %}
+            {% endif %} {% endcomment %}
             
             <div class="staff-profile-section">
                 <div class="staff-avatar-large">

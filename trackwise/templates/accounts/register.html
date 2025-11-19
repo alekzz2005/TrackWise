@@ -17,13 +17,13 @@
         <div class="auth-body">
             <h2 style="text-align: center; margin-bottom: 1.5rem; color: var(--dark-color);">Create Account</h2>
             
-            {% if messages %}
+            {% comment %} {% if messages %}
                 {% for message in messages %}
                     <div class="alert {% if message.tags == 'error' %}alert-error{% else %}alert-{{ message.tags }}{% endif %}">
                         {{ message }}
                     </div>
                 {% endfor %}
-            {% endif %}
+            {% endif %} {% endcomment %}
             
             <form method="post" novalidate>
                 {% csrf_token %}

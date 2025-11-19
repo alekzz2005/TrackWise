@@ -29,13 +29,13 @@
         </div>
         
         <div class="dashboard-content">
-            {% if messages %}
+            {% comment %} {% if messages %}
                 {% for message in messages %}
                     <div class="alert alert-{{ message.tags }}">
                         {{ message }}
                     </div>
                 {% endfor %}
-            {% endif %}
+            {% endif %} {% endcomment %}
             
             <div class="welcome-card">
                 <h2>Welcome, {{ request.user.first_name }}!</h2>

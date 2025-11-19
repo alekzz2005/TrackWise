@@ -426,13 +426,13 @@
         </div>
 
         <div class="profile-content">
-            {% if messages %}
+            {% comment %} {% if messages %}
                 {% for message in messages %}
                     <div class="alert alert-{{ message.tags }}">
                         {{ message }}
                     </div>
                 {% endfor %}
-            {% endif %}
+            {% endif %} {% endcomment %}
 
             {% if profile_form.errors or company_form.errors %}
                 <div class="alert alert-error">

@@ -126,7 +126,7 @@
 
     .search-input {
         width: 100%;
-        padding: 1rem 1rem 1rem 3rem;
+        padding: 1rem 3.6rem 1rem 3rem;
         background: rgba(255, 255, 255, 0.1);
         border: 2px solid rgba(255, 255, 255, 0.2);
         border-radius: 12px;
@@ -197,6 +197,33 @@
         transform: translateY(-2px);
         box-shadow: var(--shadow-md);
         color: var(--primary-dark);
+    }
+
+    /* Small clear icon inside the search box */
+    .btn-clear {
+        position: absolute;
+        right: 6px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: rgba(255,255,255,0.08);
+        color: var(--text-white);
+        border: none;
+        width: 36px;
+        height: 36px;
+        padding: 0;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 8px;
+        box-shadow: var(--shadow-sm);
+        transition: var(--transition);
+    }
+
+    .btn-clear:hover {
+        background: rgba(255,255,255,0.18);
+        color: var(--primary-dark);
+        /* keep vertical centering so the button doesn't jump */
+        transform: translateY(-50%);
     }
 
     /* Statistic Cards */
@@ -685,29 +712,32 @@
                 <p class="subtitle">Manage your products and stock levels efficiently</p>
             </div>
             
-            <div class="header-actions">
-                <div class="search-container">
-                    <form method="get" class="search-form">
+            <form method="get" id="search-filter-form" class="search-form">
+                <div class="header-actions">
+                    <div class="search-container">
                         <div class="search-box">
                             <i class="fas fa-search"></i>
                             <input type="text" name="search" class="search-input" placeholder="Search products..." 
                                    value="{{ search_query }}">
+                            <button type="button" id="clear-search-btn" class="btn-clear" title="Clear search">
+                                <i class="fas fa-times"></i>
+                            </button>
                         </div>
-                    </form>
-                </div>
-                
-                <div class="filter-actions">
-                    <select name="cost_filter" class="filter-select" onchange="this.form.submit()">
-                        <option value="">Sort by Cost</option>
-                        <option value="low" {% if cost_filter == 'low' %}selected{% endif %}>Low to High</option>
-                        <option value="high" {% if cost_filter == 'high' %}selected{% endif %}>High to Low</option>
-                    </select>
+                    </div>
                     
-                    <a href="{% url 'inventory:product_add' %}" class="btn-primary">
-                        <i class="fas fa-plus"></i> Add Product
-                    </a>
+                    <div class="filter-actions">
+                        <select name="cost_filter" class="filter-select" onchange="document.getElementById('search-filter-form').submit()">
+                            <option value="">Sort by Cost</option>
+                            <option value="low" {% if cost_filter == 'low' %}selected{% endif %}>Low to High</option>
+                            <option value="high" {% if cost_filter == 'high' %}selected{% endif %}>High to Low</option>
+                        </select>
+                        
+                        <a href="{% url 'inventory:product_add' %}" class="btn-primary">
+                            <i class="fas fa-plus"></i> Add Product
+                        </a>
+                    </div>
                 </div>
-            </div>
+            </form>
         </div>
 
         {% if products %}
@@ -788,9 +818,6 @@
                                 <!-- Quantity Controls -->
                                 <td>
                                     <div class="quantity-control">
-                                        {% if product.quantity <= 10 and product.quantity > 0 %}
-                                        <span class="badge-low-stock">LOW</span>
-                                        {% endif %}
                                         <button type="button" class="qty-button decrease" data-product-id="{{ product.pk }}" {% if product.quantity == 0 %}disabled{% endif %}>
                                             <i class="fas fa-minus"></i>
                                         </button>
@@ -812,13 +839,13 @@
                                 </td>
                                 
                                 <!-- Status -->
-                                <td>
+                                <td id="status-{{ product.pk }}">
                                     {% if product.quantity == 0 %}
-                                        <span class="badge stock-out">Out of Stock</span>
+                                        Out of Stock
                                     {% elif product.quantity <= 10 %}
-                                        <span class="badge stock-low">Low Stock</span>
+                                        Low Stock
                                     {% else %}
-                                        <span class="badge stock-ok">In Stock</span>
+                                        In Stock
                                     {% endif %}
                                 </td>
                                 
@@ -886,16 +913,15 @@ document.addEventListener('DOMContentLoaded', function() {
         })
         .then(data => {
             if (data.success) {
-                quantityElement.textContent = data.display_quantity;
-                
+                quantityElement.textContent = data.new_quantity;
+
                 const decreaseBtn = document.querySelector(`.decrease[data-product-id="${productId}"]`);
                 if (decreaseBtn) {
                     decreaseBtn.disabled = data.new_quantity === 0;
                 }
-                
-                updateStatusBadge(productId, data.new_quantity);
-                updateLowStockBadge(productId, data.new_quantity);
-                
+
+                updateStatusText(productId, data.new_quantity);
+
                 console.log('Stock updated successfully');
             } else {
                 console.error('Server error:', data.error);
@@ -908,43 +934,28 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    function updateStatusBadge(productId, quantity) {
-        const row = document.querySelector(`tr[data-product-id="${productId}"]`);
-        if (!row) return;
-        
-        const statusCell = row.querySelector('td:nth-child(7)');
+    function updateStatusText(productId, quantity) {
+        const statusCell = document.getElementById(`status-${productId}`);
         if (!statusCell) return;
-        
-        let badgeClass, badgeText;
-        
+
+        statusCell.classList.remove('stock-out', 'stock-low', 'stock-ok');
+
+        let statusText = '';
+        let statusClass = '';
+
         if (quantity === 0) {
-            badgeClass = 'stock-out';
-            badgeText = 'Out of Stock';
+            statusText = 'Out of Stock';
+            statusClass = 'stock-out';
         } else if (quantity <= 10) {
-            badgeClass = 'stock-low';
-            badgeText = 'Low Stock';
+            statusText = 'Low Stock';
+            statusClass = 'stock-low';
         } else {
-            badgeClass = 'stock-ok';
-            badgeText = 'In Stock';
+            statusText = 'In Stock';
+            statusClass = 'stock-ok';
         }
-        
-        statusCell.innerHTML = `<span class="badge ${badgeClass}">${badgeText}</span>`;
-    }
-    
-    function updateLowStockBadge(productId, quantity) {
-        const quantityControl = document.querySelector(`.decrease[data-product-id="${productId}"]`).closest('.quantity-control');
-        const existingBadge = quantityControl.querySelector('.badge-low-stock');
-        
-        if (existingBadge) {
-            existingBadge.remove();
-        }
-        
-        if (quantity <= 10 && quantity > 0) {
-            const lowStockBadge = document.createElement('span');
-            lowStockBadge.className = 'badge-low-stock';
-            lowStockBadge.textContent = 'LOW';
-            quantityControl.appendChild(lowStockBadge);
-        }
+
+        statusCell.textContent = statusText;
+        statusCell.classList.add(statusClass);
     }
     
     function getCookie(name) {
@@ -975,6 +986,17 @@ document.addEventListener('DOMContentLoaded', function() {
             updateStock(productId, 'decrease');
         });
     });
+    
+    // Clear search button behavior
+    const clearBtn = document.getElementById('clear-search-btn');
+    if (clearBtn) {
+        clearBtn.addEventListener('click', function() {
+            const form = document.getElementById('search-filter-form');
+            const searchInput = form.querySelector('.search-input');
+            if (searchInput) searchInput.value = '';
+            form.submit();
+        });
+    }
 });
 </script>
 {% endblock %}

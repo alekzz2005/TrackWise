@@ -58,6 +58,7 @@ def staff_list(request):
         'search_form': search_form,
         'total_staff': staff_profiles.count(),
         'active_staff': staff_profiles.filter(status='active').count(),
+        'inactive_staff': staff_profiles.filter(status='inactive').count(),
     }
     
     return render(request, 'staff_management/staff_list.html', context)
@@ -201,7 +202,6 @@ def staff_update(request, staff_id):
     context = {
         'staff': staff_profile,
         'profile_form': profile_form,
-        'user': user,
     }
     
     return render(request, 'staff_management/staff_update.html', context)
