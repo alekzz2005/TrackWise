@@ -34,6 +34,12 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    
+    # Third-party apps
+    'cloudinary',
+    'cloudinary_storage',
+    
+    # Local apps
     'accounts',
     'inventory',
     'dashboard',
@@ -145,9 +151,26 @@ else:
     SERVER_EMAIL = 'trackwisenet@gmail.com'
     print("📧 USING CONSOLE EMAIL - Set RESEND_API_KEY for production emails")
 
-# Media files
-MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media'
+# Cloudinary Configuration for Media Files
+CLOUDINARY_STORAGE = {
+    'CLOUD_NAME': os.getenv('CLOUDINARY_CLOUD_NAME', ''),
+    'API_KEY': os.getenv('CLOUDINARY_API_KEY', ''),
+    'API_SECRET': os.getenv('CLOUDINARY_API_SECRET', ''),
+}
+
+# Media files configuration - Using Cloudinary
+if all([CLOUDINARY_STORAGE['CLOUD_NAME'], CLOUDINARY_STORAGE['API_KEY'], CLOUDINARY_STORAGE['API_SECRET']]):
+    # Use Cloudinary for production
+    DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+    MEDIA_URL = '/media/'  # Cloudinary will handle the actual URL
+    
+    print("✅ USING CLOUDINARY FOR MEDIA STORAGE")
+else:
+    # Fallback to local media storage for development
+    MEDIA_URL = '/media/'
+    MEDIA_ROOT = BASE_DIR / 'media'
+    
+    print("📁 USING LOCAL MEDIA STORAGE - Set Cloudinary credentials for production")
 
 # Custom user model
 AUTH_USER_MODEL = 'auth.User'

@@ -32,12 +32,12 @@
                 {% endfor %}
             {% endif %} {% endcomment %}
             
-            <div class="staff-image-section">
+            {% comment %} <div class="staff-image-section">
                 <div class="staff-detail-image-placeholder">
                     <i class="fas fa-user fa-4x text-muted"></i>
                     <p>Staff Profile</p>
                 </div>
-            </div>
+            </div> {% endcomment %}
             
             <form method="post" enctype="multipart/form-data" id="staff-update-form">
                 {% csrf_token %}
