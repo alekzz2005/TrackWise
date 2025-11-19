@@ -719,9 +719,9 @@
                             <i class="fas fa-search"></i>
                             <input type="text" name="search" class="search-input" placeholder="Search products..." 
                                    value="{{ search_query }}">
-                            <button type="button" id="clear-search-btn" class="btn-clear" title="Clear search">
+                            {% comment %} <button type="button" id="clear-search-btn" class="btn-clear" title="Clear search">
                                 <i class="fas fa-times"></i>
-                            </button>
+                            </button> {% endcomment %}
                         </div>
                     </div>
                     
@@ -744,25 +744,25 @@
         <!-- Statistics Cards -->
         <div class="stats-grid">
             <div class="stat-card">
-                <div class="stat-number">{{ products.count }}</div>
+                <div id="kpi-total-products" class="stat-number">{{ products.count }}</div>
                 <div class="stat-label">Total Products</div>
                 <i class="stat-icon fas fa-boxes"></i>
             </div>
             
             <div class="stat-card">
-                <div class="stat-number">₱{{ total_inventory_value|floatformat:2 }}</div>
+                <div id="kpi-total-value" class="stat-number">₱{{ total_inventory_value|floatformat:2 }}</div>
                 <div class="stat-label">Total Value</div>
                 <i class="stat-icon fas fa-peso-sign"></i>
             </div>
             
             <div class="stat-card">
-                <div class="stat-number">{{ low_stock_count|default:0 }}</div>
+                <div id="kpi-low-stock" class="stat-number">{{ low_stock_count|default:0 }}</div>
                 <div class="stat-label">Low Stock</div>
                 <i class="stat-icon fas fa-exclamation-triangle"></i>
             </div>
             
             <div class="stat-card">
-                <div class="stat-number">{{ out_of_stock_count|default:0 }}</div>
+                <div id="kpi-out-of-stock" class="stat-number">{{ out_of_stock_count|default:0 }}</div>
                 <div class="stat-label">Out of Stock</div>
                 <i class="stat-icon fas fa-times-circle"></i>
             </div>
@@ -921,6 +921,25 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
 
                 updateStatusText(productId, data.new_quantity);
+
+                // Refresh KPI cards if provided
+                const totalProductsEl = document.getElementById('kpi-total-products');
+                const totalValueEl = document.getElementById('kpi-total-value');
+                const lowStockEl = document.getElementById('kpi-low-stock');
+                const outOfStockEl = document.getElementById('kpi-out-of-stock');
+
+                if (totalProductsEl && typeof data.total_products !== 'undefined') {
+                    totalProductsEl.textContent = data.total_products;
+                }
+                if (totalValueEl && typeof data.total_inventory_value !== 'undefined') {
+                    totalValueEl.textContent = '₱' + parseFloat(data.total_inventory_value).toFixed(2);
+                }
+                if (lowStockEl && typeof data.low_stock_count !== 'undefined') {
+                    lowStockEl.textContent = data.low_stock_count;
+                }
+                if (outOfStockEl && typeof data.out_of_stock_count !== 'undefined') {
+                    outOfStockEl.textContent = data.out_of_stock_count;
+                }
 
                 console.log('Stock updated successfully');
             } else {
