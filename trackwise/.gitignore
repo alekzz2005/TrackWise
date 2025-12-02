@@ -21,6 +21,8 @@ db.sqlite3
 # Media and static files
 media/
 staticfiles/
+issue_images/
+issue_attachments/
 
 # Environment variables
 .env

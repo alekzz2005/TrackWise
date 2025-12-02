@@ -1,7 +1,5 @@
 import logging
 from django.conf import settings
-from infobip_channels.email.channel import EmailChannel
-from infobip_api_client.api_client import ApiClient, Configuration
 
 logger = logging.getLogger(__name__)
 
@@ -45,14 +43,14 @@ def send_infobip_email(to_email, subject, html_content, text_content=None):
             base_url = f"https://{base_url}"
         
         # Initialize Infobip configuration with your specific base URL
-        configuration = Configuration(
+        configuration = configuration(
             host=base_url,  # This becomes https://v35rjm.api.infobip.com
             api_key_prefix="App",
             api_key=settings.INFOBIP_API_KEY,
         )
         
-        api_client = ApiClient(configuration=configuration)
-        email_channel = EmailChannel(api_client)
+        api_client = api_client(configuration=configuration)
+        email_channel = email_channel(api_client)
         
         # Prepare the email
         response = email_channel.send_email_message(
