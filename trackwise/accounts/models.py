@@ -1,6 +1,5 @@
 from django.db import models
 from django.contrib.auth.models import User
-from django.db import models
 from django.utils import timezone
 from datetime import timedelta
 
@@ -17,7 +16,7 @@ class Company(models.Model):
     def staff_count(self):
         """Count staff members in this company"""
         return UserProfile.objects.filter(company=self, role='staff').count()
-    
+
 class EmailVerification(models.Model):
     email = models.EmailField()
     otp = models.CharField(max_length=6)

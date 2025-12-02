@@ -2,8 +2,9 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, logout, authenticate, update_session_auth_hash
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+from django.urls import reverse
 from .forms import BusinessOwnerRegistrationForm, StaffRegistrationForm, CustomAuthenticationForm, BusinessOwnerProfileForm, CustomPasswordChangeForm, CompanyForm
-from .models import UserProfile, Company
+from .models import UserProfile, Company, EmailVerification
 from django.http import JsonResponse
 from django.contrib.auth.models import User
 from django.views.decorators.csrf import csrf_exempt
@@ -16,9 +17,22 @@ from django.conf import settings
 from django.utils import timezone
 from datetime import timedelta
 import secrets
-from .models import EmailVerification
 from django.core.mail import send_mail
 from django.http import HttpResponse
+
+# ADD THIS NEW VIEW
+def email_verification_view(request):
+    """Display email verification page"""
+    if request.user.is_authenticated:
+        return redirect('dashboard:dashboard')
+    
+    email = request.GET.get('email', '')
+    if not email:
+        return redirect('accounts:role_selection')
+    
+    return render(request, 'accounts/email_verification.html', {
+        'email': email
+    })
 
 def test_email_config(request):
     """Test email configuration"""
@@ -44,52 +58,136 @@ def landing_page(request):
         return redirect('dashboard:dashboard')
     return render(request, 'landing.html')
 
+# UPDATED BUSINESS OWNER REGISTRATION
 def business_owner_register(request):
     if request.user.is_authenticated:
         return redirect('dashboard:dashboard')
-        
-    if request.method == 'POST':
-        form = BusinessOwnerRegistrationForm(request.POST)
-        if form.is_valid():
-            user = form.save()
+    
+    if request.method == 'GET':
+        email = request.GET.get('email', '')
+        if email:
+            # Check if email is verified before showing form
+            is_verified = EmailVerification.objects.filter(
+                email=email.lower(),
+                is_used=True
+            ).exists()
             
-            # Show processing screen for existing company selection
-            if form.cleaned_data.get('company_choice') == 'existing':
-                return render(request, 'accounts/processing.html', {
-                    'role': 'business_owner',
-                    'next_url': 'accounts:login'
-                })
+            if not is_verified:
+                # Not verified, show error and redirect to verification
+                messages.error(request, 'Please verify your email before registering.')
+                return redirect(f'{reverse("accounts:email_verification")}?email={email}')
             
-            login(request, user)
-            messages.success(request, 'Business Owner account created successfully! Welcome to TrackWise.')
-            return redirect('dashboard:dashboard')
+            # Email is verified, show pre-filled form
+            form = BusinessOwnerRegistrationForm(initial={'email': email})
         else:
-            messages.error(request, 'Please correct the errors below.')
+            form = BusinessOwnerRegistrationForm()
+        
+        return render(request, 'accounts/business_owner_register.html', {'form': form})
+    
+    # POST request - processing registration form
+    form = BusinessOwnerRegistrationForm(request.POST)
+    if form.is_valid():
+        email = form.cleaned_data.get('email', '').lower()
+        
+        # CHECK IF EMAIL IS VERIFIED
+        is_verified = EmailVerification.objects.filter(
+            email=email,
+            is_used=True
+        ).exists()
+        
+        if not is_verified:
+            messages.error(request, 'Please verify your email before registering.')
+            return redirect(f'{reverse("accounts:email_verification")}?email={email}')
+        
+        # Email is verified, create user
+        user = form.save()
+        
+        # Delete the verification record after successful registration
+        EmailVerification.objects.filter(email=email, is_used=True).delete()
+        
+        # Show processing screen for existing company selection
+        if form.cleaned_data.get('company_choice') == 'existing':
+            return render(request, 'accounts/processing.html', {
+                'role': 'business_owner',
+                'next_url': 'accounts:login'
+            })
+        
+        login(request, user)
+        messages.success(request, 'Business Owner account created successfully! Welcome to TrackWise.')
+        return redirect('dashboard:dashboard')
     else:
-        form = BusinessOwnerRegistrationForm()
+        messages.error(request, 'Please correct the errors below.')
     
     return render(request, 'accounts/business_owner_register.html', {'form': form})
 
+# UPDATED STAFF REGISTRATION
 def staff_register(request):
     if request.user.is_authenticated:
         return redirect('dashboard:dashboard')
-        
-    if request.method == 'POST':
-        form = StaffRegistrationForm(request.POST)
-        if form.is_valid():
-            user = form.save()
+    
+    if request.method == 'GET':
+        email = request.GET.get('email', '')
+        if email:
+            # Check if email is verified before showing form
+            is_verified = EmailVerification.objects.filter(
+                email=email.lower(),
+                is_used=True
+            ).exists()
             
-            # Always show processing screen for staff
-            return render(request, 'accounts/processing.html', {
-                'role': 'staff',
-                'next_url': 'accounts:login'
-            })
+            if not is_verified:
+                # Not verified, show error and redirect to verification
+                messages.error(request, 'Please verify your email before registering.')
+                return redirect(f'{reverse("accounts:email_verification")}?email={email}')
+            
+            # Email is verified, show pre-filled form
+            form = StaffRegistrationForm(initial={'email': email})
         else:
-            messages.error(request, 'Please correct the errors below.')
+            form = StaffRegistrationForm()
+        
+        return render(request, 'accounts/staff_register.html', {'form': form})
+    
+    # POST request - processing registration form
+    form = StaffRegistrationForm(request.POST)
+    if form.is_valid():
+        email = form.cleaned_data.get('email', '').lower()
+        
+        # CHECK IF EMAIL IS VERIFIED
+        is_verified = EmailVerification.objects.filter(
+            email=email,
+            is_used=True
+        ).exists()
+        
+        if not is_verified:
+            messages.error(request, 'Please verify your email before registering.')
+            return redirect(f'{reverse("accounts:email_verification")}?email={email}')
+        
+        # Email is verified, create user
+        user = form.save()
+        
+        # Delete the verification record after successful registration
+        EmailVerification.objects.filter(email=email, is_used=True).delete()
+        
+        # Always show processing screen for staff
+        return render(request, 'accounts/processing.html', {
+            'role': 'staff',
+            'next_url': 'accounts:login'
+        })
     else:
-        form = StaffRegistrationForm()
+        messages.error(request, 'Please correct the errors below.')
     
     return render(request, 'accounts/staff_register.html', {'form': form})
+
+# ADD THIS HELPER FUNCTION FOR REDIRECTING TO VERIFICATION
+def check_and_redirect_verification(email):
+    """Check if email is verified, if not redirect to verification page"""
+    is_verified = EmailVerification.objects.filter(
+        email=email.lower(),
+        is_used=True
+    ).exists()
+    
+    if not is_verified:
+        return redirect(f'{reverse("accounts:email_verification")}?email={email}')
+    return None
 
 @require_POST
 @csrf_exempt
@@ -124,25 +222,88 @@ def send_verification_code(request):
             otp=otp
         )
         
-        # Send email
+        # Send email with HTML formatting
         try:
-            send_mail(
-                'Your TrackWise Verification Code',
-                f'Your verification code is: {otp}\n\nThis code will expire in 10 minutes.\n\nIf you didn\'t request this code, please ignore this email.',
-                settings.DEFAULT_FROM_EMAIL,
-                [email],
-                fail_silently=False,
-            )
-            print(f"OTP sent via email to {email}: {otp}")
-        except Exception as e:
-            print(f"Email sending failed: {e}")
-            print(f"DEVELOPMENT OTP for {email}: {otp}")
+            subject = 'Your TrackWise Verification Code'
             
-            # In production, we should still return success for now to avoid blocking users
-            # You might want to implement a proper email service later
-            if not settings.DEBUG:
-                # Log the error but don't block the user in production
-                pass
+            # HTML email content
+            html_content = f"""
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <style>
+                    body {{ font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px; }}
+                    .header {{ background-color: #007bff; color: white; padding: 20px; text-align: center; border-radius: 8px 8px 0 0; }}
+                    .content {{ padding: 30px; background-color: #f8f9fa; border-radius: 0 0 8px 8px; }}
+                    .otp-code {{ font-size: 32px; font-weight: bold; text-align: center; color: #007bff; margin: 30px 0; padding: 20px; background-color: white; border-radius: 8px; border: 2px dashed #007bff; letter-spacing: 5px; }}
+                    .footer {{ margin-top: 30px; padding-top: 20px; border-top: 1px solid #ddd; color: #666; font-size: 12px; text-align: center; }}
+                    .note {{ background-color: #fff3cd; border: 1px solid #ffeaa7; padding: 15px; border-radius: 5px; margin: 20px 0; }}
+                </style>
+            </head>
+            <body>
+                <div class="header">
+                    <h1>TrackWise</h1>
+                    <p>Email Verification</p>
+                </div>
+                
+                <div class="content">
+                    <h2>Hello!</h2>
+                    <p>Thank you for registering with TrackWise. Please use the following verification code to complete your registration:</p>
+                    
+                    <div class="otp-code">{otp}</div>
+                    
+                    <div class="note">
+                        <strong>Important:</strong> This code will expire in 10 minutes. Please do not share this code with anyone.
+                    </div>
+                    
+                    <p>If you didn't request this verification code, please ignore this email or contact our support team if you have concerns.</p>
+                    
+                    <p>Best regards,<br>
+                    <strong>The TrackWise Team</strong></p>
+                </div>
+                
+                <div class="footer">
+                    <p>This email was sent to {email} as part of your TrackWise registration.</p>
+                    <p>© {timezone.now().year} TrackWise. All rights reserved.</p>
+                </div>
+            </body>
+            </html>
+            """
+            
+            # Plain text content
+            text_content = f"""
+            Welcome to TrackWise!
+            
+            Your verification code is: {otp}
+            
+            This code will expire in 10 minutes.
+            
+            Enter this code on the verification page to continue with your registration.
+            
+            If you didn't request this code, please ignore this email.
+            
+            Best regards,
+            TrackWise Team
+            """
+            
+            # Send email using EmailMultiAlternatives for HTML support
+            from django.core.mail import EmailMultiAlternatives
+            
+            msg = EmailMultiAlternatives(
+                subject=subject,
+                body=text_content,
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                to=[email],
+            )
+            msg.attach_alternative(html_content, "text/html")
+            msg.send(fail_silently=False)
+            
+            print(f"✅ Email sent successfully to {email}")
+            
+        except Exception as e:
+            print(f"❌ Email sending failed: {e}")
+            if settings.DEBUG:
+                print(f"DEBUG OTP for {email}: {otp}")
         
         return JsonResponse({'success': True})
         
@@ -190,11 +351,11 @@ def verify_email_code(request):
         # Mark OTP as used
         verification.mark_used()
         
-        # Clean up used OTPs
+        # Clean up old OTPs (keep only the used one)
         EmailVerification.objects.filter(
             email=email,
-            is_used=True
-        ).delete()
+            is_used=False
+        ).exclude(id=verification.id).delete()
         
         return JsonResponse({'success': True})
         
@@ -203,6 +364,7 @@ def verify_email_code(request):
     except Exception as e:
         print(f"Error in verify_email_code: {str(e)}")
         return JsonResponse({'success': False, 'error': 'An error occurred during verification'})
+
 def login_view(request):
     if request.user.is_authenticated:
         return redirect('dashboard:dashboard')
@@ -287,7 +449,7 @@ def edit_profile(request):
             if company_form.is_valid():
                 company_form.save()
                 messages.success(request, 'Company information updated successfully!')
-                return redirect('accounts:edit_profile')
+                return redirect('accounts:email_verification')
             else:
                 messages.error(request, 'Please correct the errors in your company information.')
         else:

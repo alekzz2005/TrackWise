@@ -17,7 +17,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-l*y9*la5o2t-cx6utb=w9ty9keswzzhf_uw2-5s9m_+!2gq$ev')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.getenv('DEBUG', 'False').lower() == 'true'
+DEBUG = os.getenv('DEBUG', '').lower() == 'true'
 
 ALLOWED_HOSTS = [
     "127.0.0.1", 
@@ -128,28 +128,38 @@ LOGIN_REDIRECT_URL = 'dashboard:dashboard'
 LOGOUT_REDIRECT_URL = 'accounts:login'
 LOGIN_URL = 'accounts:login'
 
-# Email Configuration with Resend
-RESEND_API_KEY = os.getenv('RESEND_API_KEY', '')
+# ============================================
+# EMAIL CONFIGURATION - GMail SMTP (WORKS NOW!)
+# ============================================
 
-if RESEND_API_KEY:
-    # Use Resend SMTP for production
+# Get email credentials from environment or use defaults
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER', 'cararagtrisharaye@gmail.com')
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD', '')  # Your 16-char app password
+DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', 'TrackWise <cararagtrisharaye@gmail.com>')
+
+# Check if we have email credentials
+if EMAIL_HOST_USER and EMAIL_HOST_PASSWORD:
+    # PRODUCTION: Gmail SMTP Configuration
     EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-    EMAIL_HOST = 'smtp.resend.com'
+    EMAIL_HOST = 'smtp.gmail.com'
     EMAIL_PORT = 587
     EMAIL_USE_TLS = True
     EMAIL_USE_SSL = False
-    EMAIL_HOST_USER = 'resend'  # This is always 'resend'
-    EMAIL_HOST_PASSWORD = RESEND_API_KEY
-    DEFAULT_FROM_EMAIL = 'TrackWise <onboarding@resend.dev>'
-    SERVER_EMAIL = 'TrackWise <onboarding@resend.dev>'
+    SERVER_EMAIL = DEFAULT_FROM_EMAIL
     
-    print("✅ USING RESEND EMAIL SERVICE FOR PRODUCTION")
+    print("✅ USING GMAIL SMTP FOR EMAIL DELIVERY")
+    print(f"   From: {DEFAULT_FROM_EMAIL}")
+    print(f"   To test, use: {EMAIL_HOST_USER.split('@')[0]}+test1@gmail.com")
 else:
-    # Fallback to console for development
+    # DEVELOPMENT: Console backend (for testing without real emails)
     EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-    DEFAULT_FROM_EMAIL = 'trackwisenet@gmail.com'
-    SERVER_EMAIL = 'trackwisenet@gmail.com'
-    print("📧 USING CONSOLE EMAIL - Set RESEND_API_KEY for production emails")
+    DEFAULT_FROM_EMAIL = 'TrackWise <noreply@trackwise.com>'
+    SERVER_EMAIL = 'TrackWise <noreply@trackwise.com>'
+    
+    print("📧 USING CONSOLE EMAIL - Emails shown in terminal")
+    print("💡 To send real emails, set in .env:")
+    print("   EMAIL_HOST_USER=cararagtrisharaye@gmail.com")
+    print("   EMAIL_HOST_PASSWORD=your-16-digit-app-password")
 
 # Cloudinary Configuration for Media Files
 CLOUDINARY_STORAGE = {
