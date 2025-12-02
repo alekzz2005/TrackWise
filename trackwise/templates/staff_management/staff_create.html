@@ -3,6 +3,51 @@
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/staff_management/staff_create.css' %}">
+<style>
+
+.error-alert {
+    background-color: rgba(255, 31, 31, 0.493) !important; 
+    color: #ffffff !important;          
+    border: 1px solid rgba(160, 25, 25, 0.95) !important; 
+    border-radius: 8px;
+    padding: 16px;
+    margin: 20px 0;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    backdrop-filter: blur(2px); 
+}
+
+
+.error-alert * {
+    color: #ffffff !important;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1); 
+}
+
+.error-alert strong {
+    font-weight: 600;
+    display: block;
+    margin-bottom: 10px;
+    font-size: 16px;
+    color: #ffffff !important;
+}
+
+.error-alert ul {
+    margin: 10px 0 0 0;
+    padding-left: 20px;
+    list-style-type: disc;
+    color: #ffffff !important;
+}
+
+.error-alert li {
+    margin-bottom: 8px;
+    font-size: 14px;
+    line-height: 1.4;
+    color: #ffffff !important;
+}
+
+.error-alert li:last-child {
+    margin-bottom: 0;
+}
+</style>
 {% endblock %}
 
 {% block title %}Add Staff - TrackWise{% endblock %}
@@ -32,7 +77,7 @@
             {% endif %} {% endcomment %}
 
             {% if user_form.errors or profile_form.errors %}
-                <div class="alert alert-error">
+                <div class="error-alert">
                     <strong>Please correct the errors below:</strong>
                     <ul>
                         {% for field in user_form %}

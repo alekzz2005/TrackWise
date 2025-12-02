@@ -126,3 +126,43 @@ html {
     transform: translateY(-2px);
     box-shadow: var(--shadow-md);
 }
+
+/* Style for .error-alert (matches your HTML class) */
+.error-alert {
+    background: rgba(229, 62, 62, 0.1);  /* Red background with transparency */
+    color: white;                        /* White text */
+    border-left: 4px solid #dc3545;      /* Red border */
+    border-radius: 10px;
+    padding: 1rem 1.5rem;
+    margin-bottom: 1.5rem;
+    box-shadow: var(--shadow-sm);
+}
+
+.error-alert strong {
+    color: white;                        /* White text for heading */
+    font-weight: 600;
+    display: block;
+    margin-bottom: 0.5rem;
+}
+
+.error-alert ul {
+    margin: 0.5rem 0 0 0;
+    padding-left: 1.5rem;
+    color: white;                        /* White text for list */
+}
+
+.error-alert li {
+    color: white;                        /* White text for list items */
+    margin-bottom: 0.25rem;
+    font-size: 0.95rem;
+    line-height: 1.4;
+}
+
+.error-alert li:last-child {
+    margin-bottom: 0;
+}
+
+.error-alert,
+.error-alert * {
+    color: white !important;
+}
