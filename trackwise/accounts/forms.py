@@ -232,44 +232,110 @@ class CustomAuthenticationForm(AuthenticationForm):
         })
 
 class BusinessOwnerProfileForm(forms.ModelForm):
-    first_name = forms.CharField(max_length=30, required=True)
-    last_name = forms.CharField(max_length=30, required=True)
-    email = forms.EmailField(required=True)
+    # Keep existing form fields
+    email = forms.EmailField(
+        required=True,
+        widget=forms.EmailInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Enter your email'
+        })
+    )
+    
+    first_name = forms.CharField(
+        required=True,
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Enter your first name'
+        })
+    )
+    
+    last_name = forms.CharField(
+        required=True,
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Enter your last name'
+        })
+    )
+    
+    # Custom profile picture field
+    profile_picture = forms.ImageField(
+        required=False,
+        widget=forms.FileInput(attrs={
+            'class': 'form-control',
+            'accept': 'image/*'
+        })
+    )
     
     class Meta:
         model = UserProfile
-        fields = ['phone_number', 'profile_picture', 'department', 'position', 'assigned_location', 'notes']
+        fields = ['phone_number', 'assigned_location', 'department', 'position']
         widgets = {
-            'phone_number': forms.TextInput(attrs={'class': 'form-control'}),
-            'profile_picture': forms.FileInput(attrs={'class': 'form-control'}),
-            'department': forms.TextInput(attrs={'class': 'form-control'}),
-            'position': forms.TextInput(attrs={'class': 'form-control'}),
-            'assigned_location': forms.TextInput(attrs={'class': 'form-control'}),
-            'notes': forms.Textarea(attrs={'class': 'form-control', 'rows': 4}),
+            'phone_number': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Enter phone number'
+            }),
+            'assigned_location': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Enter assigned location'
+            }),
+            'department': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Enter department'
+            }),
+            'position': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Enter position'
+            }),
         }
     
     def __init__(self, *args, **kwargs):
         self.user = kwargs.pop('user', None)
         super().__init__(*args, **kwargs)
         
-        if self.instance and self.instance.user:
-            self.fields['first_name'].initial = self.instance.user.first_name
-            self.fields['last_name'].initial = self.instance.user.last_name
-            self.fields['email'].initial = self.instance.user.email
+        if self.user:
+            self.fields['email'].initial = self.user.email
+            self.fields['first_name'].initial = self.user.first_name
+            self.fields['last_name'].initial = self.user.last_name
+        
+        for field_name, field in self.fields.items():
+            if hasattr(field, 'widget') and hasattr(field.widget, 'attrs'):
+                field.widget.attrs.update({'class': 'form-control'})
+    
+    def clean_email(self):
+        email = self.cleaned_data.get('email')
+        if self.user and User.objects.filter(email=email).exclude(pk=self.user.pk).exists():
+            raise forms.ValidationError('This email is already in use.')
+        return email
+    
+    def clean_profile_picture(self):
+        """Clean and validate profile picture."""
+        image = self.cleaned_data.get('profile_picture')
+        if image:
+            # Validate file size (2MB limit for profile pictures)
+            if image.size > 2 * 1024 * 1024:
+                raise forms.ValidationError("Profile picture file too large ( > 2MB )")
             
-        for field in self.fields:
-            if field not in ['profile_picture']:
-                self.fields[field].widget.attrs.update({'class': 'form-control'})
+            # Validate file type
+            if not image.content_type.startswith('image/'):
+                raise forms.ValidationError("File is not an image")
+        
+        return image
     
     def save(self, commit=True):
-        profile = super().save(commit=False)
-        
+        # Save user information
         if self.user:
+            self.user.email = self.cleaned_data['email']
             self.user.first_name = self.cleaned_data['first_name']
             self.user.last_name = self.cleaned_data['last_name']
-            self.user.email = self.cleaned_data['email']
-            if commit:
-                self.user.save()
+            self.user.save()
+        
+        # Get the profile instance
+        profile = super().save(commit=False)
+        
+        # Handle profile picture upload
+        uploaded_image = self.cleaned_data.get('profile_picture')
+        if uploaded_image:
+            profile.set_profile_picture_from_file(uploaded_image)
         
         if commit:
             profile.save()

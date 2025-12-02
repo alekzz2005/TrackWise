@@ -60,12 +60,11 @@
             {% endif %} {% endcomment %}
             
             <div class="product-image-section">
-                {% if product.image %}
-                <img src="{{ product.image.url }}" alt="{{ product.item_name }}" class="product-detail-image">
+                {% if product.image_base64 %}
+                <img src="{{ product.image_base64 }}" alt="{{ product.item_name }}" class="product-image">
                 {% else %}
-                <div class="product-detail-image-placeholder">
-                    <i class="fas fa-box fa-4x text-muted"></i>
-                    <p>No image available</p>
+                <div class="product-image-placeholder">
+                    <i class="fas fa-box"></i>
                 </div>
                 {% endif %}
             </div>

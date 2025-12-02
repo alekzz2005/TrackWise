@@ -17,7 +17,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-l*y9*la5o2t-cx6utb=w9ty9keswzzhf_uw2-5s9m_+!2gq$ev')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.getenv('DEBUG', '').lower() == 'true'
+# DEBUG = os.getenv('DEBUG', 'False').lower() == 'true'
+DEBUG = True
 
 ALLOWED_HOSTS = [
     "127.0.0.1", 
@@ -34,10 +35,6 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    
-    # Third-party apps
-    'cloudinary',
-    'cloudinary_storage',
     
     # Local apps
     'accounts',
@@ -161,26 +158,8 @@ else:
     print("   EMAIL_HOST_USER=cararagtrisharaye@gmail.com")
     print("   EMAIL_HOST_PASSWORD=your-16-digit-app-password")
 
-# Cloudinary Configuration for Media Files
-CLOUDINARY_STORAGE = {
-    'CLOUD_NAME': os.getenv('CLOUDINARY_CLOUD_NAME', ''),
-    'API_KEY': os.getenv('CLOUDINARY_API_KEY', ''),
-    'API_SECRET': os.getenv('CLOUDINARY_API_SECRET', ''),
-}
-
-# Media files configuration - Using Cloudinary
-if all([CLOUDINARY_STORAGE['CLOUD_NAME'], CLOUDINARY_STORAGE['API_KEY'], CLOUDINARY_STORAGE['API_SECRET']]):
-    # Use Cloudinary for production
-    DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
-    MEDIA_URL = '/media/'  # Cloudinary will handle the actual URL
-    
-    print("✅ USING CLOUDINARY FOR MEDIA STORAGE")
-else:
-    # Fallback to local media storage for development
-    MEDIA_URL = '/media/'
-    MEDIA_ROOT = BASE_DIR / 'media'
-    
-    print("📁 USING LOCAL MEDIA STORAGE - Set Cloudinary credentials for production")
+# Note: No MEDIA settings needed since images are stored as BLOB in database
+print("✅ USING DATABASE BLOB STORAGE FOR IMAGES")
 
 # Custom user model
 AUTH_USER_MODEL = 'auth.User'

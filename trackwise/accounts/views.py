@@ -449,7 +449,7 @@ def edit_profile(request):
             if company_form.is_valid():
                 company_form.save()
                 messages.success(request, 'Company information updated successfully!')
-                return redirect('accounts:email_verification')
+                return redirect('accounts:edit_profile')
             else:
                 messages.error(request, 'Please correct the errors in your company information.')
         else:

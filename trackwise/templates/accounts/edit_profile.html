@@ -489,8 +489,8 @@
                         </h3>
                         
                         <div class="current-avatar">
-                            {% if profile.profile_picture %}
-                                <img src="{{ profile.profile_picture.url }}" alt="Profile Picture" class="avatar-img">
+                            {% if profile.profile_picture_base64 %}
+                                <img src="{{ profile.profile_picture_base64 }}" alt="Profile Picture" class="avatar-img">
                             {% else %}
                                 <div class="avatar-placeholder">
                                     <i class="fas fa-user"></i>

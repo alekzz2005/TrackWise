@@ -640,7 +640,13 @@
             <div class="account-section">
                 <div class="account-trigger" id="accountDropdownTrigger">
                     <div class="account-avatar">
-                        {{ user.first_name|first }}{{ user.last_name|first }}
+                        {% if request.user.userprofile.profile_picture_base64 %}
+                            <img src="{{ request.user.userprofile.profile_picture_base64 }}" 
+                                alt="{{ user.first_name }} {{ user.last_name }}"
+                                style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
+                        {% else %}
+                            {{ user.first_name|first }}{{ user.last_name|first }}
+                        {% endif %}
                     </div>
                     <div class="account-info">
                         <span class="account-name">{{ user.first_name }} {{ user.last_name }}</span>

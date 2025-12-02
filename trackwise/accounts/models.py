@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
 from datetime import timedelta
+import base64
 
 class Company(models.Model):
     name = models.CharField(max_length=200)
@@ -49,7 +50,10 @@ class UserProfile(models.Model):
     role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='staff')
     company = models.ForeignKey(Company, on_delete=models.CASCADE)
     phone_number = models.CharField(max_length=20, blank=True)
-    profile_picture = models.ImageField(upload_to='profile_pics/', blank=True, null=True)
+    
+    # Change from ImageField to TextField for BLOB/base64 storage
+    profile_picture = models.TextField(blank=True, null=True, help_text="Base64 encoded profile picture")
+    profile_picture_content_type = models.CharField(max_length=50, blank=True, null=True, help_text="MIME type of the profile picture")
     
     # Add the missing fields that exist in your database
     assigned_location = models.CharField(max_length=100, blank=True, default='Main Office')
@@ -74,3 +78,41 @@ class UserProfile(models.Model):
     def get_display_role(self):
         """Get the display name for the role"""
         return dict(self.ROLE_CHOICES).get(self.role, 'User')
+    
+    @property
+    def profile_picture_base64(self):
+        """Get profile picture as base64 data URL for HTML display."""
+        if self.profile_picture:
+            try:
+                # Remove any existing data URL prefix if present
+                image_data = self.profile_picture
+                if image_data.startswith('data:'):
+                    # Extract just the base64 part
+                    parts = image_data.split(',', 1)
+                    if len(parts) > 1:
+                        image_data = parts[1]
+                
+                return f"data:{self.profile_picture_content_type or 'image/jpeg'};base64,{image_data}"
+            except Exception as e:
+                print(f"Error in profile_picture_base64: {e}")
+                return None
+        return None
+    
+    def set_profile_picture_from_file(self, uploaded_file):
+        """Set profile picture from uploaded file."""
+        if uploaded_file:
+            try:
+                # Read file content
+                file_content = uploaded_file.read()
+                
+                # Encode to base64
+                encoded = base64.b64encode(file_content).decode('utf-8')
+                
+                # Store in profile_picture field
+                self.profile_picture = encoded
+                self.profile_picture_content_type = uploaded_file.content_type
+                return True
+            except Exception as e:
+                print(f"Error setting profile picture: {e}")
+                return False
+        return False

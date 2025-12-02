@@ -71,8 +71,8 @@
                 <div class="product-card">
                     <div class="product-header">
                         <div class="product-image">
-                            {% if product.image %}
-                                <img src="{{ product.image.url }}" alt="{{ product.item_name }}">
+                            {% if product.image_base64 %}
+                                <img src="{{ product.image_base64 }}" alt="{{ product.item_name }}">
                             {% else %}
                                 <i class="fas fa-box"></i>
                             {% endif %}

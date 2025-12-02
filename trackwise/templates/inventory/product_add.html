@@ -95,12 +95,12 @@
                 </div>
                 
                 <div class="form-group">
-                    <label class="form-label" for="{{ form.image.id_for_label }}">Product Image</label>
-                    {{ form.image }}
-                    <span class="error-message" id="{{ form.image.id_for_label }}_error"></span>
-                    {% if form.image.errors %}
-                        {% for error in form.image.errors %}
-                            <span class="error-message show" id="server_{{ form.image.id_for_label }}_error">{{ error }}</span>
+                    <label class="form-label" for="{{ form.image_upload.id_for_label }}">Product Image</label>
+                    {{ form.image_upload }}
+                    <span class="error-message" id="{{ form.image_upload.id_for_label }}_error"></span>
+                    {% if form.image_upload.errors %}
+                        {% for error in form.image_upload.errors %}
+                            <span class="error-message show" id="server_{{ form.image_upload.id_for_label }}_error">{{ error }}</span>
                         {% endfor %}
                     {% endif %}
                     <div class="form-text">Optional: Upload a product image</div>
