@@ -192,7 +192,7 @@ def check_and_redirect_verification(email):
 @require_POST
 @csrf_exempt
 def send_verification_code(request):
-    """Send OTP code to email for verification"""
+    """Send OTP code to email for verification using Infobip"""
     try:
         # Check if it's JSON data
         if request.content_type == 'application/json':
@@ -222,88 +222,44 @@ def send_verification_code(request):
             otp=otp
         )
         
-        # Send email with HTML formatting
+        # Send email using Infobip
         try:
-            subject = 'Your TrackWise Verification Code'
+            from .utils import send_verification_email_using_infobip
             
-            # HTML email content
-            html_content = f"""
-            <!DOCTYPE html>
-            <html>
-            <head>
-                <style>
-                    body {{ font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px; }}
-                    .header {{ background-color: #007bff; color: white; padding: 20px; text-align: center; border-radius: 8px 8px 0 0; }}
-                    .content {{ padding: 30px; background-color: #f8f9fa; border-radius: 0 0 8px 8px; }}
-                    .otp-code {{ font-size: 32px; font-weight: bold; text-align: center; color: #007bff; margin: 30px 0; padding: 20px; background-color: white; border-radius: 8px; border: 2px dashed #007bff; letter-spacing: 5px; }}
-                    .footer {{ margin-top: 30px; padding-top: 20px; border-top: 1px solid #ddd; color: #666; font-size: 12px; text-align: center; }}
-                    .note {{ background-color: #fff3cd; border: 1px solid #ffeaa7; padding: 15px; border-radius: 5px; margin: 20px 0; }}
-                </style>
-            </head>
-            <body>
-                <div class="header">
-                    <h1>TrackWise</h1>
-                    <p>Email Verification</p>
-                </div>
+            success = send_verification_email_using_infobip(email, otp)
+            
+            if success:
+                print(f"✅ Email sent successfully to {email} via Infobip")
+                # In production, don't log OTPs
+                if settings.DEBUG:
+                    print(f"DEBUG OTP for {email}: {otp}")
+            else:
+                print(f"❌ Email sending failed for {email}")
+                # Still save OTP but alert user
+                return JsonResponse({
+                    'success': False, 
+                    'error': 'Failed to send verification email. Please try again.'
+                })
                 
-                <div class="content">
-                    <h2>Hello!</h2>
-                    <p>Thank you for registering with TrackWise. Please use the following verification code to complete your registration:</p>
-                    
-                    <div class="otp-code">{otp}</div>
-                    
-                    <div class="note">
-                        <strong>Important:</strong> This code will expire in 10 minutes. Please do not share this code with anyone.
-                    </div>
-                    
-                    <p>If you didn't request this verification code, please ignore this email or contact our support team if you have concerns.</p>
-                    
-                    <p>Best regards,<br>
-                    <strong>The TrackWise Team</strong></p>
-                </div>
-                
-                <div class="footer">
-                    <p>This email was sent to {email} as part of your TrackWise registration.</p>
-                    <p>© {timezone.now().year} TrackWise. All rights reserved.</p>
-                </div>
-            </body>
-            </html>
-            """
-            
-            # Plain text content
-            text_content = f"""
-            Welcome to TrackWise!
-            
-            Your verification code is: {otp}
-            
-            This code will expire in 10 minutes.
-            
-            Enter this code on the verification page to continue with your registration.
-            
-            If you didn't request this code, please ignore this email.
-            
-            Best regards,
-            TrackWise Team
-            """
-            
-            # Send email using EmailMultiAlternatives for HTML support
-            from django.core.mail import EmailMultiAlternatives
-            
-            msg = EmailMultiAlternatives(
-                subject=subject,
-                body=text_content,
-                from_email=settings.DEFAULT_FROM_EMAIL,
-                to=[email],
-            )
-            msg.attach_alternative(html_content, "text/html")
-            msg.send(fail_silently=False)
-            
-            print(f"✅ Email sent successfully to {email}")
-            
-        except Exception as e:
-            print(f"❌ Email sending failed: {e}")
-            if settings.DEBUG:
-                print(f"DEBUG OTP for {email}: {otp}")
+        except ImportError:
+            # Fallback to Django's email sending
+            print("Infobip utils not available, using Django email")
+            try:
+                from django.core.mail import send_mail
+                send_mail(
+                    f'Your TrackWise Verification Code: {otp}',
+                    f'Your verification code is: {otp}\n\nThis code will expire in 10 minutes.',
+                    settings.DEFAULT_FROM_EMAIL,
+                    [email],
+                    fail_silently=False,
+                )
+                print(f"✅ Fallback email sent to {email}")
+            except Exception as e:
+                print(f"❌ Fallback email sending failed: {e}")
+                return JsonResponse({
+                    'success': False, 
+                    'error': 'Email service is currently unavailable. Please try again later.'
+                })
         
         return JsonResponse({'success': True})
         
@@ -496,3 +452,44 @@ def change_password(request):
         form = CustomPasswordChangeForm(request.user)
     
     return render(request, 'accounts/change_password.html', {'form': form})
+
+# Add to accounts/views.py
+@csrf_exempt
+def debug_email_config(request):
+    """Debug email configuration"""
+    import smtplib
+    from django.conf import settings
+    
+    info = {
+        'DEBUG': settings.DEBUG,
+        'EMAIL_BACKEND': settings.EMAIL_BACKEND,
+        'EMAIL_HOST': getattr(settings, 'EMAIL_HOST', 'Not set'),
+        'EMAIL_PORT': getattr(settings, 'EMAIL_PORT', 'Not set'),
+        'EMAIL_HOST_USER': getattr(settings, 'EMAIL_HOST_USER', 'Not set'),
+        'EMAIL_HOST_PASSWORD': '***' if getattr(settings, 'EMAIL_HOST_PASSWORD', None) else 'Not set',
+        'INFOBIP_API_KEY': '***' if getattr(settings, 'INFOBIP_API_KEY', None) else 'Not set',
+        'INFOBIP_BASE_URL': getattr(settings, 'INFOBIP_BASE_URL', 'Not set'),
+        'INFOBIP_SENDER_EMAIL': getattr(settings, 'INFOBIP_SENDER_EMAIL', 'Not set'),
+        'DEFAULT_FROM_EMAIL': getattr(settings, 'DEFAULT_FROM_EMAIL', 'Not set'),
+    }
+    
+    # Test SMTP connection
+    smtp_test = "Not tested"
+    if info['EMAIL_HOST'] != 'Not set' and info['EMAIL_HOST_PASSWORD'] != 'Not set':
+        try:
+            server = smtplib.SMTP(info['EMAIL_HOST'], info['EMAIL_PORT'])
+            server.starttls()
+            server.login(info['EMAIL_HOST_USER'], settings.EMAIL_HOST_PASSWORD)
+            server.quit()
+            smtp_test = "✅ SMTP Connection Successful"
+        except Exception as e:
+            smtp_test = f"❌ SMTP Connection Failed: {str(e)}"
+    
+    html = "<h1>Email Configuration Debug</h1>"
+    html += "<table border='1' cellpadding='10'>"
+    for key, value in info.items():
+        html += f"<tr><td><strong>{key}</strong></td><td>{value}</td></tr>"
+    html += f"<tr><td><strong>SMTP Test</strong></td><td>{smtp_test}</td></tr>"
+    html += "</table>"
+    
+    return HttpResponse(html)

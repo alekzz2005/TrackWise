@@ -22,4 +22,5 @@ urlpatterns = [
     
     # Test email
     path('test-email/', views.test_email_config, name='test_email'),
+    path('debug-email/', views.debug_email_config, name='debug_email'),
 ]

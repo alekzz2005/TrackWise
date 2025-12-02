@@ -127,17 +127,34 @@ LOGOUT_REDIRECT_URL = 'accounts:login'
 LOGIN_URL = 'accounts:login'
 
 # ============================================
-# EMAIL CONFIGURATION - GMail SMTP (WORKS NOW!)
+# INFOBIP CONFIGURATION
 # ============================================
 
-# Get email credentials from environment or use defaults
-EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER', 'cararagtrisharaye@gmail.com')
-EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD', '')  # Your 16-char app password
-DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', 'TrackWise <cararagtrisharaye@gmail.com>')
+# INFOBIP CONFIGURATION
+INFOBIP_API_KEY = os.getenv('INFOBIP_API_KEY', '')
+# Use your specific base URL
+INFOBIP_BASE_URL = os.getenv('INFOBIP_BASE_URL', 'v35rjm.api.infobip.com')
+INFOBIP_SENDER_EMAIL = os.getenv('INFOBIP_SENDER_EMAIL', 'TrackWise <trackwise@trackwise.com>')
 
-# Check if we have email credentials
-if EMAIL_HOST_USER and EMAIL_HOST_PASSWORD:
-    # PRODUCTION: Gmail SMTP Configuration
+# Determine email backend based on configuration
+if INFOBIP_API_KEY:
+    # Use Infobip for email sending
+    EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+    # Use your specific domain for SMTP
+    EMAIL_HOST = INFOBIP_BASE_URL  # This will be v35rjm.api.infobip.com
+    EMAIL_HOST_USER = 'apikey'
+    EMAIL_HOST_PASSWORD = INFOBIP_API_KEY
+    EMAIL_PORT = 587
+    EMAIL_USE_TLS = True
+    EMAIL_USE_SSL = False
+    DEFAULT_FROM_EMAIL = INFOBIP_SENDER_EMAIL
+    
+    print(f"✅ USING INFOBIP FOR EMAIL DELIVERY")
+    print(f"   Base URL: {INFOBIP_BASE_URL}")
+    print(f"   Sender: {INFOBIP_SENDER_EMAIL}")
+    
+elif EMAIL_HOST_USER and EMAIL_HOST_PASSWORD:
+    # Fallback to Gmail SMTP
     EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
     EMAIL_HOST = 'smtp.gmail.com'
     EMAIL_PORT = 587
@@ -147,17 +164,14 @@ if EMAIL_HOST_USER and EMAIL_HOST_PASSWORD:
     
     print("✅ USING GMAIL SMTP FOR EMAIL DELIVERY")
     print(f"   From: {DEFAULT_FROM_EMAIL}")
-    print(f"   To test, use: {EMAIL_HOST_USER.split('@')[0]}+test1@gmail.com")
+    
 else:
-    # DEVELOPMENT: Console backend (for testing without real emails)
+    # Development: Console backend
     EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
     DEFAULT_FROM_EMAIL = 'TrackWise <noreply@trackwise.com>'
     SERVER_EMAIL = 'TrackWise <noreply@trackwise.com>'
     
     print("📧 USING CONSOLE EMAIL - Emails shown in terminal")
-    print("💡 To send real emails, set in .env:")
-    print("   EMAIL_HOST_USER=cararagtrisharaye@gmail.com")
-    print("   EMAIL_HOST_PASSWORD=your-16-digit-app-password")
 
 # Note: No MEDIA settings needed since images are stored as BLOB in database
 print("✅ USING DATABASE BLOB STORAGE FOR IMAGES")

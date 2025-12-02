@@ -1,3 +1,4 @@
+<!-- templates/accounts/email_verification.html -->
 {% extends 'base.html' %}
 {% load static %}
 
@@ -5,193 +6,284 @@
 <div class="container mt-5">
     <div class="row justify-content-center">
         <div class="col-md-6">
-            <div class="card">
+            <div class="card shadow">
                 <div class="card-header bg-primary text-white">
-                    <h4 class="mb-0">📧 Verify Your Email</h4>
+                    <h4 class="mb-0">Verify Your Email</h4>
                 </div>
                 <div class="card-body">
-                    <p class="text-center">
-                        We've sent a 6-digit verification code to:<br>
-                        <strong id="userEmail">{{ email }}</strong>
+                    <p class="text-muted">
+                        We've sent a 6-digit verification code to <strong>{{ email }}</strong>.
+                        Please enter the code below to verify your email address.
                     </p>
                     
-                    <div class="form-group text-center">
-                        <label for="verificationCode">Enter Verification Code:</label>
-                        <div class="d-flex justify-content-center my-3">
-                            <input type="text" id="digit1" class="form-control text-center mx-1" style="width: 50px; font-size: 24px;" maxlength="1" oninput="moveToNext(1)">
-                            <input type="text" id="digit2" class="form-control text-center mx-1" style="width: 50px; font-size: 24px;" maxlength="1" oninput="moveToNext(2)">
-                            <input type="text" id="digit3" class="form-control text-center mx-1" style="width: 50px; font-size: 24px;" maxlength="1" oninput="moveToNext(3)">
-                            <input type="text" id="digit4" class="form-control text-center mx-1" style="width: 50px; font-size: 24px;" maxlength="1" oninput="moveToNext(4)">
-                            <input type="text" id="digit5" class="form-control text-center mx-1" style="width: 50px; font-size: 24px;" maxlength="1" oninput="moveToNext(5)">
-                            <input type="text" id="digit6" class="form-control text-center mx-1" style="width: 50px; font-size: 24px;" maxlength="1" oninput="moveToNext(6)">
+                    <!-- Error Display -->
+                    <div id="error-message" class="alert alert-danger d-none"></div>
+                    
+                    <!-- Success Display -->
+                    <div id="success-message" class="alert alert-success d-none">
+                        Email verified successfully! Redirecting...
+                    </div>
+                    
+                    <form id="verification-form">
+                        {% csrf_token %}
+                        <input type="hidden" name="email" id="email" value="{{ email }}">
+                        
+                        <div class="mb-3">
+                            <label for="code" class="form-label">Verification Code</label>
+                            <div class="d-flex gap-2">
+                                {% for i in "123456" %}
+                                <input type="text" 
+                                       class="form-control text-center verification-digit" 
+                                       maxlength="1" 
+                                       style="font-size: 1.5rem; height: 60px;"
+                                       data-index="{{ forloop.counter0 }}">
+                                {% endfor %}
+                            </div>
+                            <input type="hidden" name="code" id="code-input">
+                            <div class="form-text">
+                                Enter the 6-digit code sent to your email.
+                            </div>
                         </div>
-                        <input type="hidden" id="fullCode">
-                        <div id="codeError" class="text-danger text-center mt-2" style="display: none;"></div>
-                    </div>
+                        
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                Verify Email
+                            </button>
+                            <button type="button" id="resend-btn" class="btn btn-outline-secondary">
+                                Resend Code
+                            </button>
+                            <a href="{% url 'accounts:role_selection' %}" class="btn btn-link">
+                                Use different email
+                            </a>
+                        </div>
+                    </form>
                     
-                    <div class="text-center mt-3">
-                        <button class="btn btn-success btn-lg" id="verifyBtn" onclick="verifyCode()">
-                            Verify Email
-                        </button>
-                    </div>
-                    
-                    <div class="text-center mt-4">
-                        <p>Didn't receive the code?</p>
-                        <button class="btn btn-outline-primary" id="resendBtn" onclick="resendCode()" disabled>
-                            Resend Code
-                        </button>
-                        <span class="text-muted ml-2" id="timerText">(Resend available in <span id="countdown">60</span> seconds)</span>
-                    </div>
-                    
-                    <div class="text-center mt-4">
-                        <a href="{% url 'accounts:role_selection' %}" class="btn btn-link">
-                            ← Back to Registration
-                        </a>
+                    <div class="mt-4 text-center">
+                        <div class="spinner-border text-primary d-none" id="loading-spinner" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <div id="countdown" class="text-muted mt-2">
+                            Code expires in: <span id="timer">10:00</span>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
-{% endblock %}
 
-{% block extra_js %}
 <script>
-let countdown = 60;
-let timerInterval;
-
-function startTimer() {
-    const timerText = document.getElementById('timerText');
-    const countdownSpan = document.getElementById('countdown');
-    const resendBtn = document.getElementById('resendBtn');
+document.addEventListener('DOMContentLoaded', function() {
+    const email = "{{ email }}";
+    const digits = document.querySelectorAll('.verification-digit');
+    const codeInput = document.getElementById('code-input');
+    const form = document.getElementById('verification-form');
+    const resendBtn = document.getElementById('resend-btn');
+    const errorDiv = document.getElementById('error-message');
+    const successDiv = document.getElementById('success-message');
+    const loadingSpinner = document.getElementById('loading-spinner');
+    const timerDisplay = document.getElementById('timer');
     
-    timerInterval = setInterval(() => {
-        countdown--;
-        countdownSpan.textContent = countdown;
+    let countdown = 600; // 10 minutes in seconds
+    let countdownInterval;
+    
+    // Initialize timer
+    updateTimer();
+    countdownInterval = setInterval(updateTimer, 1000);
+    
+    // Handle digit inputs
+    digits.forEach((digit, index) => {
+        digit.addEventListener('input', function(e) {
+            const value = e.target.value;
+            
+            // Only allow digits
+            if (!/^\d$/.test(value)) {
+                e.target.value = '';
+                return;
+            }
+            
+            // Move to next input
+            if (index < digits.length - 1 && value !== '') {
+                digits[index + 1].focus();
+            }
+            
+            updateCode();
+        });
         
+        digit.addEventListener('keydown', function(e) {
+            // Handle backspace
+            if (e.key === 'Backspace' && e.target.value === '' && index > 0) {
+                digits[index - 1].focus();
+            }
+            
+            // Handle paste
+            if (e.key === 'v' && (e.ctrlKey || e.metaKey)) {
+                setTimeout(() => {
+                    handlePaste(e.target.value);
+                }, 10);
+            }
+        });
+    });
+    
+    function handlePaste(pastedText) {
+        const numbers = pastedText.replace(/\D/g, '').split('');
+        
+        digits.forEach((digit, index) => {
+            if (index < numbers.length) {
+                digit.value = numbers[index];
+            } else {
+                digit.value = '';
+            }
+        });
+        
+        updateCode();
+        
+        // Focus last filled digit
+        const lastFilledIndex = Math.min(numbers.length, digits.length) - 1;
+        if (lastFilledIndex >= 0) {
+            digits[lastFilledIndex].focus();
+        }
+    }
+    
+    function updateCode() {
+        const code = Array.from(digits).map(d => d.value).join('');
+        codeInput.value = code;
+    }
+    
+    function updateTimer() {
         if (countdown <= 0) {
-            clearInterval(timerInterval);
+            clearInterval(countdownInterval);
+            timerDisplay.textContent = 'Expired';
+            timerDisplay.classList.add('text-danger');
+            showError('Verification code has expired. Please request a new one.');
+            return;
+        }
+        
+        const minutes = Math.floor(countdown / 60);
+        const seconds = countdown % 60;
+        timerDisplay.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+        countdown--;
+    }
+    
+    function showError(message) {
+        errorDiv.textContent = message;
+        errorDiv.classList.remove('d-none');
+        successDiv.classList.add('d-none');
+    }
+    
+    function showSuccess(message) {
+        successDiv.textContent = message;
+        successDiv.classList.remove('d-none');
+        errorDiv.classList.add('d-none');
+    }
+    
+    function setLoading(isLoading) {
+        if (isLoading) {
+            loadingSpinner.classList.remove('d-none');
+            form.querySelector('button[type="submit"]').disabled = true;
+            resendBtn.disabled = true;
+        } else {
+            loadingSpinner.classList.add('d-none');
+            form.querySelector('button[type="submit"]').disabled = false;
             resendBtn.disabled = false;
-            timerText.style.display = 'none';
         }
-    }, 1000);
-}
-
-function moveToNext(current) {
-    const currentInput = document.getElementById(`digit${current}`);
-    const nextInput = document.getElementById(`digit${current + 1}`);
-    
-    if (currentInput.value.length === 1 && nextInput) {
-        nextInput.focus();
     }
     
-    updateFullCode();
-}
-
-function updateFullCode() {
-    let fullCode = '';
-    for (let i = 1; i <= 6; i++) {
-        fullCode += document.getElementById(`digit${i}`).value || '';
-    }
-    document.getElementById('fullCode').value = fullCode;
-}
-
-function verifyCode() {
-    const code = document.getElementById('fullCode').value;
-    const email = document.getElementById('userEmail').textContent;
-    const errorDiv = document.getElementById('codeError');
-    const verifyBtn = document.getElementById('verifyBtn');
-    
-    errorDiv.style.display = 'none';
-    
-    if (code.length !== 6) {
-        errorDiv.textContent = 'Please enter a complete 6-digit code.';
-        errorDiv.style.display = 'block';
-        return;
-    }
-    
-    // Disable button and show loading
-    verifyBtn.disabled = true;
-    verifyBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Verifying...';
-    
-    // Send verification request
-    fetch('{% url "accounts:verify_email_code" %}', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRFToken': '{{ csrf_token }}',
-        },
-        body: JSON.stringify({
-            email: email,
-            code: code
-        })
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            // Success - redirect to registration
-            window.location.href = '{% url "accounts:business_owner_register" %}?email=' + encodeURIComponent(email);
-        } else {
-            errorDiv.textContent = data.error || 'Verification failed. Please try again.';
-            errorDiv.style.display = 'block';
-            verifyBtn.disabled = false;
-            verifyBtn.innerHTML = 'Verify Email';
+    // Handle form submission
+    form.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const code = codeInput.value;
+        
+        if (code.length !== 6) {
+            showError('Please enter the complete 6-digit code.');
+            return;
         }
-    })
-    .catch(error => {
-        errorDiv.textContent = 'Network error. Please try again.';
-        errorDiv.style.display = 'block';
-        verifyBtn.disabled = false;
-        verifyBtn.innerHTML = 'Verify Email';
+        
+        setLoading(true);
+        
+        try {
+            const response = await fetch('{% url "accounts:verify_email_code" %}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                },
+                body: JSON.stringify({
+                    email: email,
+                    code: code
+                })
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                showSuccess('Email verified successfully!');
+                
+                // Redirect based on registration flow
+                setTimeout(() => {
+                    const urlParams = new URLSearchParams(window.location.search);
+                    const role = urlParams.get('role');
+                    
+                    if (role === 'business_owner') {
+                        window.location.href = `{% url 'accounts:business_owner_register' %}?email=${encodeURIComponent(email)}`;
+                    } else if (role === 'staff') {
+                        window.location.href = `{% url 'accounts:staff_register' %}?email=${encodeURIComponent(email)}`;
+                    } else {
+                        // Go to role selection
+                        window.location.href = `{% url 'accounts:role_selection' %}?verified=true&email=${encodeURIComponent(email)}`;
+                    }
+                }, 2000);
+            } else {
+                showError(data.error || 'Verification failed. Please try again.');
+            }
+        } catch (error) {
+            showError('Network error. Please check your connection and try again.');
+        } finally {
+            setLoading(false);
+        }
     });
-}
-
-function resendCode() {
-    const email = document.getElementById('userEmail').textContent;
-    const resendBtn = document.getElementById('resendBtn');
     
-    resendBtn.disabled = true;
-    resendBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Sending...';
-    
-    fetch('{% url "accounts:send_verification_code" %}', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRFToken': '{{ csrf_token }}',
-        },
-        body: JSON.stringify({
-            email: email
-        })
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            alert('✅ New verification code sent! Check your email.');
-            // Reset timer
-            clearInterval(timerInterval);
-            countdown = 60;
-            document.getElementById('countdown').textContent = '60';
-            document.getElementById('timerText').style.display = 'inline';
-            startTimer();
-        } else {
-            alert('❌ ' + (data.error || 'Failed to resend code.'));
+    // Handle resend code
+    resendBtn.addEventListener('click', async function() {
+        setLoading(true);
+        showError('');
+        
+        try {
+            const response = await fetch('{% url "accounts:send_verification_code" %}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                },
+                body: JSON.stringify({ email: email })
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                // Reset timer
+                clearInterval(countdownInterval);
+                countdown = 600;
+                updateTimer();
+                countdownInterval = setInterval(updateTimer, 1000);
+                
+                // Clear inputs
+                digits.forEach(digit => digit.value = '');
+                codeInput.value = '';
+                digits[0].focus();
+                
+                showSuccess('New verification code sent successfully!');
+                setTimeout(() => successDiv.classList.add('d-none'), 3000);
+            } else {
+                showError(data.error || 'Failed to resend code. Please try again.');
+            }
+        } catch (error) {
+            showError('Network error. Please check your connection and try again.');
+        } finally {
+            setLoading(false);
         }
-        resendBtn.disabled = false;
-        resendBtn.innerHTML = 'Resend Code';
-    })
-    .catch(error => {
-        alert('❌ Network error. Please try again.');
-        resendBtn.disabled = false;
-        resendBtn.innerHTML = 'Resend Code';
     });
-}
-
-// Start timer when page loads
-window.onload = function() {
-    startTimer();
-    
-    // Auto-focus first input
-    document.getElementById('digit1').focus();
-};
+});
 </script>
 {% endblock %}
