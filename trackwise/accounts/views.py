@@ -331,7 +331,20 @@ def login_view(request):
             username = form.cleaned_data.get('username')
             password = form.cleaned_data.get('password')
             user = authenticate(username=username, password=password)
+            
             if user is not None:
+                # Check if user should be allowed to login
+                try:
+                    profile = user.userprofile
+                    if not profile.should_allow_access():
+                        messages.error(request, 'Your account is currently inactive or on leave. Please contact your administrator.')
+                        return render(request, 'accounts/login.html', {'form': form})
+                except UserProfile.DoesNotExist:
+                    # No profile found - could redirect to setup or show error
+                    messages.error(request, 'User profile not found. Please contact administrator.')
+                    return render(request, 'accounts/login.html', {'form': form})
+                
+                # User is allowed, proceed with login
                 login(request, user)
                 messages.success(request, f'Welcome back, {username}!')
                 next_url = request.GET.get('next', 'dashboard:dashboard')

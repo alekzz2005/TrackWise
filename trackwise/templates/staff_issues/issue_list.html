@@ -1,58 +1,649 @@
 {% extends 'base.html' %}
 {% load static %}
 
+{% block extra_css %}
+<style>
+:root {
+  --primary-blue: #4a6fa5;
+  --primary-dark: #2c5282;
+  --primary-darker: #1a365d;
+  --accent-light: #a7c5eb;
+  --bg-light: #dbe4f0;
+  --bg-page: #f0f4f8;
+  --text-white: #ffffff;
+  --success: #38a169;
+  --warning: #ed8936;
+  --danger: #e53e3e;
+  --info: #4a6fa5;
+  --pending: #ed8936;
+  --in-progress: #4299e1;
+  --resolved: #38a169;
+  --closed: #a0aec0;
+  --shadow-sm: 0 2px 5px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 8px 25px rgba(0, 0, 0, 0.15);
+  --shadow-lg: 0 15px 35px rgba(0, 0, 0, 0.2);
+  --transition: all 0.3s ease;
+}
+
+.issue-management-wrapper {
+  padding: 2rem;
+  min-height: 100vh;
+  background-color: var(--bg-page);
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+/* Header Section */
+.issue-header {
+  background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-dark) 100%);
+  border-radius: 20px;
+  padding: 2.5rem;
+  margin-bottom: 2rem;
+  box-shadow: var(--shadow-lg);
+  position: relative;
+  overflow: hidden;
+}
+
+.issue-header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 300px;
+  height: 300px;
+  background: radial-gradient(circle, rgba(167, 197, 235, 0.2) 0%, transparent 70%);
+  border-radius: 50%;
+  transform: translate(30%, -30%);
+}
+
+.header-content {
+  position: relative;
+  z-index: 1;
+  margin-bottom: 1rem;
+}
+
+.header-content h1 {
+  color: var(--text-white);
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.header-content p {
+  color: var(--accent-light);
+  font-size: 1.1rem;
+  margin: 0;
+  opacity: 0.9;
+}
+
+.header-actions {
+  position: relative;
+  z-index: 1;
+}
+
+/* KPI Cards */
+.issue-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.kpi-card {
+  background: linear-gradient(135deg, var(--primary-blue), var(--primary-dark));
+  border-radius: 16px;
+  padding: 1.5rem;
+  color: var(--text-white);
+  box-shadow: var(--shadow-md);
+  transition: var(--transition);
+  position: relative;
+  overflow: hidden;
+  text-align: center;
+  cursor: pointer;
+}
+
+.kpi-card:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-lg);
+}
+
+.kpi-card.total {
+  background: linear-gradient(135deg, var(--primary-blue), var(--primary-dark));
+}
+
+.kpi-card.pending {
+  background: linear-gradient(135deg, var(--pending), #dd6b20);
+}
+
+.kpi-card.in-progress {
+  background: linear-gradient(135deg, var(--in-progress), #3182ce);
+}
+
+.kpi-card.resolved {
+  background: linear-gradient(135deg, var(--resolved), #2f855a);
+}
+
+.kpi-card.closed {
+  background: linear-gradient(135deg, var(--closed), #718096);
+}
+
+.kpi-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 100px;
+  height: 100px;
+  background: radial-gradient(circle, rgba(167, 197, 235, 0.3) 0%, transparent 70%);
+  border-radius: 50%;
+  transform: translate(30%, -30%);
+}
+
+.kpi-value {
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: var(--text-white);
+  margin-bottom: 0.5rem;
+  position: relative;
+  z-index: 1;
+}
+
+.kpi-label {
+  font-size: 0.9rem;
+  color: var(--accent-light);
+  font-weight: 500;
+  position: relative;
+  z-index: 1;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.kpi-icon {
+  position: absolute;
+  bottom: 1rem;
+  right: 1rem;
+  font-size: 1.8rem;
+  color: rgba(255, 255, 255, 0.2);
+  z-index: 1;
+}
+
+/* Search and Filter Section */
+.search-section {
+  margin-bottom: 2rem;
+}
+
+.search-card {
+  background: var(--text-white);
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: var(--shadow-md);
+}
+
+.search-form {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.5rem;
+  align-items: end;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-label {
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+  color: var(--primary-dark);
+  font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.form-control {
+  padding: 1rem;
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  font-size: 1rem;
+  transition: var(--transition);
+  background: var(--bg-light);
+}
+
+.form-control:focus {
+  outline: none;
+  border-color: var(--primary-blue);
+  box-shadow: 0 0 0 3px rgba(74, 111, 165, 0.1);
+  background: var(--text-white);
+}
+
+/* Buttons */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem 2rem;
+  border: none;
+  border-radius: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+  text-decoration: none;
+  font-size: 1rem;
+  box-shadow: var(--shadow-sm);
+}
+
+.btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem 2rem;
+    background: var(--accent-light);
+    color: var(--primary-dark);
+    text-decoration: none;
+    border-radius: 12px;
+    font-weight: 600;
+    transition: var(--transition);
+    box-shadow: var(--shadow-sm);
+    border: none;
+    cursor: pointer;
+}
+
+.btn-primary:hover {
+    background: var(--text-white);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.btn-sm {
+  padding: 0.75rem 1.5rem;
+  font-size: 0.9rem;
+}
+
+.btn-outline-secondary {
+  background: transparent;
+  border: 2px solid #e2e8f0;
+  color: #666;
+}
+
+.btn-outline-secondary:hover {
+  background: #e2e8f0;
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+/* Issues Grid */
+.issues-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+  gap: 2rem;
+  margin-bottom: 2rem;
+}
+
+.issue-card {
+  background: var(--text-white);
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: var(--shadow-md);
+  transition: var(--transition);
+  border-left: 4px solid var(--primary-blue);
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+
+.issue-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 80px;
+  height: 80px;
+  background: radial-gradient(circle, rgba(167, 197, 235, 0.1) 0%, transparent 70%);
+  border-radius: 50%;
+  transform: translate(30%, -30%);
+}
+
+.issue-card:hover {
+  transform: translateY(-8px);
+  box-shadow: var(--shadow-lg);
+}
+
+.issue-card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+  position: relative;
+  z-index: 1;
+}
+
+.issue-title {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--primary-dark);
+  margin-bottom: 0.5rem;
+  line-height: 1.3;
+}
+
+.issue-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  position: relative;
+  z-index: 1;
+}
+
+.meta-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.issue-description {
+  color: #555;
+  line-height: 1.6;
+  margin-bottom: 1.5rem;
+  position: relative;
+  z-index: 1;
+  max-height: 80px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+}
+
+/* Status Badges */
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.status-pending {
+  background: #feebcb;
+  color: #744210;
+  border: 1px solid #fbd38d;
+}
+
+.status-in_progress {
+  background: #bee3f8;
+  color: #2c5282;
+  border: 1px solid #90cdf4;
+}
+
+.status-resolved {
+  background: #c6f6d5;
+  color: #22543d;
+  border: 1px solid #9ae6b4;
+}
+
+.status-closed {
+  background: #e2e8f0;
+  color: #4a5568;
+  border: 1px solid #cbd5e0;
+}
+
+.priority-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.priority-low {
+  background: #e2e8f0;
+  color: #4a5568;
+  border: 1px solid #cbd5e0;
+}
+
+.priority-medium {
+  background: #bee3f8;
+  color: #2c5282;
+  border: 1px solid #90cdf4;
+}
+
+.priority-high {
+  background: #feebcb;
+  color: #744210;
+  border: 1px solid #fbd38d;
+}
+
+.priority-urgent {
+  background: #fed7d7;
+  color: #742a2a;
+  border: 1px solid #feb2b2;
+}
+
+.issue-type-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  background: var(--bg-light);
+  color: var(--primary-dark);
+  border: 1px solid var(--accent-light);
+}
+
+/* Issue Actions */
+.issue-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 1.5rem;
+  position: relative;
+  z-index: 1;
+}
+
+/* Click indicator */
+.issue-card::after {
+  content: 'Click to view details';
+  position: absolute;
+  bottom: 1rem;
+  right: 1rem;
+  font-size: 0.75rem;
+  color: var(--primary-blue);
+  opacity: 0;
+  transition: var(--transition);
+  font-weight: 500;
+}
+
+.issue-card:hover::after {
+  opacity: 1;
+}
+
+/* Empty State */
+.empty-state {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 4rem 2rem;
+  background: var(--text-white);
+  border-radius: 16px;
+  box-shadow: var(--shadow-md);
+}
+
+.empty-icon {
+  font-size: 4rem;
+  color: var(--accent-light);
+  margin-bottom: 1.5rem;
+}
+
+.empty-state h3 {
+  font-size: 1.5rem;
+  color: var(--primary-dark);
+  margin-bottom: 1rem;
+  font-weight: 600;
+}
+
+.empty-state p {
+  color: #666;
+  margin-bottom: 2rem;
+  font-size: 1.1rem;
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+  .issue-kpi-grid {
+    grid-template-columns: repeat(5, 1fr);
+  }
+  
+  .issues-grid {
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  }
+}
+
+@media (max-width: 992px) {
+  .issue-kpi-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  
+  .search-form {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .issue-management-wrapper {
+    padding: 1rem;
+  }
+  
+  .issue-header {
+    padding: 2rem;
+    text-align: center;
+  }
+  
+  .header-content h1 {
+    font-size: 2rem;
+    justify-content: center;
+  }
+  
+  .issue-kpi-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
+  
+  .search-form {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  .issues-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+  
+  .issue-card {
+    padding: 1.5rem;
+  }
+  
+  .issue-card::after {
+    content: 'Tap to view details';
+    font-size: 0.7rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .issue-header {
+    padding: 1.5rem;
+  }
+  
+  .header-content h1 {
+    font-size: 1.75rem;
+  }
+  
+  .issue-kpi-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .kpi-card {
+    padding: 1.5rem;
+  }
+  
+  .kpi-value {
+    font-size: 2rem;
+  }
+}
+</style>
+{% endblock %}
+
 {% block title %}Reported Issues - TrackWise{% endblock %}
 
 {% block content %}
-<div class="container mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2><i class="fas fa-flag"></i> Reported Issues</h2>
-        <a href="{% url 'staff_issues:report_issue' %}" class="btn btn-primary">
-            <i class="fas fa-plus"></i> Report New Issue
-        </a>
+<div class="issue-management-wrapper">
+    <!-- Header Section -->
+    <section class="issue-header">
+        <div class="header-content">
+            <h1>
+                <i class="fas fa-flag"></i>
+                Reported Issues
+            </h1>
+            <p>Track and manage all reported issues in one place</p>
+        </div>
+        <div class="header-actions">
+            <a href="{% url 'staff_issues:report_issue' %}" class="btn-primary">
+                <i class="fas fa-plus"></i> Report New Issue
+            </a>
+        </div>
+    </section>
+
+    <!-- KPI Section -->
+    <div class="issue-kpi-grid">
+        <div class="kpi-card total" onclick="filterByStatus('')">
+            <div class="kpi-value">{{ status_counts.total }}</div>
+            <div class="kpi-label">Total Issues</div>
+            <i class="kpi-icon fas fa-list-alt"></i>
+        </div>
+        <div class="kpi-card pending" onclick="filterByStatus('pending')">
+            <div class="kpi-value">{{ status_counts.pending }}</div>
+            <div class="kpi-label">Pending</div>
+            <i class="kpi-icon fas fa-clock"></i>
+        </div>
+        <div class="kpi-card in-progress" onclick="filterByStatus('in_progress')">
+            <div class="kpi-value">{{ status_counts.in_progress }}</div>
+            <div class="kpi-label">In Progress</div>
+            <i class="kpi-icon fas fa-spinner"></i>
+        </div>
+        <div class="kpi-card resolved" onclick="filterByStatus('resolved')">
+            <div class="kpi-value">{{ status_counts.resolved }}</div>
+            <div class="kpi-label">Resolved</div>
+            <i class="kpi-icon fas fa-check-circle"></i>
+        </div>
+        <div class="kpi-card closed" onclick="filterByStatus('closed')">
+            <div class="kpi-value">{{ status_counts.closed }}</div>
+            <div class="kpi-label">Closed</div>
+            <i class="kpi-icon fas fa-archive"></i>
+        </div>
     </div>
 
-    <!-- Statistics Cards -->
-    <div class="row mb-4">
-        <div class="col-md-2">
-            <div class="stat-card">
-                <div class="stat-number">{{ status_counts.total }}</div>
-                <div class="stat-label">Total Issues</div>
-            </div>
-        </div>
-        <div class="col-md-2">
-            <div class="stat-card">
-                <div class="stat-number">{{ status_counts.pending }}</div>
-                <div class="stat-label">Pending</div>
-            </div>
-        </div>
-        <div class="col-md-2">
-            <div class="stat-card">
-                <div class="stat-number">{{ status_counts.in_progress }}</div>
-                <div class="stat-label">In Progress</div>
-            </div>
-        </div>
-        <div class="col-md-2">
-            <div class="stat-card">
-                <div class="stat-number">{{ status_counts.resolved }}</div>
-                <div class="stat-label">Resolved</div>
-            </div>
-        </div>
-        <div class="col-md-2">
-            <div class="stat-card">
-                <div class="stat-number">{{ status_counts.closed }}</div>
-                <div class="stat-label">Closed</div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Filters -->
-    <div class="card mb-4">
-        <div class="card-body">
-            <form method="get" class="row g-3">
-                <div class="col-md-3">
-                    <label>Status</label>
-                    <select name="status" class="form-control">
+    <!-- Search and Filter Section -->
+    <section class="search-section">
+        <div class="search-card">
+            <form method="get" class="search-form">
+                <div class="form-group">
+                    <label class="form-label" for="id_status">
+                        <i class="fas fa-circle"></i> Status
+                    </label>
+                    <select name="status" id="id_status" class="form-control">
                         <option value="">All Status</option>
                         <option value="pending" {% if current_status == 'pending' %}selected{% endif %}>Pending</option>
                         <option value="in_progress" {% if current_status == 'in_progress' %}selected{% endif %}>In Progress</option>
@@ -60,9 +651,11 @@
                         <option value="closed" {% if current_status == 'closed' %}selected{% endif %}>Closed</option>
                     </select>
                 </div>
-                <div class="col-md-3">
-                    <label>Issue Type</label>
-                    <select name="type" class="form-control">
+                <div class="form-group">
+                    <label class="form-label" for="id_type">
+                        <i class="fas fa-tag"></i> Issue Type
+                    </label>
+                    <select name="type" id="id_type" class="form-control">
                         <option value="">All Types</option>
                         <option value="system_error" {% if current_type == 'system_error' %}selected{% endif %}>System Error</option>
                         <option value="stock_discrepancy" {% if current_type == 'stock_discrepancy' %}selected{% endif %}>Stock Discrepancy</option>
@@ -71,12 +664,16 @@
                         <option value="other" {% if current_type == 'other' %}selected{% endif %}>Other</option>
                     </select>
                 </div>
-                <div class="col-md-4">
-                    <label>Search</label>
-                    <input type="text" name="search" class="form-control" placeholder="Search issues..." value="{{ search_query }}">
+                <div class="form-group">
+                    <label class="form-label" for="id_search">
+                        <i class="fas fa-search"></i> Search Issues
+                    </label>
+                    <input type="text" name="search" id="id_search" class="form-control" placeholder="Search by title or description..." value="{{ search_query }}">
                 </div>
-                <div class="col-md-2 d-flex align-items-end">
-                    <button type="submit" class="btn btn-primary w-100">Filter</button>
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-filter"></i> Filter
+                    </button>
                 </div>
             </form>
             <div class="mt-3">
@@ -85,98 +682,110 @@
                 </a>
             </div>
         </div>
-    </div>
+    </section>
 
-    <!-- Issues List -->
-    <div class="card">
-        <div class="card-body">
-            {% if issues %}
-                {% for issue in issues %}
-                <div class="issue-item">
-                    <div class="issue-main">
-                        <div class="issue-title">
-                            <h5>{{ issue.title }}</h5>
-                            <span class="badge badge-{{ issue.status }}">{{ issue.get_status_display }}</span>
-                            <span class="badge badge-priority-{{ issue.priority }}">{{ issue.get_priority_display }}</span>
+    <!-- Issues Grid -->
+    <section class="issues-grid">
+        {% if issues %}
+            {% for issue in issues %}
+            <div class="issue-card" onclick="window.location.href='{% url 'staff_issues:issue_detail' issue.id %}'">
+                <div class="issue-card-header">
+                    <div>
+                        <div class="issue-title">{{ issue.title }}</div>
+                        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                            <span class="status-badge status-{{ issue.status }}">
+                                <i class="fas {% if issue.status == 'pending' %}fa-clock{% elif issue.status == 'in_progress' %}fa-spinner{% elif issue.status == 'resolved' %}fa-check-circle{% else %}fa-archive{% endif %}"></i>
+                                {{ issue.get_status_display }}
+                            </span>
+                            <span class="priority-badge priority-{{ issue.priority }}">
+                                <i class="fas fa-exclamation-circle"></i>
+                                {{ issue.get_priority_display }}
+                            </span>
+                            <span class="issue-type-badge">
+                                <i class="fas fa-tag"></i>
+                                {{ issue.get_issue_type_display }}
+                            </span>
                         </div>
-                        <div class="issue-meta">
-                            <span>Type: {{ issue.get_issue_type_display }}</span>
-                            <span>Reported by: {{ issue.reporter.user.get_full_name }}</span>
-                            <span>Date: {{ issue.created_at|date:"M d, Y" }}</span>
-                        </div>
-                        <p class="issue-description">{{ issue.description|truncatewords:30 }}</p>
-                    </div>
-                    <div class="issue-actions">
-                        <a href="{% url 'staff_issues:issue_detail' issue.id %}" class="btn btn-sm btn-outline-primary">
-                            View Details
-                        </a>
                     </div>
                 </div>
-                {% if not forloop.last %}<hr>{% endif %}
-                {% endfor %}
-            {% else %}
-                <div class="text-center py-4">
-                    <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
-                    <p class="text-muted">No issues found.</p>
-                    <a href="{% url 'staff_issues:report_issue' %}" class="btn btn-primary">Report First Issue</a>
+                
+                <div class="issue-meta">
+                    <div class="meta-item">
+                        <i class="fas fa-user"></i>
+                        <span>{{ issue.reporter.user.get_full_name }}</span>
+                    </div>
+                    <div class="meta-item">
+                        <i class="fas fa-calendar-alt"></i>
+                        <span>{{ issue.created_at|date:"M d, Y" }}</span>
+                    </div>
+                    {% if issue.assigned_to %}
+                    <div class="meta-item">
+                        <i class="fas fa-user-check"></i>
+                        <span>Assigned to: {{ issue.assigned_to.user.get_full_name }}</span>
+                    </div>
+                    {% endif %}
                 </div>
-            {% endif %}
-        </div>
-    </div>
+                
+                <div class="issue-description">
+                    {{ issue.description|truncatewords:50 }}
+                </div>
+                
+                {% comment %} <div class="issue-actions">
+                    <a href="{% url 'staff_issues:issue_detail' issue.id %}" class="btn btn-primary btn-sm" onclick="event.stopPropagation()">
+                        <i class="fas fa-eye"></i> View Details
+                    </a>
+                </div> {% endcomment %}
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="empty-state">
+                <div class="empty-icon">
+                    <i class="fas fa-inbox"></i>
+                </div>
+                <h3>No Issues Found</h3>
+                <p>{% if search_query or current_status or current_type %}Try adjusting your filters{% else %}Get started by reporting your first issue{% endif %}</p>
+                <a href="{% url 'staff_issues:report_issue' %}" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Report First Issue
+                </a>
+            </div>
+        {% endif %}
+    </section>
 </div>
 
-<style>
-/* PLACEHOLDER CSS - REPLACE WITH ACTUAL STYLING */
-.stat-card {
-    background: white;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    padding: 1rem;
-    text-align: center;
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Add hover animations to cards
+    const issueCards = document.querySelectorAll('.issue-card');
+    issueCards.forEach(card => {
+        card.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-8px)';
+        });
+        
+        card.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0)';
+        });
+    });
+
+    // Add click animations to KPI cards
+    const kpiCards = document.querySelectorAll('.kpi-card');
+    kpiCards.forEach(card => {
+        card.addEventListener('click', function() {
+            this.style.transform = 'scale(0.98)';
+            setTimeout(() => {
+                this.style.transform = '';
+            }, 150);
+        });
+    });
+});
+
+function filterByStatus(status) {
+    const url = new URL(window.location.href);
+    if (status) {
+        url.searchParams.set('status', status);
+    } else {
+        url.searchParams.delete('status');
+    }
+    window.location.href = url.toString();
 }
-.stat-number {
-    font-size: 1.5rem;
-    font-weight: bold;
-    color: #007bff;
-}
-.stat-label {
-    color: #6c757d;
-    font-size: 0.875rem;
-}
-.issue-item {
-    display: flex;
-    justify-content: between;
-    align-items: start;
-    padding: 1rem 0;
-}
-.issue-main {
-    flex: 1;
-}
-.issue-title {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    margin-bottom: 0.5rem;
-}
-.issue-meta {
-    display: flex;
-    gap: 1rem;
-    font-size: 0.875rem;
-    color: #6c757d;
-    margin-bottom: 0.5rem;
-}
-.badge {
-    padding: 0.25rem 0.5rem;
-    border-radius: 12px;
-    font-size: 0.75rem;
-}
-.badge-pending { background: #ffc107; color: black; }
-.badge-in_progress { background: #17a2b8; color: white; }
-.badge-resolved { background: #28a745; color: white; }
-.badge-closed { background: #6c757d; color: white; }
-.badge-priority-low { background: #6c757d; color: white; }
-.badge-priority-medium { background: #17a2b8; color: white; }
-.badge-priority-high { background: #ffc107; color: black; }
-.badge-priority-urgent { background: #dc3545; color: white; }
-</style>
+</script>
 {% endblock %}

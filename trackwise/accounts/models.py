@@ -116,3 +116,28 @@ class UserProfile(models.Model):
                 print(f"Error setting profile picture: {e}")
                 return False
         return False
+    
+    def should_allow_access(self):
+        """
+        Check if user should be allowed to access the system.
+        Staff members are blocked if their profile is inactive or if their StaffProfile status is inactive/on_leave.
+        """
+        # Always allow business owners
+        if self.role == 'business_owner':
+            return True
+            
+        # Check UserProfile's is_active field
+        if not self.is_active:
+            return False
+            
+        # Check if there's a StaffProfile with inactive or on_leave status
+        try:
+            from staff_management.models import StaffProfile
+            staff_profile = StaffProfile.objects.get(user_profile=self)
+            if staff_profile.status in ['inactive', 'on_leave']:
+                return False
+        except StaffProfile.DoesNotExist:
+            # If no StaffProfile exists, allow access based on UserProfile.is_active
+            pass
+            
+        return True
