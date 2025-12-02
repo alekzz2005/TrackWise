@@ -24,13 +24,13 @@
                 <p>Manage your inventory efficiently</p>
             </div>
 
-            {% if messages %}
+            {% comment %} {% if messages %}
                 {% for message in messages %}
                     <div class="alert alert-{{ message.tags }}">
                         {{ message }}
                     </div>
                 {% endfor %}
-            {% endif %}
+            {% endif %} {% endcomment %}
             
             <form method="post" enctype="multipart/form-data" id="product-form">
                 {% csrf_token %}

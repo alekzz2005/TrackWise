@@ -9,25 +9,911 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'css/base.css' %}">
     {% block extra_css %}{% endblock %}
+    <style>
+        :root {
+            --primary-blue: #4a6fa5;
+            --primary-dark: #2c5282;
+            --accent-light: #a7c5eb;
+            --bg-light: #dbe4f0;
+            --bg-page: #f0f4f8;
+            --text-white: #ffffff;
+            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.08);
+            --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.12);
+            --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.15);
+            --transition-fast: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --sidebar-width: 260px;
+            --sidebar-collapsed-width: 80px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-page);
+            color: #333;
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* SIDEBAR STYLES */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: linear-gradient(180deg, var(--primary-blue) 0%, var(--primary-dark) 100%);
+            color: var(--text-white);
+            height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+            transition: var(--transition);
+            overflow-x: hidden;
+            overflow-y: auto;
+            z-index: 1000;
+            box-shadow: var(--shadow-lg);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar.collapsed {
+            width: var(--sidebar-collapsed-width);
+        }
+
+        /* Custom Scrollbar for Sidebar */
+        .sidebar::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .sidebar::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .sidebar::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 3px;
+        }
+
+        .sidebar::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .sidebar-header {
+            padding: 1.75rem 1.25rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            min-height: 80px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.875rem;
+            font-weight: 700;
+            font-size: 1.4rem;
+            color: var(--text-white);
+            text-decoration: none;
+            white-space: nowrap;
+            letter-spacing: -0.02em;
+            transition: var(--transition);
+        }
+
+        .logo i {
+            font-size: 1.5rem;
+            flex-shrink: 0;
+            transition: var(--transition);
+        }
+
+        .logo-text {
+            transition: var(--transition);
+            opacity: 1;
+        }
+
+        .sidebar.collapsed .logo {
+            opacity: 0;
+            width: 0;
+            overflow: hidden;
+        }
+
+        .sidebar.collapsed .logo-text {
+            opacity: 0;
+            width: 0;
+            overflow: hidden;
+        }
+
+        .toggle-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: var(--text-white);
+            font-size: 1.1rem;
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 6px;
+            transition: var(--transition-fast);
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .toggle-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: scale(1.05);
+        }
+
+        .toggle-btn:active {
+            transform: scale(0.95);
+        }
+
+        .sidebar.collapsed .toggle-btn {
+            margin: 0 auto;
+        }
+
+        .sidebar-nav {
+            flex: 1;
+            padding: 1.5rem 0;
+        }
+
+        .nav-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .nav-item {
+            margin-bottom: 0.35rem;
+            padding: 0 0.75rem;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 0.875rem;
+            padding: 0.875rem 1rem;
+            color: rgba(255, 255, 255, 0.85);
+            text-decoration: none;
+            transition: var(--transition-fast);
+            white-space: nowrap;
+            overflow: hidden;
+            border-radius: 8px;
+            font-weight: 500;
+            font-size: 0.95rem;
+            position: relative;
+        }
+
+        .nav-link::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 3px;
+            height: 0;
+            background: var(--text-white);
+            border-radius: 0 2px 2px 0;
+            transition: var(--transition-fast);
+        }
+
+        .nav-link:hover {
+            background: rgba(255, 255, 255, 0.12);
+            color: var(--text-white);
+            transform: translateX(2px);
+        }
+
+        .nav-link:hover::before {
+            height: 60%;
+        }
+
+        .nav-link.active {
+            background: rgba(255, 255, 255, 0.15);
+            color: var(--text-white);
+            font-weight: 600;
+        }
+
+        .nav-link.active::before {
+            height: 70%;
+        }
+
+        .nav-text {
+            transition: var(--transition);
+            opacity: 1;
+        }
+
+        .sidebar.collapsed .nav-text {
+            opacity: 0;
+            width: 0;
+        }
+
+        .sidebar.collapsed .nav-link {
+            justify-content: center;
+            padding: 0.875rem;
+        }
+
+        .sidebar.collapsed .nav-link::before {
+            display: none;
+        }
+
+        .nav-icon {
+            width: 20px;
+            text-align: center;
+            flex-shrink: 0;
+            font-size: 1.1rem;
+        }
+
+        /* SIDEBAR FOOTER WITH ACCOUNT DROPDOWN */
+        .sidebar-footer {
+            margin-top: auto;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 1rem 0.75rem;
+        }
+
+        .account-section {
+            position: relative;
+        }
+
+        .account-trigger {
+            display: flex;
+            align-items: center;
+            gap: 0.875rem;
+            padding: 0.875rem 1rem;
+            color: var(--text-white);
+            text-decoration: none;
+            transition: var(--transition-fast);
+            border-radius: 10px;
+            cursor: pointer;
+            white-space: nowrap;
+            overflow: hidden;
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .account-trigger:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-1px);
+        }
+
+        .account-trigger:active {
+            transform: translateY(0);
+        }
+
+        .sidebar.collapsed .account-trigger {
+            justify-content: center;
+            padding: 0.875rem;
+        }
+
+        .account-avatar {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent-light), #88b3e0);
+            color: var(--primary-dark);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.95rem;
+            flex-shrink: 0;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        .account-info {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+            transition: var(--transition);
+            overflow: hidden;
+            flex: 1;
+            min-width: 0;
+        }
+
+        .sidebar.collapsed .account-info {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .account-name {
+            font-weight: 600;
+            font-size: 0.92rem;
+            line-height: 1.2;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+         .account-role {
+            font-size: 0.75rem;
+            opacity: 0.75;
+            font-weight: 500;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .account-chevron {
+            font-size: 0.75rem;
+            margin-left: auto;
+            flex-shrink: 0;
+            transition: var(--transition-fast);
+        }
+
+        .sidebar.collapsed .account-chevron {
+            display: none;
+        }
+
+        .account-trigger.dropdown-open .account-chevron {
+            transform: rotate(180deg);
+        }
+
+        .account-dropdown {
+            position: absolute;
+            bottom: calc(100% + 0.5rem);
+            left: 0;
+            right: 0;
+            background: white;
+            color: #333;
+            border-radius: 10px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            padding: 0.5rem;
+            z-index: 100;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(10px);
+            transition: var(--transition-fast);
+            border: 1px solid rgba(0, 0, 0, 0.08);
+        }
+
+        .account-dropdown.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .sidebar.collapsed .account-dropdown {
+            left: 0.75rem;
+            right: 0.75rem;
+            bottom: calc(100% + 0.5rem);
+        }
+
+        .account-dropdown-item {
+            padding: 0.75rem 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.875rem;
+            cursor: pointer;
+            transition: var(--transition-fast);
+            border: none;
+            background: none;
+            width: 100%;
+            text-align: left;
+            color: #333;
+            text-decoration: none;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .account-dropdown-item i {
+            width: 18px;
+            text-align: center;
+            color: var(--primary-blue);
+        }
+
+        .account-dropdown-item:hover {
+            background: var(--bg-light);
+            color: var(--primary-dark);
+        }
+
+        .account-dropdown-item:active {
+            transform: scale(0.98);
+        }
+
+        .account-dropdown-divider {
+            height: 1px;
+            background: #e8e8e8;
+            margin: 0.5rem 0;
+        }
+
+        /* MAIN CONTENT STYLES */
+        .main-content {
+            flex: 1;
+            margin-left: var(--sidebar-width);
+            transition: var(--transition);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar.collapsed ~ .main-content {
+            margin-left: var(--sidebar-collapsed-width);
+        }
+
+        /* Styles for when sidebar is not present */
+        .main-content.no-sidebar {
+            margin-left: 0 !important;
+            width: 100%;
+        }
+
+        /* TOP BAR STYLES */
+        .top-bar {
+            background: var(--text-white);
+            padding: 1rem 2rem;
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+        }
+
+        .page-title {
+            margin-right: auto;
+            font-weight: 600;
+            color: var(--primary-dark);
+            font-size: 1.25rem;
+        }
+
+        /* CONTENT WRAPPER */
+        .content-wrapper {
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        /* Enhanced Alert Styles */
+        .alert {
+            border: none;
+            border-radius: 8px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        /* RESPONSIVE STYLES */
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            
+            .sidebar.mobile-open {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                margin-left: 0 !important;
+            }
+            
+            .mobile-toggle {
+                display: block;
+                position: fixed;
+                top: 1rem;
+                left: 1rem;
+                z-index: 999;
+                background: var(--primary-blue);
+                color: white;
+                border: none;
+                border-radius: 8px;
+                padding: 0.625rem;
+                cursor: pointer;
+                box-shadow: var(--shadow-md);
+                width: 44px;
+                height: 44px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .mobile-toggle:active {
+                transform: scale(0.95);
+            }
+            
+            .top-bar {
+                display: none;
+            }
+
+            .content-wrapper {
+                padding: 1rem;
+            }
+        }
+
+        /* Overlay for mobile */
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+            backdrop-filter: blur(2px);
+            transition: var(--transition-fast);
+        }
+        
+        @media (max-width: 768px) {
+            .sidebar-overlay.mobile-open {
+                display: block;
+            }
+        }
+
+        /* Tooltip for collapsed sidebar */
+        .nav-link[data-tooltip] {
+            position: relative;
+        }
+
+        .sidebar.collapsed .nav-link:hover::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            left: calc(100% + 0.75rem);
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(0, 0, 0, 0.9);
+            color: white;
+            padding: 0.5rem 0.75rem;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            white-space: nowrap;
+            z-index: 1000;
+            pointer-events: none;
+            box-shadow: var(--shadow-md);
+        }
+    </style>
 </head>
 <body>
-    <main>
-        {% comment %} {% if messages %}
-        <div class="container mt-3">
-            {% for message in messages %}
-            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
-                {{ message }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
-            {% endfor %}
+    <!-- In base.html, replace the entire authenticated section with this: -->
+    {% if user.is_authenticated %}
+    <!-- Sidebar Navigation (Only for authenticated users) -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <a href="{% url 'dashboard:dashboard' %}" class="logo">
+                <i class="fas fa-chart-line"></i>
+                <span class="logo-text">TrackWise</span>
+            </a>
+            <button class="toggle-btn" id="sidebarToggle" aria-label="Toggle sidebar">
+                <i class="fas fa-bars"></i>
+            </button>
         </div>
-        {% endif %} {% endcomment %}
+        
+        <nav class="sidebar-nav">
+            <ul class="nav-list">
+                <!-- Dashboard Link for All Users -->
+                <li class="nav-item">
+                    <a href="{% url 'dashboard:dashboard' %}" 
+                    class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}"
+                    data-tooltip="Dashboard">
+                        <i class="fas fa-home nav-icon"></i>
+                        <span class="nav-text">Dashboard</span>
+                    </a>
+                </li>
+                
+                <!-- Inventory Link for All Users -->
+                <li class="nav-item">
+                    <a href="{% url 'inventory:inventory_list' %}" 
+                    class="nav-link {% if 'inventory' in request.resolver_match.namespace %}active{% endif %}"
+                    data-tooltip="Inventory">
+                        <i class="fas fa-boxes nav-icon"></i>
+                        <span class="nav-text">Inventory</span>
+                    </a>
+                </li>
+                
+                <!-- Reports Link - Only for Business Owners -->
+                {% if is_business_owner %}
+                <li class="nav-item">
+                    <a href="{% url 'reports:reports_dashboard' %}" 
+                    class="nav-link {% if 'reports' in request.resolver_match.namespace %}active{% endif %}"
+                    data-tooltip="Reports">
+                        <i class="fas fa-chart-bar nav-icon"></i>
+                        <span class="nav-text">Reports</span>
+                    </a>
+                </li>
+                {% endif %}
+                
+                <!-- Staff Management - Only for Business Owners -->
+                {% if is_business_owner %}
+                <li class="nav-item">
+                    <a href="{% url 'staff_management:staff_list' %}" 
+                    class="nav-link {% if 'staff_management' in request.resolver_match.namespace %}active{% endif %}"
+                    data-tooltip="Staff Management">
+                        <i class="fas fa-users-cog nav-icon"></i>
+                        <span class="nav-text">Staff Management</span>
+                    </a>
+                </li>
+                {% endif %}
+                
+                <!-- Report Issues Button - Only for Staff (UI Only) -->
+                {% if is_staff %}
+                <li class="nav-item">
+                    <a href="#" 
+                    class="nav-link report-issues-btn"
+                    data-tooltip="Report Issues"
+                    onclick="showReportIssuesModal()">
+                        <i class="fas fa-flag nav-icon"></i>
+                        <span class="nav-text">Report Issues</span>
+                    </a>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+        
+        <!-- Account Section at Bottom of Sidebar -->
+        <div class="sidebar-footer">
+            <div class="account-section">
+                <div class="account-trigger" id="accountDropdownTrigger">
+                    <div class="account-avatar">
+                        {{ user.first_name|first }}{{ user.last_name|first }}
+                    </div>
+                    <div class="account-info">
+                        <span class="account-name">{{ user.first_name }} {{ user.last_name }}</span>
+                        <span class="account-role">{{ user_display_role }}</span>
+                    </div>
+                    <i class="fas fa-chevron-up account-chevron"></i>
+                </div>
+                
+                <div class="account-dropdown" id="accountDropdown">
+                    <a href="{% url 'accounts:edit_profile' %}" class="account-dropdown-item">
+                        <i class="fas fa-user-edit"></i>
+                        <span>Edit Profile</span>
+                    </a>
+                    <a href="{% url 'accounts:change_password' %}" class="account-dropdown-item">
+                        <i class="fas fa-key"></i>
+                        <span>Change Password</span>
+                    </a>
+                    
+                    {% comment %} <!-- Business Owner Only Links -->
+                    {% if is_business_owner %}
+                    <div class="account-dropdown-divider"></div>
+                    <a href="#" class="account-dropdown-item">
+                        <i class="fas fa-cog"></i>
+                        <span>Company Settings</span>
+                    </a>
+                    {% endif %} {% endcomment %}
+                    
+                    <div class="account-dropdown-divider"></div>
+                    <form method="post" action="{% url 'accounts:logout' %}" style="display: inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="account-dropdown-item">
+                            <i class="fas fa-sign-out-alt"></i>
+                            <span>Logout</span>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </aside>
 
-        {% block content %}
-        {% endblock %}
-    </main>
+    <!-- Mobile Toggle Button (hidden on desktop) -->
+    <button class="mobile-toggle" id="mobileToggle" style="display: none;" aria-label="Toggle mobile menu">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <!-- Overlay for mobile sidebar -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- Report Issues Modal (Hidden by default) -->
+    <div class="modal fade" id="reportIssuesModal" tabindex="-1" aria-labelledby="reportIssuesModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="reportIssuesModalLabel">
+                        <i class="fas fa-flag me-2"></i>Report an Issue
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <strong>Report Issues Feature</strong><br>
+                        This feature is currently under development. You will be able to report system issues here in a future update.
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card border-0 bg-light">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-tools fa-3x text-primary mb-3"></i>
+                                    <h6>Coming Soon</h6>
+                                    <p class="small text-muted">Issue reporting functionality will be available in the next release.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card border-0 bg-light">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-clock fa-3x text-primary mb-3"></i>
+                                    <h6>Stay Tuned</h6>
+                                    <p class="small text-muted">We're working on implementing a comprehensive issue tracking system.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" disabled>
+                        <i class="fas fa-paper-plane me-2"></i>Submit Issue (Coming Soon)
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Main Content Area -->
+    <div class="main-content {% if not user.is_authenticated %}no-sidebar{% endif %}" id="mainContent">
+        <!-- Content Wrapper -->
+        <div class="content-wrapper">
+            {% comment %} {% if messages and user.is_authenticated %}
+            <div class="container mt-3">
+                {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %} {% endcomment %}
+
+            {% block content %}
+            {% endblock %}
+        </div>
+    </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            {% if user.is_authenticated %}
+            // Your existing sidebar JavaScript code (only for authenticated users)
+            const sidebar = document.getElementById('sidebar');
+            const sidebarToggle = document.getElementById('sidebarToggle');
+            const mobileToggle = document.getElementById('mobileToggle');
+            const sidebarOverlay = document.getElementById('sidebarOverlay');
+            const mainContent = document.getElementById('mainContent');
+            
+            const accountDropdownTrigger = document.getElementById('accountDropdownTrigger');
+            const accountDropdown = document.getElementById('accountDropdown');
+            
+            // Toggle sidebar collapse/expand
+            function toggleSidebar() {
+                sidebar.classList.toggle('collapsed');
+                
+                // Close account dropdown when collapsing sidebar
+                if (sidebar.classList.contains('collapsed')) {
+                    closeAccountDropdown();
+                }
+                
+                // Save state to localStorage
+                const isCollapsed = sidebar.classList.contains('collapsed');
+                localStorage.setItem('sidebarCollapsed', isCollapsed);
+            }
+            
+            // Expand sidebar function
+            function expandSidebar() {
+                if (sidebar.classList.contains('collapsed')) {
+                    sidebar.classList.remove('collapsed');
+                    localStorage.setItem('sidebarCollapsed', 'false');
+                }
+            }
+
+            // Report Issues Modal Function
+            function showReportIssuesModal() {
+                const modal = new bootstrap.Modal(document.getElementById('reportIssuesModal'));
+                modal.show();
+            }
+            
+            // Toggle mobile sidebar
+            function toggleMobileSidebar() {
+                sidebar.classList.toggle('mobile-open');
+                sidebarOverlay.classList.toggle('mobile-open');
+                
+                // Close account dropdown when closing mobile sidebar
+                if (!sidebar.classList.contains('mobile-open')) {
+                    closeAccountDropdown();
+                }
+            }
+            
+            // Close account dropdown function
+            function closeAccountDropdown() {
+                accountDropdown.classList.remove('active');
+                accountDropdownTrigger.classList.remove('dropdown-open');
+            }
+            
+            // Open account dropdown function
+            function openAccountDropdown() {
+                // Expand sidebar if it's collapsed
+                if (sidebar.classList.contains('collapsed')) {
+                    expandSidebar();
+                    // Wait for sidebar to expand before showing dropdown
+                    setTimeout(() => {
+                        accountDropdown.classList.add('active');
+                        accountDropdownTrigger.classList.add('dropdown-open');
+                    }, 300);
+                } else {
+                    accountDropdown.classList.add('active');
+                    accountDropdownTrigger.classList.add('dropdown-open');
+                }
+            }
+            
+            // Report Issues Modal Function
+            function showReportIssuesModal() {
+                const modal = new bootstrap.Modal(document.getElementById('reportIssuesModal'));
+                modal.show();
+            }
+            
+            // Initialize sidebar state from localStorage
+            const savedState = localStorage.getItem('sidebarCollapsed');
+            if (savedState === 'true') {
+                sidebar.classList.add('collapsed');
+            }
+            
+            // Event listeners
+            sidebarToggle.addEventListener('click', toggleSidebar);
+            
+            // Mobile sidebar toggle
+            mobileToggle.addEventListener('click', toggleMobileSidebar);
+            sidebarOverlay.addEventListener('click', toggleMobileSidebar);
+            
+            // Account dropdown functionality
+            accountDropdownTrigger.addEventListener('click', function(e) {
+                e.stopPropagation();
+                
+                if (accountDropdown.classList.contains('active')) {
+                    closeAccountDropdown();
+                } else {
+                    openAccountDropdown();
+                }
+            });
+            
+            // Close dropdown when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!accountDropdown.contains(e.target) && !accountDropdownTrigger.contains(e.target)) {
+                    closeAccountDropdown();
+                }
+            });
+            
+            // Close dropdown when pressing Escape key
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    closeAccountDropdown();
+                }
+            });
+            
+            // Prevent dropdown from closing when clicking inside it
+            accountDropdown.addEventListener('click', function(e) {
+                // Allow form submission for logout
+                if (e.target.tagName === 'BUTTON' && e.target.type === 'submit') {
+                    return;
+                }
+                // Close dropdown when clicking links
+                if (e.target.tagName === 'A' || e.target.closest('a')) {
+                    closeAccountDropdown();
+                }
+            });
+            
+            // Responsive behavior
+            function handleResize() {
+                if (window.innerWidth <= 768) {
+                    mobileToggle.style.display = 'flex';
+                    sidebar.classList.remove('collapsed');
+                    localStorage.removeItem('sidebarCollapsed');
+                } else {
+                    mobileToggle.style.display = 'none';
+                    sidebar.classList.remove('mobile-open');
+                    sidebarOverlay.classList.remove('mobile-open');
+                    
+                    // Restore collapsed state on desktop
+                    const savedState = localStorage.getItem('sidebarCollapsed');
+                    if (savedState === 'true') {
+                        sidebar.classList.add('collapsed');
+                    }
+                }
+            }
+            
+            // Initial check and event listener for window resize
+            handleResize();
+            window.addEventListener('resize', handleResize);
+            {% endif %}
+        });
+    </script>
     {% block extra_js %}{% endblock %}
 </body>
 </html>

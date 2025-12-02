@@ -1,7 +1,7 @@
 from django import forms
-from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
+from django.contrib.auth.forms import PasswordChangeForm, UserCreationForm, AuthenticationForm
 from django.contrib.auth.models import User
-from django.contrib.auth.forms import PasswordChangeForm
+from django.core.exceptions import ValidationError
 from .models import UserProfile, Company
 
 class BusinessOwnerRegistrationForm(UserCreationForm):
@@ -81,6 +81,19 @@ class BusinessOwnerRegistrationForm(UserCreationForm):
         
         # Style the radio buttons properly
         self.fields['company_choice'].widget.attrs.update({'class': 'radio-input'})
+
+    def clean_email(self):
+        email = self.cleaned_data.get('email', '').strip().lower()
+        
+        # Basic email format check
+        if not email or '@' not in email:
+            raise ValidationError('Please enter a valid email address.')
+        
+        # Check if email already exists
+        if User.objects.filter(email=email).exists():
+            raise ValidationError('This email is already registered.')
+        
+        return email
 
     def clean(self):
         cleaned_data = super().clean()
@@ -172,6 +185,19 @@ class StaffRegistrationForm(UserCreationForm):
             'placeholder': 'Repeat password'
         })
 
+    def clean_email(self):
+        email = self.cleaned_data.get('email', '').strip().lower()
+        
+        # Basic email format check
+        if not email or '@' not in email:
+            raise ValidationError('Please enter a valid email address.')
+        
+        # Check if email already exists
+        if User.objects.filter(email=email).exists():
+            raise ValidationError('This email is already registered.')
+        
+        return email
+
     def save(self, commit=True):
         user = super().save(commit=False)
         user.email = self.cleaned_data['email']
@@ -249,7 +275,7 @@ class BusinessOwnerProfileForm(forms.ModelForm):
             profile.save()
         
         return profile
-    
+
 class CompanyForm(forms.ModelForm):
     class Meta:
         model = Company

@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
+from django.contrib import messages
 from django.http import HttpResponse
 from django.utils import timezone
 from datetime import datetime, timedelta
@@ -21,21 +22,37 @@ def reports_dashboard(request):
 
 @login_required
 def staff_activity_report(request):
-    """Staff Activity Report with Export Functionality"""
+    """Staff Activity Report with Export Functionality - SECURED BY COMPANY"""
     try:
         from staff_management.models import StaffProfile
+        from accounts.models import UserProfile
         from django.db.models import Count, Q
         import random
         
         print("=== STAFF ACTIVITY DEBUG ===")
         
-        # Get all staff profiles
+        # Get the current user's profile and company
+        try:
+            current_user_profile = UserProfile.objects.get(user=request.user)
+            user_company = current_user_profile.company
+            print(f"Current user company: {user_company.name}")
+        except UserProfile.DoesNotExist:
+            messages.error(request, 'Your user profile is not properly configured.')
+            return render(request, 'reports/staff_activity.html', {
+                'error': 'User profile not configured',
+                'activity_data': None
+            })
+        
+        # ONLY fetch staff from the current user's company
         staff_profiles = StaffProfile.objects.select_related(
             'user_profile', 
-            'user_profile__user'
+            'user_profile__user',
+            'user_profile__company'  # Add company to select_related
+        ).filter(
+            user_profile__company=user_company  # CRITICAL SECURITY FILTER
         ).all()
         
-        print(f"Found {staff_profiles.count()} staff profiles")
+        print(f"Found {staff_profiles.count()} staff profiles in company: {user_company.name}")
         
         # Calculate basic statistics
         total_staff = staff_profiles.count()
@@ -92,24 +109,27 @@ def staff_activity_report(request):
             'inactive_staff': inactive_staff,
             'on_leave_staff': on_leave_staff,
             'staff_details': staff_details,
+            'company_name': user_company.name,  # Add company name for context
         }
         
-        # Handle export requests
+        # Handle export requests - SECURE EXPORTS TOO
         export_format = request.GET.get('export')
         if export_format:
+            # Ensure exports also respect company filtering
             if export_format == 'excel':
-                return generate_excel_report(activity_data, 'staff_activity', 'staff_activity_report')
+                return generate_excel_report(activity_data, 'staff_activity', f'staff_activity_report_{user_company.name}')
             elif export_format == 'pdf':
-                return generate_pdf_report(activity_data, 'staff_activity', 'staff_activity_report')
+                return generate_pdf_report(activity_data, 'staff_activity', f'staff_activity_report_{user_company.name}')
             elif export_format == 'csv':
-                return generate_csv_report(activity_data, 'staff_activity', 'staff_activity_report')
+                return generate_csv_report(activity_data, 'staff_activity', f'staff_activity_report_{user_company.name}')
         
         context = {
             'activity_data': activity_data,
             'debug_total_staff': total_staff,
+            'company_name': user_company.name,
         }
         
-        print(f"Sending {total_staff} staff members to template")
+        print(f"Sending {total_staff} staff members to template from company: {user_company.name}")
         return render(request, 'reports/staff_activity.html', context)
         
     except Exception as e:
@@ -124,13 +144,25 @@ def staff_activity_report(request):
 
 @login_required
 def inventory_report(request):
-    """Inventory Report with Export Functionality"""
+    """Inventory Report with Export Functionality - SECURED BY COMPANY"""
     try:
         from inventory.models import Product
+        from accounts.models import UserProfile
         from django.db.models import Sum, Count
         
-        # Get all products (no company filtering for now)
-        products = Product.objects.all().order_by('item_name')
+        # Get the current user's company
+        try:
+            current_user_profile = UserProfile.objects.get(user=request.user)
+            user_company = current_user_profile.company
+        except UserProfile.DoesNotExist:
+            messages.error(request, 'Your user profile is not properly configured.')
+            return render(request, 'reports/inventory_report.html', {
+                'error': 'User profile not configured',
+                'inventory_data': None
+            })
+        
+        # ONLY fetch products from the current user's company
+        products = Product.objects.filter(company=user_company).order_by('item_name')
         
         # Calculate statistics
         total_products = products.count()
@@ -182,24 +214,26 @@ def inventory_report(request):
             'low_stock_items': low_stock_items,
             'out_of_stock_items': out_of_stock_items,
             'total_value': round(total_value, 2),
-            'items': items_list
+            'items': items_list,
+            'company_name': user_company.name,
         }
         
-        # Handle export requests
+        # Handle export requests - SECURE EXPORTS TOO
         export_format = request.GET.get('export')
         if export_format:
             if export_format == 'excel':
-                return generate_excel_report(inventory_data, 'inventory', 'inventory_report')
+                return generate_excel_report(inventory_data, 'inventory', f'inventory_report_{user_company.name}')
             elif export_format == 'pdf':
-                return generate_pdf_report(inventory_data, 'inventory', 'inventory_report')
+                return generate_pdf_report(inventory_data, 'inventory', f'inventory_report_{user_company.name}')
             elif export_format == 'csv':
-                return generate_csv_report(inventory_data, 'inventory', 'inventory_report')
+                return generate_csv_report(inventory_data, 'inventory', f'inventory_report_{user_company.name}')
         
         context = {
             'inventory_data': inventory_data,
             'total_products': total_products,
             'total_quantity': total_quantity,
             'total_value': round(total_value, 2),
+            'company_name': user_company.name,
         }
         
         return render(request, 'reports/inventory_report.html', context)

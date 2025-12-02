@@ -4,567 +4,135 @@
 {% block title %}TrackWise - Reports Dashboard{% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'reports/css/reports.css' %}">
-<link rel="stylesheet" href="{% static 'css/dashboard/business_owner_dashboard.css' %}">
-<style>
-:root {
-  --primary-blue: #4a6fa5;
-  --primary-dark: #2c5282;
-  --accent-light: #a7c5eb;
-  --bg-light: #dbe4f0;
-  --bg-page: #f0f4f8;
-  --text-white: #ffffff;
-  --shadow-md: 0 8px 25px rgba(0, 0, 0, 0.2);
-  --transition: all 0.3s ease;
-}
-
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-}
-
-body {
-  background-color: var(--bg-page);
-  color: #333;
-}
-
-/* --- WRAPPER --- */
-.reports-wrapper {
-  padding-top: 80px;
-  min-height: 100vh;
-  background-color: var(--bg-page);
-}
-
-/* --- HERO --- */
-.reports-hero {
-  background: var(--bg-light);
-  margin: 2rem auto;
-  padding: 3rem 2rem;
-  display: flex;
-  align-items: center;
-  border-radius: 20px;
-  max-width: 1200px;
-  box-shadow: var(--shadow-md);
-  flex-wrap: wrap;
-  gap: 120px;
-}
-
-.reports-hero-text {
-  max-width: 45%;
-  min-width: 280px;
-}
-
-.reports-hero-text h1 {
-  font-size: 2rem;
-  font-weight: 800;
-  color: var(--primary-dark);
-  margin-bottom: 1rem;
-}
-
-.reports-hero-text p {
-  margin-bottom: 1.5rem;
-  color: #555;
-}
-
-/* --- QUICK STATS (like KPI cards) --- */
-.quick-stats-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 1rem;
-  width: 100%;
-  max-width: 400px;
-}
-
-.quick-stats-card {
-  width: 180px;  
-  background: linear-gradient(135deg, var(--primary-blue), var(--primary-dark));
-  color: var(--text-white);
-  padding: 1.5rem;
-  border-radius: 15px;
-  text-align: center;
-  box-shadow: var(--shadow-md);
-  transition: var(--transition);
-  
-}
-
-.quick-stats-card:hover {
-  transform: translateY(-5px);
-}
-
-.quick-stats-icon {
-  font-size: 2rem;
-  margin-bottom: 0.5rem;
-  opacity: 0.9;
-}
-
-.quick-stats-value {
-  font-size: 1.3rem;
-  font-weight: 700;
-}
-
-.quick-stats-label {
-  font-size: 0.9rem;
-  color: var(--accent-light);
-}
-
-/* --- REPORTS GRID --- */
-.reports-grid {
-  max-width: 1200px;
-  margin: 0 auto;
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-  gap: 2rem;
-  padding: 0 2rem 4rem;
-}
-
-.report-card {
-  background: linear-gradient(135deg, var(--primary-blue), var(--primary-dark));
-  color: var(--text-white);
-  border-radius: 15px;
-  padding: 2rem;
-  box-shadow: var(--shadow-md);
-  transition: var(--transition);
-  border-left: 4px solid transparent;
-}
-
-.report-card:hover {
-  transform: translateY(-5px);
-}
-
-.report-header h3 {
-  font-size: 1.4rem;
-  font-weight: 700;
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  color: var(--text-white);
-}
-
-.report-badge {
-  background: rgba(255, 255, 255, 0.2);
-  padding: 0.3rem 0.8rem;
-  border-radius: 20px;
-  font-size: 0.8rem;
-  font-weight: 600;
-  color: var(--text-white);
-}
-
-.report-card p {
-  color: rgba(255, 255, 255, 0.9);
-  margin: 1rem 0 1.5rem;
-  line-height: 1.5;
-}
-
-.report-features li {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  margin-bottom: 0.5rem;
-  color: rgba(255, 255, 255, 0.9);
-}
-
-.report-features i {
-  color: #38a169;
-}
-
-/* --- REPORT BUTTONS --- */
-.report-btn {
-  display: inline-block;
-  width: 100%;
-  padding: 1rem;
-  border: none;
-  border-radius: 10px;
-  text-decoration: none;
-  font-weight: 600;
-  font-size: 0.95rem;
-  color: var(--text-white);
-  background: linear-gradient(135deg, var(--primary-dark), var(--primary-blue));
-  transition: var(--transition);
-  text-align: center;
-}
-
-.report-btn:hover {
-  transform: translateY(-2px);
-  background: var(--primary-dark);
-}
-
-/* --- RECENT REPORTS --- */
-.recent-reports-section {
-  max-width: 1200px;
-  margin: 0 auto 4rem;
-  padding: 0 2rem;
-}
-
-.section-card {
-  background: white;
-  border-radius: 15px;
-  padding: 2rem;
-  box-shadow: var(--shadow-md);
-}
-
-.section-card h3 {
-  color: var(--primary-dark);
-  margin-bottom: 1.5rem;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.reports-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-.reports-table th {
-  background: var(--bg-light);
-  color: var(--primary-dark);
-  padding: 1rem;
-  text-align: left;
-  font-weight: 600;
-  border-bottom: 2px solid var(--accent-light);
-}
-
-.reports-table td {
-  padding: 1rem;
-  border-bottom: 1px solid #eee;
-  color: #333;
-}
-
-.reports-table tr:hover {
-  background: var(--bg-light);
-}
-
-.download-btn {
-  padding: 0.5rem 1rem;
-  background: linear-gradient(135deg, var(--primary-blue), var(--primary-dark));
-  color: white;
-  border: none;
-  border-radius: 6px;
-  text-decoration: none;
-  font-size: 0.9rem;
-  transition: var(--transition);
-}
-
-.download-btn:hover {
-  background: var(--primary-dark);
-}
-
-/* NAVBAR */
-.navbar {
-  background: linear-gradient(135deg, var(--primary-blue), var(--primary-dark));
-  padding: 1rem 2rem;
-  color: var(--text-white);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  box-shadow: var(--shadow-md);
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  z-index: 1000;
-}
-
-.navbar-content {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  width: 100%;
-  max-width: 1400px;
-  margin: 0 auto;
-}
-
-.navbar-brand {
-  font-weight: 700;
-  font-size: 1.3rem;
-  color: var(--text-white);
-  text-decoration: none;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.navbar-menu {
-  display: flex;
-  gap: 1.5rem;
-}
-
-.nav-link {
-  color: var(--text-white);
-  text-decoration: none;
-  transition: var(--transition);
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.nav-link:hover, .nav-link.active {
-  color: var(--accent-light);
-}
-
-/* User Section */
-.user-section {
-  position: relative;
-}
-
-.user-info {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  cursor: pointer;
-  padding: 0.5rem;
-  border-radius: 5px;
-  transition: var(--transition);
-}
-
-.user-info:hover {
-  background: rgba(255, 255, 255, 0.1);
-}
-
-.user-avatar {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  background: var(--accent-light);
-  color: var(--primary-dark);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: bold;
-}
-
-.user-dropdown {
-  position: absolute;
-  top: 100%;
-  right: 0;
-  background: white;
-  color: #333;
-  border-radius: 8px;
-  box-shadow: var(--shadow-md);
-  width: 200px;
-  padding: 0.5rem 0;
-  z-index: 100;
-  display: none;
-}
-
-.user-dropdown.active {
-  display: block;
-}
-
-.user-dropdown-item {
-  padding: 0.75rem 1rem;
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  cursor: pointer;
-  transition: var(--transition);
-  border: none;
-  background: none;
-  width: 100%;
-  text-align: left;
-}
-
-.user-dropdown-item:hover {
-  background: var(--bg-light);
-}
-
-.user-dropdown-divider {
-  height: 1px;
-  background: #e0e0e0;
-  margin: 0.5rem 0;
-}
-
-/* --- RESPONSIVE --- */
-@media (max-width: 900px) {
-  .reports-hero {
-    flex-direction: column;
-    text-align: center;
-    gap: 2rem;
-  }
-
-  .reports-hero-text {
-    max-width: 100%;
-  }
-
-  .quick-stats-grid {
-    grid-template-columns: 1fr 1fr;
-    max-width: 400px;
-  }
-
-  .reports-grid {
-    grid-template-columns: 1fr;
-  }
-}
-
-</style>
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'css/reports/reports_dashboard.css' %}">
 {% endblock %}
 
 {% block content %}
-<!-- Navigation -->
-<nav class="navbar">
-    <div class="navbar-content">
-        <a href="{% url 'dashboard:dashboard' %}" class="navbar-brand">
-            <i class="fas fa-chart-line"></i>
-            TrackWise
-        </a>
-
-        <div class="navbar-menu">
-            <a href="{% url 'dashboard:dashboard' %}" class="nav-link"><i class="fas fa-home"></i> Dashboard</a>
-            <a href="{% url 'inventory:inventory_list' %}" class="nav-link"><i class="fas fa-boxes"></i> Inventory</a>
-            <a href="{% url 'reports:reports_dashboard' %}" class="nav-link active"><i class="fas fa-chart-bar"></i> Reports</a>
-            <a href="{% url 'staff_management:staff_list' %}" class="nav-link"><i class="fas fa-users"></i> Staff</a>
-        </div>
-
-        <div class="user-section">
-            <div class="user-info" id="userDropdownTrigger">
-                <span>{{ user.first_name }} {{ user.last_name }}</span>
-                <div class="user-avatar">{{ user.first_name|first }}{{ user.last_name|first }}</div>
-                <i class="fas fa-chevron-down" style="font-size: 0.8rem;"></i>
+<div class="reports-wrapper">
+    <div class="container-fluid">
+        <!-- Header Section -->
+        <div class="reports-header">
+            <div class="header-content">
+                <h1 class="welcome-text">
+                    <i class="fas fa-chart-bar"></i>
+                    Reports Dashboard
+                </h1>
+                <p class="subtitle">Generate and view various reports for your business analytics</p>
             </div>
             
-            <div class="user-dropdown" id="userDropdown">
-                <a href="{% url 'accounts:edit_profile' %}" class="user-dropdown-item">
-                    <i class="fas fa-user-edit"></i>
-                    <span>Edit Profile</span>
+            <div class="header-actions">
+                <div></div> <!-- Empty div for spacing -->
+            </div>
+        </div>
+
+        <!-- Quick Stats -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-number">Staff</div>
+                <div class="stat-label">Activity & Metrics</div>
+                <i class="stat-icon fas fa-users"></i>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">Inventory</div>
+                <div class="stat-label">Stock & Levels</div>
+                <i class="stat-icon fas fa-boxes"></i>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">Export</div>
+                <div class="stat-label">Multiple Formats</div>
+                <i class="stat-icon fas fa-file-export"></i>
+            </div>
+        </div>
+
+        <!-- Reports Grid -->
+        <div class="reports-grid">
+            <!-- Staff Activity Card -->
+            <div class="report-card">
+                <div class="report-header">
+                    <h3 class="report-title">
+                        <i class="fas fa-user-clock"></i>
+                        Staff Activity Report
+                    </h3>
+                </div>
+                <p class="report-description">
+                    View staff activity summaries, login times, task completion rates, and performance metrics.
+                </p>
+                <ul class="report-features">
+                    <li><i class="fas fa-check"></i>Activity tracking</li>
+                    <li><i class="fas fa-check"></i>Performance metrics</li>
+                    <li><i class="fas fa-check"></i>Time-based analysis</li>
+                </ul>
+                <a href="{% url 'reports:staff_activity' %}" class="report-btn">
+                    <i class="fas fa-chart-line"></i>View Activity Report
                 </a>
-                <div class="user-dropdown-divider"></div>
-                <form method="post" action="{% url 'accounts:logout' %}" style="display: inline;">
-                    {% csrf_token %}
-                    <button type="submit" class="user-dropdown-item">
-                        <i class="fas fa-sign-out-alt"></i>
-                        <span>Logout</span>
-                    </button>
-                </form>
+            </div>
+
+            <!-- Inventory Report Card -->
+            <div class="report-card">
+                <div class="report-header">
+                    <h3 class="report-title">
+                        <i class="fas fa-boxes-stacked"></i>
+                        Inventory Report
+                    </h3>
+                </div>
+                <p class="report-description">
+                    Comprehensive inventory reports including stock levels, low stock alerts, and inventory movements.
+                </p>
+                <ul class="report-features">
+                    <li><i class="fas fa-check"></i>Stock level monitoring</li>
+                    <li><i class="fas fa-check"></i>Low stock alerts</li>
+                    <li><i class="fas fa-check"></i>Movement tracking</li>
+                </ul>
+                <a href="{% url 'reports:inventory_report' %}" class="report-btn">
+                    <i class="fas fa-boxes"></i>Check Inventory Report
+                </a>
             </div>
         </div>
+
+        <!-- Recent Reports Section -->
+        {% if recent_reports %}
+        <div class="recent-reports-section">
+            <div class="section-card">
+                <h3 class="section-title">
+                    <i class="fas fa-history"></i>
+                    Recently Generated Reports
+                </h3>
+                <div class="table-responsive">
+                    <table class="reports-table">
+                        <thead>
+                            <tr>
+                                <th>Report Name</th>
+                                <th>Generated On</th>
+                                <th>Format</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for report in recent_reports %}
+                            <tr>
+                                <td>{{ report.report_config.name }}</td>
+                                <td>{{ report.generated_at|date:"M d, Y H:i" }}</td>
+                                <td>
+                                    <span class="format-badge">{{ report.file_format|upper }}</span>
+                                </td>
+                                <td>
+                                    {% if report.file_path %}
+                                    <a href="{{ report.file_path }}" class="download-btn">
+                                        <i class="fas fa-download"></i>Download
+                                    </a>
+                                    {% else %}
+                                    <span style="color: #999;">Not available</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        {% endif %}
     </div>
-</nav>
-
-<div class="reports-wrapper">
-    <!-- HERO SECTION -->
-    <section class="reports-hero">
-        <div class="reports-hero-text">
-            <h1><i class="fas fa-chart-bar me-2"></i>Reports Dashboard</h1>
-            <p>Generate and view various reports for your business analytics</p>
-        </div>
-
-        <div class="quick-stats-grid">
-            <div class="quick-stats-card">
-                <i class="fas fa-users quick-stats-icon"></i>
-                <div class="quick-stats-value">Staff</div>
-                <div class="quick-stats-label">Activity & Metrics</div>
-            </div>
-            <div class="quick-stats-card">
-                <i class="fas fa-boxes quick-stats-icon"></i>
-                <div class="quick-stats-value">Inventory</div>
-                <div class="quick-stats-label">Stock & Levels</div>
-            </div>
-            <div class="quick-stats-card">
-                <i class="fas fa-file-export quick-stats-icon"></i>
-                <div class="quick-stats-value">Export</div>
-                <div class="quick-stats-label">Multiple Formats</div>
-            </div>
-        </div>
-    </section>
-
-    <!-- REPORTS GRID -->
-    <section class="reports-grid">
-        <!-- Staff Activity Card -->
-        <div class="report-card staff">
-            <div class="report-header">
-                <h3 class="report-title"><i class="fas fa-user-clock"></i>Staff Activity</h3>
-            </div>
-            <p>View staff activity summaries, login times, task completion rates, and performance metrics.</p>
-            <ul class="report-features">
-                <li><i class="fas fa-check"></i>Activity tracking</li>
-                <li><i class="fas fa-check"></i>Performance metrics</li>
-                <li><i class="fas fa-check"></i>Time-based analysis</li>
-            </ul>
-            <a href="{% url 'reports:staff_activity' %}" class="report-btn staff-btn">View Activity</a>
-        </div>
-
-        <!-- Inventory Report Card -->
-        <div class="report-card inventory">
-            <div class="report-header">
-                <h3 class="report-title"><i class="fas fa-boxes-stacked"></i>Inventory Report</h3>
-            </div>
-            <p>Comprehensive inventory reports including stock levels, low stock alerts, and inventory movements.</p>
-            <ul class="report-features">
-                <li><i class="fas fa-check"></i>Stock level monitoring</li>
-                <li><i class="fas fa-check"></i>Low stock alerts</li>
-                <li><i class="fas fa-check"></i>Movement tracking</li>
-            </ul>
-            <a href="{% url 'reports:inventory_report' %}" class="report-btn inventory-btn">Check Inventory</a>
-        </div>
-    </section>
-
-    <!-- RECENT REPORTS SECTION -->
-    {% if recent_reports %}
-    <section class="recent-reports-section">
-        <div class="section-card">
-            <h3><i class="fas fa-history"></i> Recently Generated Reports</h3>
-            <table class="reports-table">
-                <thead>
-                    <tr>
-                        <th>Report Name</th>
-                        <th>Generated On</th>
-                        <th>Format</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for report in recent_reports %}
-                    <tr>
-                        <td>{{ report.report_config.name }}</td>
-                        <td>{{ report.generated_at|date:"M d, Y H:i" }}</td>
-                        <td><span style="background: var(--bg-light); color: var(--primary-dark); padding: 0.3rem 0.8rem; border-radius: 15px; font-size: 0.8rem; font-weight: 600;">{{ report.file_format|upper }}</span></td>
-                        <td>
-                            {% if report.file_path %}
-                            <a href="{{ report.file_path }}" class="download-btn">Download</a>
-                            {% else %}
-                            <span style="color: #999;">Not available</span>
-                            {% endif %}
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-    </section>
-    {% endif %}
 </div>
-{% endblock %}
-
-{% block extra_js %}
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    // User dropdown functionality
-    const userDropdownTrigger = document.getElementById('userDropdownTrigger');
-    const userDropdown = document.getElementById('userDropdown');
-    
-    if (userDropdownTrigger && userDropdown) {
-        // Toggle dropdown on click
-        userDropdownTrigger.addEventListener('click', function(e) {
-            e.stopPropagation();
-            userDropdown.classList.toggle('active');
-        });
-        
-        // Close dropdown when clicking outside
-        document.addEventListener('click', function(e) {
-            if (!userDropdown.contains(e.target) && !userDropdownTrigger.contains(e.target)) {
-                userDropdown.classList.remove('active');
-            }
-        });
-        
-        // Close dropdown when clicking on a dropdown item
-        userDropdown.addEventListener('click', function(e) {
-            if (e.target.tagName === 'A' || e.target.tagName === 'BUTTON') {
-                userDropdown.classList.remove('active');
-            }
-        });
-    }
-});
-</script>
 {% endblock %}

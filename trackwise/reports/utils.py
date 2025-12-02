@@ -6,21 +6,127 @@ from io import BytesIO
 import json
 from datetime import datetime
 
+# reports/utils.py
+import pandas as pd
+from django.http import HttpResponse
+from django.template.loader import render_to_string
+from io import BytesIO
+import json
+from datetime import datetime
+
 def generate_excel_report(data, report_type, filename_prefix):
     """Generate Excel report from data"""
     try:
         # Create DataFrame based on report type
         if report_type == 'inventory':
             df = pd.DataFrame(data['items'])
+            
+            # Remove min_stock column if it exists
+            if 'min_stock' in df.columns:
+                df = df.drop(columns=['min_stock'])
+            # Also check for similar columns
+            min_stock_variants = ['minimum_stock', 'reorder_level', 'reorder_point', 'stock_min', 'min_level']
+            for col in min_stock_variants:
+                if col in df.columns:
+                    df = df.drop(columns=[col])
+            
+            # Format price columns with peso sign for inventory reports
+            if 'price' in df.columns:
+                df['price'] = df['price'].apply(lambda x: f'₱{x:,.2f}' if pd.notnull(x) else '₱0.00')
+            if 'total_value' in df.columns:
+                df['total_value'] = df['total_value'].apply(lambda x: f'₱{x:,.2f}' if pd.notnull(x) else '₱0.00')
+            if 'unit_price' in df.columns:
+                df['unit_price'] = df['unit_price'].apply(lambda x: f'₱{x:,.2f}' if pd.notnull(x) else '₱0.00')
+            if 'cost' in df.columns:
+                df['cost'] = df['cost'].apply(lambda x: f'₱{x:,.2f}' if pd.notnull(x) else '₱0.00')
+                
+            # Rename columns for better display (optional)
+            column_rename = {
+                'name': 'Item Name',
+                'category': 'Category',
+                'current_stock': 'Current Stock',
+                'unit': 'Unit',
+                'price': 'Unit Price',
+                'total_value': 'Total Value',
+                'status': 'Status'
+            }
+            df = df.rename(columns={k: v for k, v in column_rename.items() if k in df.columns})
+                
         elif report_type == 'staff_activity':
             df = pd.DataFrame(data['staff_details'])
+            
+            # Remove the specified performance and attendance columns
+            columns_to_remove = [
+                'tenure_days', 
+                'performance_score', 
+                'performance_level', 
+                'performance_class', 
+                'task_completion', 
+                'attendance_rate'
+            ]
+            
+            for col in columns_to_remove:
+                if col in df.columns:
+                    df = df.drop(columns=[col])
+            
+            # Remove any min_stock related columns if they somehow exist
+            if 'min_stock' in df.columns:
+                df = df.drop(columns=['min_stock'])
+            
+            # Format salary columns with peso sign for staff reports
+            if 'salary' in df.columns:
+                df['salary'] = df['salary'].apply(lambda x: f'₱{x:,.2f}' if pd.notnull(x) else '₱0.00')
+            if 'monthly_salary' in df.columns:
+                df['monthly_salary'] = df['monthly_salary'].apply(lambda x: f'₱{x:,.2f}' if pd.notnull(x) else '₱0.00')
+            
+            # Rename columns for better display
+            column_rename = {
+                'name': 'Staff Name',
+                'employee_id': 'Employee ID',
+                'position': 'Position',
+                'department': 'Department',
+                'status': 'Status',
+                'email': 'Email',
+                'phone': 'Phone',
+                'hire_date': 'Hire Date'
+            }
+            df = df.rename(columns={k: v for k, v in column_rename.items() if k in df.columns})
+                
+        elif report_type == 'sales':
+            df = pd.DataFrame(data.get('sales_data', []))
+            # Remove any min_stock related columns
+            if 'min_stock' in df.columns:
+                df = df.drop(columns=['min_stock'])
+            
+            # Format sales amount columns with peso sign
+            amount_columns = ['amount', 'total', 'subtotal', 'tax', 'discount', 'grand_total', 
+                             'revenue', 'profit', 'cost_price', 'selling_price']
+            for col in amount_columns:
+                if col in df.columns:
+                    df[col] = df[col].apply(lambda x: f'₱{x:,.2f}' if pd.notnull(x) else '₱0.00')
         else:
             df = pd.DataFrame([data])  # Fallback for single record
+            # Remove min_stock if present
+            if 'min_stock' in df.columns:
+                df = df.drop(columns=['min_stock'])
+            
+            # Check for any amount columns in generic reports
+            amount_columns = ['price', 'amount', 'total', 'value', 'cost']
+            for col in amount_columns:
+                if col in df.columns:
+                    df[col] = df[col].apply(lambda x: f'₱{x:,.2f}' if pd.notnull(x) else '₱0.00')
         
         # Create response
         output = BytesIO()
         with pd.ExcelWriter(output, engine='openpyxl') as writer:
             df.to_excel(writer, sheet_name='Report', index=False)
+            
+            # Auto-adjust column widths for better readability
+            worksheet = writer.sheets['Report']
+            for column in df:
+                column_length = max(df[column].astype(str).map(len).max(), len(str(column))) + 2
+                col_idx = df.columns.get_loc(column)
+                worksheet.column_dimensions[chr(65 + col_idx)].width = min(column_length, 50)
         
         output.seek(0)
         response = HttpResponse(
@@ -33,46 +139,79 @@ def generate_excel_report(data, report_type, filename_prefix):
     except Exception as e:
         return HttpResponse(f"Error generating Excel report: {str(e)}", status=500)
 
+# In your existing reports/utils.py, replace the PDF functions:
+
 def generate_pdf_report(data, report_type, filename_prefix):
-    """Generate PDF report with improved error handling and debugging"""
+    """Generate PDF report using ReportLab"""
     print(f"=== PDF GENERATION DEBUG ===")
     print(f"Report type: {report_type}")
     print(f"Data keys: {list(data.keys()) if data else 'No data'}")
     
     try:
-        # Try to import WeasyPrint
-        from weasyprint import HTML
-        print("✓ WeasyPrint imported successfully")
+        # Import ReportLab PDF generators
+        from .pdf_generator import create_inventory_pdf, create_staff_activity_pdf, create_sales_pdf
         
-        # Generate HTML content directly instead of using templates
-        html_content = generate_pdf_html(data, report_type)
-        print(f"✓ HTML content generated, length: {len(html_content)}")
+        company_name = data.get('company_name', 'Unknown Company')
         
-        # Generate PDF
-        html = HTML(string=html_content)
-        print("✓ HTML object created")
+        # Clean data: Remove min_stock from items before PDF generation
+        if report_type == 'inventory' and 'items' in data:
+            # Remove min_stock from each item in the data
+            for item in data['items']:
+                item.pop('min_stock', None)
+                # Also remove similar columns
+                min_stock_variants = ['minimum_stock', 'reorder_level', 'reorder_point', 'stock_min', 'min_level']
+                for col in min_stock_variants:
+                    item.pop(col, None)
         
-        result = html.write_pdf()
-        print("✓ PDF generated successfully")
+        # Choose appropriate PDF generator
+        if report_type == 'inventory':
+            pdf_content = create_inventory_pdf(data, company_name)
+        elif report_type == 'staff_activity':
+            pdf_content = create_staff_activity_pdf(data, company_name)
+        elif report_type == 'sales':
+            pdf_content = create_sales_pdf(data, company_name)
+        else:
+            # Generic fallback
+            from .pdf_generator import create_inventory_pdf
+            pdf_content = create_inventory_pdf(data, company_name)
         
-        response = HttpResponse(result, content_type='application/pdf')
+        print("✅ PDF generated successfully using ReportLab")
+        
+        response = HttpResponse(pdf_content, content_type='application/pdf')
         response['Content-Disposition'] = f'attachment; filename="{filename_prefix}_{datetime.now().strftime("%Y%m%d_%H%M")}.pdf"'
         return response
         
     except ImportError as e:
-        print(f"✗ WeasyPrint import failed: {e}")
-        # Fallback if WeasyPrint is not installed
+        print(f"✗ ReportLab import failed: {e}")
         return HttpResponse(
-            "PDF export requires WeasyPrint. Install with: pip install weasyprint", 
+            "PDF export requires ReportLab. Install with: pip install reportlab", 
             status=500
         )
     except Exception as e:
-        print(f"✗ WeasyPrint PDF generation failed: {e}")
-        # Fallback: return a simple text PDF
-        return generate_fallback_pdf(data, report_type, filename_prefix)
+        print(f"✗ PDF generation failed: {e}")
+        import traceback
+        print(traceback.format_exc())
+        
+        # Fallback: return error message
+        return HttpResponse(
+            f"Error generating PDF: {str(e)}",
+            status=500
+        )
+
+# Remove or comment out the old WeasyPrint functions:
+# generate_pdf_html, generate_staff_activity_pdf_html, etc.
 
 def generate_pdf_html(data, report_type):
     """Generate HTML content for PDF based on report type"""
+    # Clean data before generating HTML
+    if report_type == 'inventory' and 'items' in data:
+        # Remove min_stock from items
+        for item in data['items']:
+            item.pop('min_stock', None)
+            min_stock_variants = ['minimum_stock', 'reorder_level', 'reorder_point', 'stock_min', 'min_level']
+            for col in min_stock_variants:
+                item.pop(col, None)
+    
     if report_type == 'staff_activity':
         return generate_staff_activity_pdf_html(data)
     elif report_type == 'inventory':
@@ -89,55 +228,55 @@ def generate_staff_activity_pdf_html(data):
         <meta charset="utf-8">
         <title>Staff Activity Report</title>
         <style>
-            body {{ 
-                font-family: Arial, sans-serif; 
-                margin: 20px; 
+            body {{
+                font-family: Arial, sans-serif;
+                margin: 20px;
                 font-size: 12px;
             }}
             .header {{ 
-                text-align: center; 
-                margin-bottom: 30px; 
-                border-bottom: 2px solid #333; 
-                padding-bottom: 10px; 
+                text-align: center;
+                margin-bottom: 30px;
+                border-bottom: 2px solid #333;
+                padding-bottom: 10px;
             }}
-            .summary {{ 
-                margin-bottom: 20px; 
-                background: #f5f5f5; 
-                padding: 15px; 
-                border-radius: 5px; 
+            .summary {{
+                margin-bottom: 20px;
+                background: #f5f5f5;
+                padding: 15px;
+                border-radius: 5px;
             }}
-            table {{ 
-                width: 100%; 
-                border-collapse: collapse; 
+            table {{
+                width: 100%;
+                border-collapse: collapse;
                 margin-top: 20px;
                 font-size: 10px;
             }}
-            th, td {{ 
-                border: 1px solid #ddd; 
-                padding: 8px; 
-                text-align: left; 
+            th, td {{
+                border: 1px solid #ddd;
+                padding: 8px;
+                text-align: left;
                 vertical-align: top;
             }}
-            th {{ 
-                background-color: #4a6fa5; 
-                color: white; 
+            th {{
+                background-color: #4a6fa5;
+                color: white;
                 font-weight: bold;
             }}
-            tr:nth-child(even) {{ 
-                background-color: #f2f2f2; 
+            tr:nth-child(even) {{
+                background-color: #f2f2f2;
             }}
-            .stats {{ 
-                display: flex; 
-                justify-content: space-between; 
-                margin-bottom: 20px; 
+            .stats {{
+                display: flex;
+                justify-content: space-between;
+                margin-bottom: 20px;
             }}
-            .stat-card {{ 
-                background: white; 
-                padding: 15px; 
-                border-radius: 5px; 
-                border-left: 4px solid #4a6fa5; 
-                flex: 1; 
-                margin: 0 10px; 
+            .stat-card {{
+                background: white;
+                padding: 15px;
+                border-radius: 5px;
+                border-left: 4px solid #4a6fa5;
+                flex: 1;
+                margin: 0 10px;
                 text-align: center;
             }}
             .status-active {{ color: #38a169; font-weight: bold; }}
@@ -252,7 +391,7 @@ def generate_staff_activity_pdf_html(data):
     return html
 
 def generate_inventory_pdf_html(data):
-    """Generate HTML for inventory PDF"""
+    """Generate HTML for inventory PDF - NO MIN_STOCK HERE!"""
     html = f"""
     <!DOCTYPE html>
     <html>
@@ -280,7 +419,7 @@ def generate_inventory_pdf_html(data):
             <p><strong>Total Items:</strong> {data['total_items']}</p>
             <p><strong>Low Stock Items:</strong> {data['low_stock_items']}</p>
             <p><strong>Out of Stock Items:</strong> {data['out_of_stock_items']}</p>
-            <p><strong>Total Inventory Value:</strong> ${data['total_value']:,.2f}</p>
+            <p><strong>Total Inventory Value:</strong> ₱{data['total_value']:,.2f}</p>
         </div>
         
         <table>
@@ -300,12 +439,12 @@ def generate_inventory_pdf_html(data):
     for item in data['items']:
         html += f"""
                 <tr>
-                    <td>{item['name']}</td>
-                    <td>{item['category']}</td>
-                    <td>{item['current_stock']} {item.get('unit', '')}</td>
-                    <td>{item['status']}</td>
-                    <td>${item['price']:,.2f}</td>
-                    <td>${item['total_value']:,.2f}</td>
+                    <td>{item.get('name', 'N/A')}</td>
+                    <td>{item.get('category', 'N/A')}</td>
+                    <td>{item.get('current_stock', 0)} {item.get('unit', '')}</td>
+                    <td>{item.get('status', 'N/A')}</td>
+                    <td>₱{item.get('price', 0):,.2f}</td>
+                    <td>₱{item.get('total_value', 0):,.2f}</td>
                 </tr>
         """
     
@@ -367,7 +506,7 @@ def generate_fallback_pdf(data, report_type, filename_prefix):
                     y_position = 750
         elif report_type == 'inventory':
             p.drawString(100, 700, f"Total Items: {data['total_items']}")
-            p.drawString(100, 680, f"Total Value: ${data['total_value']:,.2f}")
+            p.drawString(100, 680, f"Total Value: ₱{data['total_value']:,.2f}")  # Fixed peso sign here
         
         p.save()
         buffer.seek(0)
@@ -391,6 +530,13 @@ def generate_csv_report(data, report_type, filename_prefix):
             items = [data]
         
         df = pd.DataFrame(items)
+        
+        # Remove min_stock and related columns from CSV
+        columns_to_remove = ['min_stock', 'minimum_stock', 'reorder_level', 'reorder_point']
+        for col in columns_to_remove:
+            if col in df.columns:
+                df = df.drop(columns=[col])
+        
         response = HttpResponse(content_type='text/csv')
         response['Content-Disposition'] = f'attachment; filename="{filename_prefix}_{datetime.now().strftime("%Y%m%d_%H%M")}.csv"'
         df.to_csv(response, index=False)

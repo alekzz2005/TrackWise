@@ -24,20 +24,20 @@
                 <p>Update staff member information</p>
             </div>
 
-            {% if messages %}
+            {% comment %} {% if messages %}
                 {% for message in messages %}
                     <div class="alert alert-{{ message.tags }}">
                         {{ message }}
                     </div>
                 {% endfor %}
-            {% endif %}
+            {% endif %} {% endcomment %}
             
-            <div class="staff-image-section">
+            {% comment %} <div class="staff-image-section">
                 <div class="staff-detail-image-placeholder">
                     <i class="fas fa-user fa-4x text-muted"></i>
                     <p>Staff Profile</p>
                 </div>
-            </div>
+            </div> {% endcomment %}
             
             <form method="post" enctype="multipart/form-data" id="staff-update-form">
                 {% csrf_token %}
@@ -47,7 +47,7 @@
                 <div class="form-row">
                     <div class="form-group">
                         <label class="form-label" for="id_first_name">First Name *</label>
-                        <input type="text" name="first_name" id="id_first_name" class="form-control" value="{{ user.first_name }}" required>
+                        <input type="text" name="first_name" id="id_first_name" class="form-control" value="{{ staff.user_profile.user.first_name }}" required>
                         <span class="error-message" id="id_first_name_error"></span>
                         {% if profile_form.first_name.errors %}
                             {% for error in profile_form.first_name.errors %}
@@ -58,7 +58,7 @@
                     
                     <div class="form-group">
                         <label class="form-label" for="id_last_name">Last Name *</label>
-                        <input type="text" name="last_name" id="id_last_name" class="form-control" value="{{ user.last_name }}" required>
+                        <input type="text" name="last_name" id="id_last_name" class="form-control" value="{{ staff.user_profile.user.last_name }}" required>
                         <span class="error-message" id="id_last_name_error"></span>
                         {% if profile_form.last_name.errors %}
                             {% for error in profile_form.last_name.errors %}
@@ -71,7 +71,7 @@
                 <div class="form-row">
                     <div class="form-group">
                         <label class="form-label" for="id_email">Email *</label>
-                        <input type="email" name="email" id="id_email" class="form-control" value="{{ user.email }}" required>
+                        <input type="email" name="email" id="id_email" class="form-control" value="{{ staff.user_profile.user.email }}" required>
                         <span class="error-message" id="id_email_error"></span>
                         {% if profile_form.email.errors %}
                             {% for error in profile_form.email.errors %}

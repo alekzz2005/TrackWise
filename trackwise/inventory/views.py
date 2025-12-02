@@ -130,11 +130,21 @@ def increase_stock(request, pk):
             product = Product.objects.get(pk=pk, company=profile.company)
             product.quantity += 1
             product.save()
+            # Recompute KPI values for the company
+            company_products = Product.objects.filter(company=profile.company)
+            total_products = company_products.count()
+            total_inventory_value = float(sum(p.total_value for p in company_products))
+            low_stock_count = company_products.filter(quantity__lte=10, quantity__gt=0).count()
+            out_of_stock_count = company_products.filter(quantity=0).count()
+
             return JsonResponse({
                 'success': True,
                 'new_quantity': product.quantity,
-                'display_quantity': product.get_display_quantity(),
-                'total_value': float(product.total_value)
+                'total_value': float(product.total_value),
+                'total_products': total_products,
+                'total_inventory_value': total_inventory_value,
+                'low_stock_count': low_stock_count,
+                'out_of_stock_count': out_of_stock_count,
             })
         except (Product.DoesNotExist, UserProfile.DoesNotExist):
             return JsonResponse({'success': False, 'error': 'Product not found'})
@@ -149,11 +159,21 @@ def decrease_stock(request, pk):
             if product.quantity > 0:
                 product.quantity -= 1
                 product.save()
+            # Recompute KPI values for the company
+            company_products = Product.objects.filter(company=profile.company)
+            total_products = company_products.count()
+            total_inventory_value = float(sum(p.total_value for p in company_products))
+            low_stock_count = company_products.filter(quantity__lte=10, quantity__gt=0).count()
+            out_of_stock_count = company_products.filter(quantity=0).count()
+
             return JsonResponse({
                 'success': True,
                 'new_quantity': product.quantity,
-                'display_quantity': product.get_display_quantity(),
-                'total_value': float(product.total_value)
+                'total_value': float(product.total_value),
+                'total_products': total_products,
+                'total_inventory_value': total_inventory_value,
+                'low_stock_count': low_stock_count,
+                'out_of_stock_count': out_of_stock_count,
             })
         except (Product.DoesNotExist, UserProfile.DoesNotExist):
             return JsonResponse({'success': False, 'error': 'Product not found'})

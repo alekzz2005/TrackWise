@@ -24,145 +24,25 @@
         --transition: all 0.3s ease;
     }
 
-    /* NAVBAR */
-    .navbar {
-    background: linear-gradient(135deg, var(--primary-blue), var(--primary-dark));
-    padding: 1rem 2rem;
-    color: var(--text-white);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    box-shadow: var(--shadow-md);
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    z-index: 1000;
+    /* Layout */
+    body {
+        background: var(--bg-page);
+        color: #333;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
 
-    .navbar-content {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    width: 100%;
-    max-width: 1400px;
-    margin: 0 auto;
-    }
-
-    .navbar-brand {
-    font-weight: 700;
-    font-size: 1.3rem;
-    color: var(--text-white);
-    text-decoration: none;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    }
-
-    .navbar-menu {
-    display: flex;
-    gap: 1.5rem;
-    }
-
-    .nav-link {
-    color: var(--text-white);
-    text-decoration: none;
-    transition: var(--transition);
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    }
-
-    .nav-link:hover, .nav-link.active {
-    color: var(--accent-light);
-    }
-
-    /* User Section */
-    .user-section {
-    position: relative;
-    }
-
-    .user-info {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    cursor: pointer;
-    padding: 0.5rem;
-    border-radius: 5px;
-    transition: var(--transition);
-    }
-
-    .user-info:hover {
-    background: rgba(255, 255, 255, 0.1);
-    }
-
-    .user-avatar {
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    background: var(--accent-light);
-    color: var(--primary-dark);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: bold;
-    }
-
-    .user-dropdown {
-    position: absolute;
-    top: 100%;
-    right: 0;
-    background: white;
-    color: #333;
-    border-radius: 8px;
-    box-shadow: var(--shadow-md);
-    width: 200px;
-    padding: 0.5rem 0;
-    z-index: 100;
-    display: none;
-    }
-
-    .user-dropdown.active {
-    display: block;
-    }
-
-    .user-dropdown-item {
-    padding: 0.75rem 1rem;
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    cursor: pointer;
-    transition: var(--transition);
-    border: none;
-    background: none;
-    width: 100%;
-    text-align: left;
-    }
-
-    .user-dropdown-item:hover {
-    background: var(--bg-light);
-    }
-
-    .user-dropdown-divider {
-    height: 1px;
-    background: #e0e0e0;
-    margin: 0.5rem 0;
-    }
-
-    /* Main Content */
-    .dashboard-wrapper {
-        padding-top: 80px;
-        min-height: 100vh;
+    .inventory-wrapper {
+        padding: 2rem;
         background-color: var(--bg-page);
     }
 
-    .container {
+    .container-fluid {
         max-width: 1400px;
         margin: 0 auto;
         padding: 0 2rem;
     }
 
-    /* Inventory Header */
+    /* Header Section */
     .inventory-header {
         background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-dark) 100%);
         border-radius: 20px;
@@ -246,7 +126,7 @@
 
     .search-input {
         width: 100%;
-        padding: 1rem 1rem 1rem 3rem;
+        padding: 1rem 3.6rem 1rem 3rem;
         background: rgba(255, 255, 255, 0.1);
         border: 2px solid rgba(255, 255, 255, 0.2);
         border-radius: 12px;
@@ -309,6 +189,7 @@
         font-weight: 600;
         transition: var(--transition);
         box-shadow: var(--shadow-sm);
+        border: none;
     }
 
     .btn-primary:hover {
@@ -318,7 +199,34 @@
         color: var(--primary-dark);
     }
 
-    /* Stats Grid */
+    /* Small clear icon inside the search box */
+    .btn-clear {
+        position: absolute;
+        right: 6px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: rgba(255,255,255,0.08);
+        color: var(--text-white);
+        border: none;
+        width: 36px;
+        height: 36px;
+        padding: 0;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 8px;
+        box-shadow: var(--shadow-sm);
+        transition: var(--transition);
+    }
+
+    .btn-clear:hover {
+        background: rgba(255,255,255,0.18);
+        color: var(--primary-dark);
+        /* keep the vertical centering translate so the button doesn't jump */
+        transform: translateY(-50%);
+    }
+
+    /* Statistic Cards */
     .stats-grid {
         display: grid;
         grid-template-columns: repeat(4, 1fr);
@@ -335,6 +243,7 @@
         transition: var(--transition);
         position: relative;
         overflow: hidden;
+        text-align: center;
     }
 
     .stat-card::before {
@@ -380,7 +289,7 @@
         z-index: 1;
     }
 
-    /* Table Layout Styles */
+    /* Table Layout */
     .inventory-view {
         width: 100%;
         background-color: var(--text-white);
@@ -390,94 +299,59 @@
         margin-bottom: 2rem;
     }
 
-    /* Search Section */
-    .search-section {
-        padding: 20px;
-        background-color: var(--bg-light);
-        border-bottom: 1px solid #ddd;
-    }
-
-    .table-search-input {
-        width: 100%;
-        padding: 12px 20px;
-        border: none;
-        border-radius: 8px;
-        font-size: 1rem;
-        color: #333;
-        background-color: var(--text-white);
-        box-shadow: var(--shadow-sm);
-        font-weight: 600;
-        letter-spacing: 0.5px;
-        text-transform: uppercase;
-    }
-
-    .table-search-input::placeholder {
-        color: #888;
-        text-transform: uppercase;
-        font-weight: 600;
-        letter-spacing: 0.5px;
-    }
-
-    /* List Header */
-    .list-header {
-        display: grid;
-        grid-template-columns: 80px 3fr 2fr 1.5fr 1.5fr 120px;
-        padding: 15px 20px;
+    /* Card Header */
+    .card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1.5rem 2rem;
         background: linear-gradient(135deg, var(--primary-dark), var(--primary-darker));
         color: var(--text-white);
         font-weight: 600;
-        text-transform: uppercase;
-        font-size: 0.9rem;
-        gap: 10px;
-        align-items: center;
     }
 
-    .header-item {
+    .card-title {
+        margin: 0;
         display: flex;
-        justify-content: flex-start;
-    }
-
-    .header-item:nth-child(4) {
-        justify-content: center;
-    }
-
-    .header-item:nth-child(5) {
-        justify-content: flex-end;
-    }
-
-    .header-item:nth-child(6) {
-        justify-content: center;
-    }
-
-    /* Item List */
-    .item-list {
-        /* Container for all items */
-    }
-
-    /* List Item Row */
-    .item-row {
-        display: grid;
-        grid-template-columns: 80px 3fr 2fr 1.5fr 1.5fr 120px;
         align-items: center;
-        padding: 15px 20px;
-        border-bottom: 1px solid #eee;
-        background-color: var(--text-white);
-        transition: var(--transition);
         gap: 10px;
     }
 
-    .item-row:hover {
+    /* Table */
+    .table {
+        border-radius: 10px;
+        overflow: hidden;
+        background: var(--text-white);
+        box-shadow: none;
+        margin: 0;
+        width: 100%;
+    }
+
+    .table thead.table-dark th {
+        background: linear-gradient(135deg, var(--primary-blue), var(--primary-dark)) !important;
+        color: var(--text-white);
+        font-weight: 600;
+        border: none;
+        padding: 1rem 1.5rem;
+    }
+
+    .table-striped tbody tr:nth-of-type(odd) {
         background-color: var(--bg-light);
     }
 
-    .item-row:last-child {
-        border-bottom: none;
+    .table-hover tbody tr:hover {
+        background-color: #e8f0fa;
     }
 
-    /* Product Image Container */
+    .table td {
+        padding: 1rem 1.5rem;
+        vertical-align: middle;
+    }
+
+    /* Product Image */
     .product-image-container {
-        width: 60px;
-        height: 60px;
+        width: 50px;
+        height: 50px;
         border-radius: 8px;
         overflow: hidden;
         display: flex;
@@ -500,26 +374,8 @@
         justify-content: center;
         align-items: center;
         color: var(--primary-blue);
-        font-size: 1.5rem;
+        font-size: 1.2rem;
         border-radius: 8px;
-    }
-
-    /* Item Details */
-    .item-name {
-        font-weight: 600;
-        color: var(--primary-dark);
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        font-size: 1rem;
-    }
-
-    .item-category {
-        color: #666;
-        font-size: 0.95rem;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
     }
 
     /* Quantity Controls */
@@ -584,12 +440,34 @@
         z-index: 2;
     }
 
+    /* Status Badges */
+    .badge {
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+    }
+
+    .stock-low { 
+        background: #fed7d7; 
+        color: #742a2a; 
+    }
+
+    .stock-out { 
+        background: #e2e8f0; 
+        color: #4a5568; 
+    }
+
+    .stock-ok { 
+        background: #c6f6d5; 
+        color: #22543d; 
+    }
+
     /* Cost Price */
     .cost-price {
         font-weight: 700;
         color: var(--primary-darker);
         font-size: 1.1rem;
-        text-align: right;
         white-space: nowrap;
     }
 
@@ -657,7 +535,7 @@
         margin-bottom: 1.5rem;
     }
 
-    .empty-state h3 {
+    .empty-state h4 {
         color: var(--primary-dark);
         font-size: 1.5rem;
         margin-bottom: 1rem;
@@ -677,6 +555,10 @@
     }
 
     @media (max-width: 768px) {
+        .inventory-wrapper {
+            padding: 1rem;
+        }
+
         .inventory-header {
             padding: 1.5rem;
         }
@@ -699,36 +581,29 @@
             grid-template-columns: 1fr;
         }
         
-        /* Adjust table layout for mobile */
-        .list-header, .item-row {
-            grid-template-columns: 60px 2fr 1fr 1.5fr;
-            gap: 5px;
-        }
-
-        .list-header {
-            font-size: 0.75rem;
-        }
-
-        .header-item:nth-child(3), .item-category {
-            display: none;
+        .stat-number {
+            font-size: 2rem;
         }
         
-        .header-item:nth-child(4) {
-            grid-column: 3 / 4;
+        .card-header {
+            flex-direction: column;
+            gap: 1rem;
+            align-items: flex-start;
         }
-
-        .quantity-control, .cost-price {
-            justify-content: center;
-            text-align: center;
-        }
-
-        .item-name {
+        
+        .table-responsive {
             font-size: 0.9rem;
         }
         
-        .product-image-container {
-            width: 40px;
-            height: 40px;
+        .table thead.table-dark th,
+        .table td {
+            padding: 0.75rem 1rem;
+        }
+
+        /* Hide category on mobile */
+        .table td:nth-child(3),
+        .table th:nth-child(3) {
+            display: none;
         }
     }
 
@@ -748,16 +623,13 @@
         .stat-number {
             font-size: 2rem;
         }
-        
-        .list-header, .item-row {
-            grid-template-columns: 50px 2fr 1.5fr;
-            padding: 10px 15px;
-        }
-        
-        .header-item:nth-child(5), .cost-price {
+
+        /* Hide unit on very small screens */
+        .table td:nth-child(5),
+        .table th:nth-child(5) {
             display: none;
         }
-        
+
         .quantity-control {
             flex-direction: column;
             gap: 4px;
@@ -773,18 +645,6 @@
             height: 28px;
             font-size: 0.9rem;
         }
-
-        .navbar-menu {
-            gap: 0.5rem;
-        }
-
-        .nav-link span {
-            display: none;
-        }
-
-        .nav-link {
-            padding: 0.5rem;
-        }
     }
 </style>
 {% endblock %}
@@ -792,49 +652,8 @@
 {% block title %}Inventory - TrackWise{% endblock %}
 
 {% block content %}
-<!-- Navigation -->
-<nav class="navbar">
-    <div class="navbar-content">
-        <a href="{% url 'dashboard:dashboard' %}" class="navbar-brand">
-            <i class="fas fa-chart-line"></i>
-            TrackWise
-        </a>
-
-        <div class="navbar-menu">
-            <a href="{% url 'dashboard:dashboard' %}" class="nav-link"><i class="fas fa-home"></i> Dashboard</a>
-            <a href="{% url 'inventory:inventory_list' %}" class="nav-link active"><i class="fas fa-boxes"></i> Inventory</a>
-            <a href="{% url 'reports:reports_dashboard' %}" class="nav-link"><i class="fas fa-chart-bar"></i> Reports</a>
-            <a href="{% url 'staff_management:staff_list' %}" class="nav-link"><i class="fas fa-users"></i> Staff</a>
-        </div>
-
-        <div class="user-section">
-            <div class="user-info" id="userDropdownTrigger">
-                <span>{{ user.first_name }} {{ user.last_name }}</span>
-                <div class="user-avatar">{{ user.first_name|first }}{{ user.last_name|first }}</div>
-                <i class="fas fa-chevron-down" style="font-size: 0.8rem;"></i>
-            </div>
-            
-            <div class="user-dropdown" id="userDropdown">
-                <a href="{% url 'accounts:edit_profile' %}" class="user-dropdown-item">
-                    <i class="fas fa-user-edit"></i>
-                    <span>Edit Profile</span>
-                </a>
-                <div class="user-dropdown-divider"></div>
-                <form method="post" action="{% url 'accounts:logout' %}" style="display: inline;">
-                    {% csrf_token %}
-                    <button type="submit" class="user-dropdown-item">
-                        <i class="fas fa-sign-out-alt"></i>
-                        <span>Logout</span>
-                    </button>
-                </form>
-            </div>
-        </div>
-    </div>
-</nav>
-
-<!-- Inventory Content -->
-<div class="dashboard-wrapper">
-    <div class="container">
+<div class="inventory-wrapper">
+    <div class="container-fluid">
         <!-- Header Section -->
         <div class="inventory-header">
             <div class="header-content">
@@ -845,334 +664,293 @@
                 <p class="subtitle">Manage your products and stock levels efficiently</p>
             </div>
             
-            <div class="header-actions">
-                <div class="search-container">
-                    <form method="get" class="search-form">
+            <form method="get" id="search-filter-form" class="search-form">
+                <div class="header-actions">
+                    <div class="search-container">
                         <div class="search-box">
                             <i class="fas fa-search"></i>
                             <input type="text" name="search" class="search-input" placeholder="Search products..." 
                                    value="{{ search_query }}">
+                            <button type="button" id="clear-search-btn" class="btn-clear" title="Clear search">
+                                <i class="fas fa-times"></i>
+                            </button>
                         </div>
-                    </form>
-                </div>
-                
-                <div class="filter-actions">
-                    <select name="cost_filter" class="filter-select" onchange="this.form.submit()">
-                        <option value="">Sort by Cost</option>
-                        <option value="low" {% if cost_filter == 'low' %}selected{% endif %}>Low to High</option>
-                        <option value="high" {% if cost_filter == 'high' %}selected{% endif %}>High to Low</option>
-                    </select>
+                    </div>
                     
-                    <a href="{% url 'inventory:product_add' %}" class="btn-primary">
-                        <i class="fas fa-plus"></i> Add Product
-                    </a>
+                    <div class="filter-actions">
+                        <select name="cost_filter" class="filter-select" onchange="document.getElementById('search-filter-form').submit()">
+                            <option value="">Sort by Cost</option>
+                            <option value="low" {% if cost_filter == 'low' %}selected{% endif %}>Low to High</option>
+                            <option value="high" {% if cost_filter == 'high' %}selected{% endif %}>High to Low</option>
+                        </select>
+                        
+                        <a href="{% url 'inventory:product_add' %}" class="btn-primary">
+                            <i class="fas fa-plus"></i> Add Product
+                        </a>
+                    </div>
                 </div>
-            </div>
+            </form>
         </div>
 
-        {% comment %} <!-- Summary Cards -->
+        {% if products %}
+        <!-- Statistics Cards -->
         <div class="stats-grid">
             <div class="stat-card">
-                <div class="stat-number">{{ products.count }}</div>
+                <div id="kpi-total-products" class="stat-number">{{ products.count }}</div>
                 <div class="stat-label">Total Products</div>
                 <i class="stat-icon fas fa-boxes"></i>
             </div>
             
             <div class="stat-card">
-                <div class="stat-number">${{ total_inventory_value|floatformat:2 }}</div>
+                <div id="kpi-total-value" class="stat-number">₱{{ total_inventory_value|floatformat:2 }}</div>
                 <div class="stat-label">Total Value</div>
-                <i class="stat-icon fas fa-dollar-sign"></i>
+                <i class="stat-icon fas fa-peso-sign"></i>
             </div>
             
             <div class="stat-card">
-                <div class="stat-number">{{ low_stock_count|default:0 }}</div>
+                <div id="kpi-low-stock" class="stat-number">{{ low_stock_count|default:0 }}</div>
                 <div class="stat-label">Low Stock</div>
                 <i class="stat-icon fas fa-exclamation-triangle"></i>
             </div>
             
             <div class="stat-card">
-                <div class="stat-number">{{ out_of_stock_count|default:0 }}</div>
+                <div id="kpi-out-of-stock" class="stat-number">{{ out_of_stock_count|default:0 }}</div>
                 <div class="stat-label">Out of Stock</div>
                 <i class="stat-icon fas fa-times-circle"></i>
             </div>
-        </div> {% endcomment %}
-
-        <!-- Products List (Table Layout) -->
-        <div class="inventory-content">
-            {% if products %}
-            <div class="inventory-view">
-                {% comment %} <!-- Search Section -->
-                <div class="search-section">
-                    <form method="get" class="search-form">
-                        <input type="search" class="table-search-input" placeholder="SEARCH" name="search" value="{{ search_query }}">
-                    </form>
-                </div> {% endcomment %}
-
-                <!-- List Header -->
-                <div class="list-header">
-                    <div class="header-item"></div> 
-                    <div class="header-item">ITEM NAME</div>
-                    <div class="header-item">CATEGORY</div>
-                    <div class="header-item" style="justify-content: center;">QUANTITY</div>
-                    <div class="header-item" style="justify-content: right;">COST PRICE</div>
-                    <div class="header-item" style="justify-content: center;">ACTIONS</div>
-                </div>
-
-                <!-- Item List -->
-                <div class="item-list">
-                    {% for product in products %}
-                    <div class="item-row" data-product-id="{{ product.pk }}">
-                        <!-- Product Image -->
-                        <div class="product-image-container">
-                            {% if product.image %}
-                            <img src="{{ product.image.url }}" alt="{{ product.item_name }}" class="product-image">
-                            {% else %}
-                            <div class="product-image-placeholder">
-                                <i class="fas fa-box"></i>
-                            </div>
-                            {% endif %}
-                        </div>
-                        
-                        <!-- Item Name -->
-                        <div class="item-name">{{ product.item_name }}</div>
-                        
-                        <!-- Category -->
-                        <div class="item-category">{{ product.get_category_display }}</div>
-                        
-                        <!-- Quantity Controls -->
-                        <div class="quantity-control">
-                            {% if product.quantity <= 10 and product.quantity > 0 %}
-                            <span class="badge-low-stock">LOW STOCK</span>
-                            {% endif %}
-                            <button type="button" class="qty-button decrease" data-product-id="{{ product.pk }}" {% if product.quantity == 0 %}disabled{% endif %}>
-                                <i class="fas fa-minus"></i>
-                            </button>
-                            <span class="quantity-text" id="quantity-{{ product.pk }}">
-                                {{ product.quantity }} {{ product.unit_of_measure }}
-                            </span>
-                            <button type="button" class="qty-button increase" data-product-id="{{ product.pk }}">
-                                <i class="fas fa-plus"></i>
-                            </button>
-                        </div>
-                        
-                        <!-- Cost Price -->
-                        <div class="cost-price">₱{{ product.cost_price }}</div>
-                        
-                        <!-- Actions -->
-                        <div class="item-actions">
-                            <a href="{% url 'inventory:product_detail' product.pk %}" class="action-btn view" title="View Details">
-                                <i class="fas fa-eye"></i>
-                            </a>
-                            <form method="post" action="{% url 'inventory:product_delete' product.pk %}" class="delete-form">
-                                {% csrf_token %}
-                                <button type="submit" class="action-btn delete" title="Delete Product" onclick="return confirm('Are you sure you want to delete {{ product.item_name }}?')">
-                                    <i class="fas fa-trash"></i>
-                                </button>
-                            </form>
-                        </div>
-                    </div>
-                    {% endfor %}
-                </div>
-            </div>
-            {% else %}
-            <!-- Empty State -->
-            <div class="empty-state">
-                <div class="empty-icon">
-                    <i class="fas fa-box-open"></i>
-                </div>
-                <h3>No Products Found</h3>
-                <p>Get started by adding your first product to the inventory.</p>
-                <a href="{% url 'inventory:product_add' %}" class="btn-primary">
-                    <i class="fas fa-plus"></i> Add Your First Product
-                </a>
-            </div>
-            {% endif %}
         </div>
+
+        <!-- Products Table -->
+        <div class="inventory-view">
+            <div class="card-header">
+                <h5 class="card-title">
+                    <i class="fas fa-table me-2"></i>Product Inventory
+                    <span class="badge bg-light text-dark ms-2">{{ products.count }} items</span>
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover">
+                        <thead class="table-dark">
+                            <tr data-product-id="{{ product.pk }}">
+                                <th style="width: 60px;"></th>
+                                <th>Product Name</th>
+                                <th>Category</th>
+                                <th style="text-align: center;">Quantity</th>
+                                <th>Unit</th>
+                                <th style="text-align: right;">Cost Price</th>
+                                <th style="text-align: center;">Status</th>
+                                <th style="text-align: center;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for product in products %}
+                            <tr>
+                                <!-- Product Image -->
+                                <td>
+                                    <div class="product-image-container">
+                                        {% if product.image %}
+                                        <img src="{{ product.image.url }}" alt="{{ product.item_name }}" class="product-image">
+                                        {% else %}
+                                        <div class="product-image-placeholder">
+                                            <i class="fas fa-box"></i>
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                                
+                                <!-- Item Name -->
+                                <td>
+                                    <strong>{{ product.item_name }}</strong>
+                                </td>
+                                
+                                <!-- Category -->
+                                <td>{{ product.get_category_display }}</td>
+                                
+                                <!-- Quantity Controls -->
+                                <td style="text-align: center;">
+                                    <div class="quantity-control">
+                                        <button type="button" class="qty-button decrease" data-product-id="{{ product.pk }}" {% if product.quantity == 0 %}disabled{% endif %}>
+                                            <i class="fas fa-minus"></i>
+                                        </button>
+                                        <span class="quantity-text" id="quantity-{{ product.pk }}">
+                                            {{ product.quantity }}
+                                        </span>
+                                        <button type="button" class="qty-button increase" data-product-id="{{ product.pk }}">
+                                            <i class="fas fa-plus"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                                
+                                <!-- Unit -->
+                                <td>{{ product.get_unit_of_measure_display }}</td>
+                                
+                                <!-- Cost Price -->
+                                <td style="text-align: right;">
+                                    <span class="cost-price">₱{{ product.cost_price }}</span>
+                                </td>
+                                
+                                <!-- Status -->
+                                <td style="text-align: center;" id="status-{{ product.pk }}">
+                                    {% if product.quantity == 0 %}
+                                        Out of Stock
+                                    {% elif product.quantity <= 10 %}
+                                        Low Stock
+                                    {% else %}
+                                        In Stock
+                                    {% endif %}
+                                </td>
+                                
+                                <!-- Actions -->
+                                <td style="text-align: center;">
+                                    <div class="item-actions">
+                                        <a href="{% url 'inventory:product_detail' product.pk %}" class="action-btn view" title="View Details">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        <form method="post" action="{% url 'inventory:product_delete' product.pk %}" class="delete-form">
+                                            {% csrf_token %}
+                                            <button type="submit" class="action-btn delete" title="Delete Product" onclick="return confirm('Are you sure you want to delete {{ product.item_name }}?')">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <!-- Empty State -->
+        <div class="empty-state">
+            <div class="empty-icon">
+                <i class="fas fa-box-open"></i>
+            </div>
+            <h4>No Products Found</h4>
+            <p>Get started by adding your first product to the inventory.</p>
+            <a href="{% url 'inventory:product_add' %}" class="btn-primary">
+                <i class="fas fa-plus"></i> Add Your First Product
+            </a>
+        </div>
+        {% endif %}
     </div>
 </div>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const userDropdownTrigger = document.getElementById('userDropdownTrigger');
-    const userDropdown = document.getElementById('userDropdown');
-    
-    // Toggle dropdown on click
-    userDropdownTrigger.addEventListener('click', function(e) {
-        e.stopPropagation();
-        userDropdown.classList.toggle('active');
-    });
-    
-    // Close dropdown when clicking outside
-    document.addEventListener('click', function(e) {
-        if (!userDropdown.contains(e.target) && !userDropdownTrigger.contains(e.target)) {
-            userDropdown.classList.remove('active');
-        }
-    });
-    
-    // Close dropdown when pressing Escape key
-    document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape') {
-            userDropdown.classList.remove('active');
-        }
-    });
-    
-    // Real-time search for both search inputs
-    const searchInputs = document.querySelectorAll('.search-input, .table-search-input');
-    searchInputs.forEach(searchInput => {
-        if (searchInput) {
-            let searchTimeout;
-            searchInput.addEventListener('input', function() {
-                clearTimeout(searchTimeout);
-                searchTimeout = setTimeout(() => {
-                    this.form.submit();
-                }, 500);
-            });
-        }
-    });
+console.log('Script loading - testing basic JavaScript');
 
-    // AJAX for stock controls
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOM loaded - setting up event listeners');
+    
+    // Debug: Check if buttons exist
+    const increaseButtons = document.querySelectorAll('.qty-button.increase');
+    const decreaseButtons = document.querySelectorAll('.qty-button.decrease');
+    console.log('Found increase buttons:', increaseButtons.length);
+    console.log('Found decrease buttons:', decreaseButtons.length);
+    
+    // Simple stock update function
     function updateStock(productId, action) {
+        console.log(`Updating stock for product ${productId}, action: ${action}`);
+        
         const url = `/inventory/${productId}/${action}/`;
         const csrfToken = getCookie('csrftoken');
-        
-        // Get elements
         const quantityElement = document.getElementById(`quantity-${productId}`);
-        const decreaseBtn = document.querySelector(`.decrease[data-product-id="${productId}"]`);
-        const lowStockBadge = document.querySelector(`.item-row[data-product-id="${productId}"] .badge-low-stock`);
         
-        // Store original values for rollback in case of error
-        const originalQuantity = parseInt(quantityElement.textContent);
-        
-        // Optimistic update - update UI immediately
-        let newQuantity = originalQuantity;
-        if (action === 'increase') {
-            newQuantity = originalQuantity + 1;
-        } else if (action === 'decrease' && originalQuantity > 0) {
-            newQuantity = originalQuantity - 1;
+        if (!quantityElement) {
+            console.error('Quantity element not found for product:', productId);
+            return;
         }
         
-        // Update quantity display
-        const unitText = quantityElement.textContent.replace(originalQuantity, '');
-        quantityElement.textContent = newQuantity + unitText;
+        console.log('Making AJAX request to:', url);
         
-        // Update button states
-        if (decreaseBtn) {
-            decreaseBtn.disabled = newQuantity === 0;
-        }
-        
-        // Update low stock badge
-        if (lowStockBadge) {
-            if (newQuantity > 10) {
-                lowStockBadge.style.display = 'none';
-            } else if (newQuantity <= 10 && newQuantity > 0) {
-                lowStockBadge.style.display = 'block';
-            } else {
-                lowStockBadge.style.display = 'none';
-            }
-        } else if (newQuantity <= 10 && newQuantity > 0) {
-            // Create low stock badge if needed
-            const quantityControl = document.querySelector(`.item-row[data-product-id="${productId}"] .quantity-control`);
-            if (quantityControl) {
-                const badge = document.createElement('span');
-                badge.className = 'badge-low-stock';
-                badge.textContent = 'LOW STOCK';
-                quantityControl.insertBefore(badge, quantityControl.firstChild);
-            }
-        }
-        
-        // Send AJAX request
+        // Make the AJAX request
         fetch(url, {
             method: 'POST',
             headers: {
                 'X-CSRFToken': csrfToken,
-                'Content-Type': 'application/json',
             },
         })
-        .then(response => response.json())
+        .then(response => {
+            console.log('Response status:', response.status);
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
         .then(data => {
+            console.log('Response data:', data);
             if (data.success) {
-                // Update with actual server data
-                quantityElement.textContent = data.new_quantity + unitText;
-                
-                // Update button states with server data
+                // Update the quantity display - server returns numeric new_quantity
+                quantityElement.textContent = data.new_quantity;
+
+                // Update button states
+                const decreaseBtn = document.querySelector(`.decrease[data-product-id="${productId}"]`);
                 if (decreaseBtn) {
                     decreaseBtn.disabled = data.new_quantity === 0;
                 }
-                
-                // Update low stock badge with server data
-                const updatedLowStockBadge = document.querySelector(`.item-row[data-product-id="${productId}"] .badge-low-stock`);
-                if (updatedLowStockBadge) {
-                    if (data.new_quantity > 10) {
-                        updatedLowStockBadge.style.display = 'none';
-                    } else if (data.new_quantity <= 10 && data.new_quantity > 0) {
-                        updatedLowStockBadge.style.display = 'block';
-                    } else {
-                        updatedLowStockBadge.style.display = 'none';
-                    }
+
+                // Update status text
+                updateStatusText(productId, data.new_quantity);
+
+                // Refresh KPI cards (if present)
+                const totalProductsEl = document.getElementById('kpi-total-products');
+                const totalValueEl = document.getElementById('kpi-total-value');
+                const lowStockEl = document.getElementById('kpi-low-stock');
+                const outOfStockEl = document.getElementById('kpi-out-of-stock');
+
+                if (totalProductsEl && typeof data.total_products !== 'undefined') {
+                    totalProductsEl.textContent = data.total_products;
                 }
-                
+                if (totalValueEl && typeof data.total_inventory_value !== 'undefined') {
+                    totalValueEl.textContent = '₱' + parseFloat(data.total_inventory_value).toFixed(2);
+                }
+                if (lowStockEl && typeof data.low_stock_count !== 'undefined') {
+                    lowStockEl.textContent = data.low_stock_count;
+                }
+                if (outOfStockEl && typeof data.out_of_stock_count !== 'undefined') {
+                    outOfStockEl.textContent = data.out_of_stock_count;
+                }
+
+                console.log('Stock updated successfully');
             } else {
-                // Rollback optimistic update on error
-                quantityElement.textContent = originalQuantity + unitText;
-                if (decreaseBtn) {
-                    decreaseBtn.disabled = originalQuantity === 0;
-                }
-                
-                // Rollback low stock badge
-                const rollbackLowStockBadge = document.querySelector(`.item-row[data-product-id="${productId}"] .badge-low-stock`);
-                if (rollbackLowStockBadge) {
-                    if (originalQuantity > 10) {
-                        rollbackLowStockBadge.style.display = 'none';
-                    } else if (originalQuantity <= 10 && originalQuantity > 0) {
-                        rollbackLowStockBadge.style.display = 'block';
-                    } else {
-                        rollbackLowStockBadge.style.display = 'none';
-                    }
-                }
-                
-                alert('Error updating stock: ' + (data.error || 'Unknown error'));
+                console.error('Server error:', data.error);
+                alert('Error: ' + (data.error || 'Unknown error'));
             }
         })
         .catch(error => {
-            console.error('Error:', error);
-            // Rollback optimistic update on network error
-            quantityElement.textContent = originalQuantity + unitText;
-            if (decreaseBtn) {
-                decreaseBtn.disabled = originalQuantity === 0;
-            }
-            
-            // Rollback low stock badge
-            const networkLowStockBadge = document.querySelector(`.item-row[data-product-id="${productId}"] .badge-low-stock`);
-            if (networkLowStockBadge) {
-                if (originalQuantity > 10) {
-                    networkLowStockBadge.style.display = 'none';
-                } else if (originalQuantity <= 10 && originalQuantity > 0) {
-                    networkLowStockBadge.style.display = 'block';
-                } else {
-                    networkLowStockBadge.style.display = 'none';
-                }
-            }
-            
-            alert('Network error updating stock. Please try again.');
+            console.error('Fetch error:', error);
+            alert('Network error. Please try again.');
         });
     }
+    
+    function updateStatusText(productId, quantity) {
+        const statusCell = document.getElementById(`status-${productId}`);
+        if (!statusCell) return;
 
-    // Add event listeners to stock buttons
-    document.querySelectorAll('.qty-button.increase').forEach(button => {
-        button.addEventListener('click', function() {
-            const productId = this.getAttribute('data-product-id');
-            updateStock(productId, 'increase');
-        });
-    });
+        // Clear previous status-related classes on the cell
+        statusCell.classList.remove('stock-out', 'stock-low', 'stock-ok');
 
-    document.querySelectorAll('.qty-button.decrease').forEach(button => {
-        button.addEventListener('click', function() {
-            const productId = this.getAttribute('data-product-id');
-            updateStock(productId, 'decrease');
-        });
-    });
+        let statusText = '';
+        let statusClass = '';
 
-    // CSRF token helper function
+        if (quantity === 0) {
+            statusText = 'Out of Stock';
+            statusClass = 'stock-out';
+        } else if (quantity <= 10) {
+            statusText = 'Low Stock';
+            statusClass = 'stock-low';
+        } else {
+            statusText = 'In Stock';
+            statusClass = 'stock-ok';
+        }
+
+        statusCell.textContent = statusText;
+        statusCell.classList.add(statusClass);
+    }
+    
+    // Get CSRF token
     function getCookie(name) {
         let cookieValue = null;
         if (document.cookie && document.cookie !== '') {
@@ -1187,6 +965,31 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         return cookieValue;
     }
+    
+    // Add event listeners using a simpler approach
+    increaseButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const productId = this.getAttribute('data-product-id');
+            console.log('Increase button clicked for product:', productId);
+            updateStock(productId, 'increase');
+        });
+    });
+
+    decreaseButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const productId = this.getAttribute('data-product-id');
+            console.log('Decrease button clicked for product:', productId);
+            updateStock(productId, 'decrease');
+        });
+    });
+    
+    console.log('Event listeners setup complete');
 });
+
+// Test function that can be called from browser console
+window.testButtonClick = function(productId, action) {
+    console.log('Manual test:', productId, action);
+    updateStock(productId, action);
+};
 </script>
 {% endblock %}

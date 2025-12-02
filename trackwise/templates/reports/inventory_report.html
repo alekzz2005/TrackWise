@@ -5,136 +5,24 @@
 
 {% block extra_css %}
 {{ block.super }}
-<style>
-.inventory-report-wrapper {
-    padding: 20px;
-}
-
-.stat-card {
-    background: white;
-    border-radius: 10px;
-    padding: 1.5rem;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    text-align: center;
-    margin-bottom: 1rem;
-}
-
-.stat-number {
-    font-size: 2rem;
-    font-weight: bold;
-    margin-bottom: 0.5rem;
-}
-
-.stat-label {
-    color: #666;
-    font-size: 0.9rem;
-}
-
-.bg-total { border-left: 4px solid #4a6fa5; }
-.bg-low { border-left: 4px solid #e53e3e; }
-.bg-out { border-left: 4px solid #c53030; }
-.bg-value { border-left: 4px solid #38a169; }
-
-.table th {
-    background: #4a6fa5;
-    color: white;
-}
-
-.stock-low { background: #fed7d7; color: #742a2a; }
-.stock-out { background: #e2e8f0; color: #4a5568; }
-.stock-ok { background: #c6f6d5; color: #22543d; }
-
-.export-buttons {
-    gap: 10px;
-    align-items: center;
-}
-
-.export-buttons .btn {
-    font-size: 0.8rem;
-    padding: 0.4rem 0.8rem;
-}
-
-.export-buttons .btn i {
-    margin-right: 4px;
-}
-
-.btn-outline-secondary {
-    position: relative;
-    overflow: hidden;
-    padding: 16px 24px;
-    border-radius: 10px;
-    background: transparent;
-    color: var(--primary-dark);
-    cursor: pointer;
-    font-weight: 600;
-    text-transform: uppercase;
-    transition: var(--transition);
-    font-size: 14px;
-    letter-spacing: 0.5px;
-    box-shadow: var(--shadow-sm);
-    text-decoration: none; /* ← removes underline */
-}
-
-/* Ripple effect */
-.btn-outline-secondary::before {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 0;
-    height: 0;
-    border-radius: 50%;
-    background: rgba(42, 82, 130, 0.25);
-    transform: translate(-50%, -50%);
-    transition: width 0.6s, height 0.6s;
-    z-index: 0;
-}
-
-.btn-outline-secondary:hover::before {
-    width: 300px;
-    height: 300px;
-}
-
-/* Hover lift + glow */
-.btn-outline-secondary:hover {
-    background: linear-gradient(135deg, var(--primary-blue), var(--primary-dark));
-    color: var(--text-white);
-    transform: translateY(-3px);
-    box-shadow: 0 8px 20px rgba(42, 82, 130, 0.4);
-    border-color: transparent;
-    text-decoration: none; /* ← removes underline */
-}
-
-/* Keep the text above the ripple */
-.btn-outline-secondary span {
-    position: relative;
-    z-index: 1;
-}
-
-/* Active click feedback */
-.btn-outline-secondary:active {
-    transform: translateY(-1px);
-    box-shadow: 0 4px 10px rgba(42, 82, 130, 0.3);
-}
-
-</style>
+<link rel="stylesheet" href="{% static 'css/reports/inventory_report.css' %}">
 {% endblock %}
 
 {% block content %}
 <div class="inventory-report-wrapper">
     <div class="container-fluid">
         <!-- Header -->
-        <div class="row mb-4">
-            <div class="col-12">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <h1><i class="fas fa-boxes-stacked me-2"></i>Inventory Report</h1>
-                        <p class="text-muted">Comprehensive overview of your inventory status</p>
-                    </div>
-                    <a href="{% url 'reports:reports_dashboard' %}" class="btn-outline-secondary">
-                        <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
-                    </a>
-                </div>
+        <div class="report-header">
+            <div class="header-content">
+                <h1 class="welcome-text">
+                    <i class="fas fa-boxes-stacked"></i>
+                    Inventory Report
+                </h1>
+                <p class="subtitle">Comprehensive overview of your inventory status</p>
+            </div>
+            
+            <div class="header-actions">
+
             </div>
         </div>
 
@@ -152,41 +40,37 @@
 
         {% if inventory_data %}
         <!-- Statistics Cards -->
-        <div class="row mb-4">
-            <div class="col-md-3">
-                <div class="stat-card bg-total">
-                    <div class="stat-number text-primary">{{ inventory_data.total_items }}</div>
-                    <div class="stat-label">Total Products</div>
-                </div>
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-number">{{ inventory_data.total_items }}</div>
+                <div class="stat-label">Total Products</div>
+                <i class="stat-icon fas fa-boxes"></i>
             </div>
-            <div class="col-md-3">
-                <div class="stat-card bg-low">
-                    <div class="stat-number text-danger">{{ inventory_data.low_stock_items }}</div>
-                    <div class="stat-label">Low Stock Items</div>
-                </div>
+            <div class="stat-card">
+                <div class="stat-number">{{ inventory_data.low_stock_items }}</div>
+                <div class="stat-label">Low Stock Items</div>
+                <i class="stat-icon fas fa-exclamation-triangle"></i>
             </div>
-            <div class="col-md-3">
-                <div class="stat-card bg-out">
-                    <div class="stat-number text-dark">{{ inventory_data.out_of_stock_items }}</div>
-                    <div class="stat-label">Out of Stock</div>
-                </div>
+            <div class="stat-card">
+                <div class="stat-number">{{ inventory_data.out_of_stock_items }}</div>
+                <div class="stat-label">Out of Stock</div>
+                <i class="stat-icon fas fa-times-circle"></i>
             </div>
-            <div class="col-md-3">
-                <div class="stat-card bg-value">
-                    <div class="stat-number text-success">${{ inventory_data.total_value|floatformat:2 }}</div>
-                    <div class="stat-label">Total Inventory Value</div>
-                </div>
+            <div class="stat-card">
+                <div class="stat-number">₱{{ inventory_data.total_value|floatformat:2 }}</div>
+                <div class="stat-label">Total Inventory Value</div>
+                <i class="stat-icon fas fa-peso-sign"></i>
             </div>
         </div>
 
         <!-- Inventory Table -->
         <div class="row">
             <div class="col-12">
-                <div class="card">
-                    <div class="card-header d-flex justify-content-between align-items-center">
-                        <h5 class="card-title mb-0">
+                <div class="inventory-view">
+                    <div class="card-header">
+                        <h5 class="card-title">
                             <i class="fas fa-table me-2"></i>Inventory Details
-                            <span class="badge bg-primary ms-2">{{ inventory_data.items|length }} items</span>
+                            <span class="badge bg-light text-dark ms-2">{{ inventory_data.items|length }} items</span>
                         </h5>
                         <div class="export-buttons">
                             <a href="?export=excel" class="btn btn-success btn-sm">
@@ -195,15 +79,13 @@
                             <a href="?export=pdf" class="btn btn-danger btn-sm">
                                 <i class="fas fa-file-pdf"></i>PDF
                             </a>
-                            <a href="?export=csv" class="btn btn-info btn-sm">
-                                <i class="fas fa-file-csv"></i>CSV
-                            </a>
+                            <!-- REMOVED CSV BUTTON -->
                         </div>
                     </div>
                     <div class="card-body">
                         <div class="table-responsive">
                             <table class="table table-striped table-hover">
-                                <thead>
+                                <thead class="table-dark">
                                     <tr>
                                         <th>Product Name</th>
                                         <th>Category</th>
@@ -224,8 +106,8 @@
                                         <td>{{ item.category }}</td>
                                         <td>{{ item.current_stock }}</td>
                                         <td>{{ item.unit }}</td>
-                                        <td>${{ item.price|floatformat:2 }}</td>
-                                        <td><strong>${{ item.total_value|floatformat:2 }}</strong></td>
+                                        <td>₱{{ item.price|floatformat:2 }}</td>
+                                        <td><strong>₱{{ item.total_value|floatformat:2 }}</strong></td>
                                         <td>
                                             {% if item.status == 'Out of Stock' %}
                                                 <span class="badge stock-out">Out of Stock</span>
@@ -249,19 +131,19 @@
         <!-- Empty State -->
         <div class="row">
             <div class="col-12">
-                <div class="card">
-                    <div class="card-body text-center py-5">
-                        <i class="fas fa-boxes fa-4x text-muted mb-3"></i>
-                        <h4>No Inventory Data Available</h4>
-                        <p class="text-muted">
-                            {% if not error %}
-                            No inventory data found for your company.
-                            {% endif %}
-                        </p>
-                        <a href="{% url 'inventory:inventory_list' %}" class="btn btn-primary">
-                            <i class="fas fa-plus me-2"></i>Add Products to Inventory
-                        </a>
+                <div class="empty-state">
+                    <div class="empty-icon">
+                        <i class="fas fa-boxes"></i>
                     </div>
+                    <h4>No Inventory Data Available</h4>
+                    <p>
+                        {% if not error %}
+                        No inventory data found for your company.
+                        {% endif %}
+                    </p>
+                    <a href="{% url 'inventory:inventory_list' %}" class="btn-primary">
+                        <i class="fas fa-plus"></i>Add Products to Inventory
+                    </a>
                 </div>
             </div>
         </div>

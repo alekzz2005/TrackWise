@@ -24,13 +24,13 @@
                 <p>Confirm product deletion</p>
             </div>
 
-            {% if messages %}
+            {% comment %} {% if messages %}
                 {% for message in messages %}
                     <div class="alert alert-{{ message.tags }}">
                         {{ message }}
                     </div>
                 {% endfor %}
-            {% endif %}
+            {% endif %} {% endcomment %}
             
             <div class="warning-section">
                 <div class="warning-icon">

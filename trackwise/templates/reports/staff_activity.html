@@ -5,298 +5,7 @@
 
 {% block extra_css %}
 {{ block.super }}
-<style>
-:root {
-  --primary-blue: #4a6fa5;
-  --primary-dark: #2c5282;
-  --accent-light: #a7c5eb;
-  --bg-light: #dbe4f0;
-  --bg-page: #f0f4f8;
-  --text-white: #ffffff;
-  --shadow-md: 0 6px 20px rgba(0, 0, 0, 0.15);
-  --transition: all 0.3s ease;
-}
-
-/* Layout */
-body {
-  background: var(--bg-page);
-  color: #333;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-}
-
-.staff-report-wrapper {
-  padding: 2rem;
-  background-color: var(--bg-page);
-}
-
-/* Header */
-h1 {
-  color: var(--primary-dark);
-  font-weight: 800;
-}
-
-.btn-outline-secondary {
-  color: var(--primary-dark);
-  border-color: var(--primary-dark);
-  transition: var(--transition);
-}
-
-.btn-outline-secondary:hover {
-  background: var(--primary-dark);
-  color: var(--text-white);
-}
-
-/* Debug Alert */
-.debug-alert {
-  background: var(--accent-light);
-  border: 1px solid var(--primary-blue);
-  border-radius: 8px;
-  padding: 0.8rem 1rem;
-  color: var(--primary-dark);
-  font-weight: 500;
-  margin-bottom: 1.5rem;
-}
-
-/* Statistic Cards */
-.stat-card {
-  background: var(--text-white);
-  border-radius: 15px;
-  box-shadow: var(--shadow-md);
-  text-align: center;
-  padding: 1.5rem;
-  transition: var(--transition);
-  border-top: 5px solid transparent;
-}
-
-.stat-card:hover {
-  transform: translateY(-5px);
-}
-
-.stat-number {
-  font-size: 2rem;
-  font-weight: 700;
-}
-
-.stat-label {
-  color: #666;
-  font-size: 0.9rem;
-}
-
-/* Table */
-.table {
-  border-radius: 10px;
-  overflow: hidden;
-  background: var(--text-white);
-  box-shadow: var(--shadow-md);
-}
-
-.table thead.table-dark th {
-  background: linear-gradient(135deg, var(--primary-blue), var(--primary-dark)) !important;
-  color: var(--text-white);
-  font-weight: 600;
-  border: none;
-}
-
-.table-striped tbody tr:nth-of-type(odd) {
-  background-color: var(--bg-light);
-}
-
-.table-hover tbody tr:hover {
-  background-color: #e8f0fa;
-}
-
-/* Performance Badges */
-.performance-badge {
-  padding: 0.3rem 0.7rem;
-  border-radius: 20px;
-  font-size: 0.8rem;
-  font-weight: 600;
-}
-
-.badge-success-custom {
-  background: #c6f6d5;
-  color: #22543d;
-}
-
-.badge-info-custom {
-  background: #bee3f8;
-  color: #2a4365;
-}
-
-.badge-warning-custom {
-  background: #feebc8;
-  color: #744210;
-}
-
-.badge-danger-custom {
-  background: #fed7d7;
-  color: #742a2a;
-}
-
-/* Metric Bars */
-.metric-bar {
-  height: 8px;
-  background: #e2e8f0;
-  border-radius: 4px;
-  width: 90px;
-  margin-right: 10px;
-  box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
-}
-
-.tasks-fill {
-  background: linear-gradient(90deg, #38a169, #2f855a);
-}
-
-.attendance-fill {
-  background: linear-gradient(90deg, var(--primary-blue), var(--primary-dark));
-}
-
-/* Export Buttons */
-.export-buttons {
-  gap: 10px;
-  align-items: center;
-}
-
-.export-buttons .btn {
-  font-size: 0.8rem;
-  padding: 0.45rem 0.9rem;
-  border-radius: 8px;
-  font-weight: 500;
-  transition: var(--transition);
-  box-shadow: var(--shadow-md);
-}
-
-.export-buttons .btn-success {
-  background: linear-gradient(135deg, #48bb78, #38a169);
-  border: none;
-}
-
-.export-buttons .btn-danger {
-  background: linear-gradient(135deg, #e53e3e, #c53030);
-  border: none;
-}
-
-.export-buttons .btn-info {
-  background: linear-gradient(135deg, var(--primary-blue), var(--primary-dark));
-  border: none;
-}
-
-.export-buttons .btn:hover {
-  transform: translateY(-2px);
-}
-
-.btn-outline-secondary {
-    position: relative;
-    overflow: hidden;
-    padding: 16px 24px;
-    border-radius: 10px;
-    background: transparent;
-    color: var(--primary-dark);
-    cursor: pointer;
-    font-weight: 600;
-    text-transform: uppercase;
-    transition: var(--transition);
-    font-size: 14px;
-    letter-spacing: 0.5px;
-    box-shadow: var(--shadow-sm);
-    text-decoration: none; /* ← removes underline */
-}
-
-/* Ripple effect */
-.btn-outline-secondary::before {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 0;
-    height: 0;
-    border-radius: 50%;
-    background: rgba(42, 82, 130, 0.25);
-    transform: translate(-50%, -50%);
-    transition: width 0.6s, height 0.6s;
-    z-index: 0;
-}
-
-.btn-outline-secondary:hover::before {
-    width: 300px;
-    height: 300px;
-}
-
-/* Hover lift + glow */
-.btn-outline-secondary:hover {
-    background: linear-gradient(135deg, var(--primary-blue), var(--primary-dark));
-    color: var(--text-white);
-    transform: translateY(-3px);
-    box-shadow: 0 8px 20px rgba(42, 82, 130, 0.4);
-    border-color: transparent;
-    text-decoration: none; /* ← removes underline */
-}
-
-/* Keep the text above the ripple */
-.btn-outline-secondary span {
-    position: relative;
-    z-index: 1;
-}
-
-/* Active click feedback */
-.btn-outline-secondary:active {
-    transform: translateY(-1px);
-    box-shadow: 0 4px 10px rgba(42, 82, 130, 0.3);
-}
-
-
-
-/* Summary Box */
-.bg-light.rounded {
-  background: var(--bg-light) !important;
-  border: 1px solid #e2e8f0;
-  box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
-}
-
-/* Cards */
-.card {
-  border: none;
-  border-radius: 12px;
-  box-shadow: var(--shadow-md);
-  overflow: hidden;
-}
-
-.card-header {
-  background: linear-gradient(135deg, var(--primary-blue), var(--primary-dark));
-  color: var(--text-white);
-  font-weight: 600;
-}
-
-.card-body {
-  background: var(--text-white);
-}
-
-/* Responsive */
-@media (max-width: 992px) {
-  .stat-card {
-    margin-bottom: 1rem;
-  }
-
-  .export-buttons {
-    flex-wrap: wrap;
-  }
-}
-
-@media (max-width: 768px) {
-  .staff-report-wrapper {
-    padding: 1rem;
-  }
-
-  .stat-number {
-    font-size: 1.6rem;
-  }
-
-  .export-buttons .btn {
-    width: 100%;
-    text-align: center;
-  }
-}
-</style>
+<link rel="stylesheet" href="{% static 'css/reports/staff_activity.css' %}">
 {% endblock %}
 
 
@@ -304,60 +13,51 @@ h1 {
 <div class="staff-report-wrapper">
     <div class="container-fluid">
         <!-- Header -->
-        <div class="row mb-4">
-            <div class="col-12">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <h1><i class="fas fa-user-clock me-2"></i>Staff Activity Report</h1>
-                        <p class="text-muted">Staff performance metrics and activity overview</p>
-                    </div>
-                    <a href="{% url 'reports:reports_dashboard' %}" class="btn-outline-secondary">
-                        <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
-                    </a>
-                </div>
+        <div class="report-header">
+            <div class="header-content">
+                <h1 class="welcome-text">
+                    <i class="fas fa-user-clock"></i>
+                    Staff Activity Report
+                </h1>
+                <p class="subtitle">Staff performance metrics and activity overview</p>
             </div>
-        </div>
-
-        <!-- Debug Info -->
-        <div class="debug-alert">
-            <strong>✓ Data Loaded Successfully:</strong> Found {{ activity_data.total_staff }} staff members in database
+            
+            <div class="header-actions">
+                
+            </div>
         </div>
 
         {% if activity_data %}
         <!-- Statistics Cards -->
-        <div class="row mb-4">
-            <div class="col-md-3">
-                <div class="stat-card" style="border-left: 4px solid #4a6fa5;">
-                    <div class="stat-number text-primary">{{ activity_data.total_staff }}</div>
-                    <div class="stat-label">Total Staff</div>
-                </div>
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-number">{{ activity_data.total_staff }}</div>
+                <div class="stat-label">Total Staff</div>
+                <i class="stat-icon fas fa-users"></i>
             </div>
-            <div class="col-md-3">
-                <div class="stat-card" style="border-left: 4px solid #38a169;">
-                    <div class="stat-number text-success">{{ activity_data.active_staff }}</div>
-                    <div class="stat-label">Active Staff</div>
-                </div>
+            <div class="stat-card">
+                <div class="stat-number">{{ activity_data.active_staff }}</div>
+                <div class="stat-label">Active Staff</div>
+                <i class="stat-icon fas fa-user-check"></i>
             </div>
-            <div class="col-md-3">
-                <div class="stat-card" style="border-left: 4px solid #e53e3e;">
-                    <div class="stat-number text-danger">{{ activity_data.inactive_staff }}</div>
-                    <div class="stat-label">Inactive Staff</div>
-                </div>
+            <div class="stat-card">
+                <div class="stat-number">{{ activity_data.inactive_staff }}</div>
+                <div class="stat-label">Inactive Staff</div>
+                <i class="stat-icon fas fa-user-times"></i>
             </div>
-            <div class="col-md-3">
-                <div class="stat-card" style="border-left: 4px solid #ed8936;">
-                    <div class="stat-number text-warning">{{ activity_data.on_leave_staff }}</div>
-                    <div class="stat-label">On Leave</div>
-                </div>
+            <div class="stat-card">
+                <div class="stat-number">{{ activity_data.on_leave_staff }}</div>
+                <div class="stat-label">On Leave</div>
+                <i class="stat-icon fas fa-user-clock"></i>
             </div>
         </div>
 
         <!-- Staff Details Table -->
         <div class="row">
             <div class="col-12">
-                <div class="card">
-                    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-                        <h5 class="card-title mb-0">
+                <div class="inventory-view">
+                    <div class="card-header">
+                        <h5 class="card-title">
                             <i class="fas fa-users me-2"></i>Staff Performance Details
                             <span class="badge bg-light text-dark ms-2">{{ activity_data.staff_details|length }} staff members</span>
                         </h5>
@@ -368,9 +68,7 @@ h1 {
                             <a href="?export=pdf" class="btn btn-danger btn-sm">
                                 <i class="fas fa-file-pdf"></i>PDF
                             </a>
-                            <a href="?export=csv" class="btn btn-info btn-sm">
-                                <i class="fas fa-file-csv"></i>CSV
-                            </a>
+                            <!-- REMOVED CSV BUTTON -->
                         </div>
                     </div>
                     <div class="card-body">
@@ -384,10 +82,6 @@ h1 {
                                         <th>Position</th>
                                         <th>Department</th>
                                         <th>Status</th>
-                                        <th>Tenure</th>
-                                        <th>Performance</th>
-                                        <th>Task Completion</th>
-                                        <th>Attendance</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -409,42 +103,6 @@ h1 {
                                             {% else %}
                                                 <span class="badge bg-warning">On Leave</span>
                                             {% endif %}
-                                        </td>
-                                        <td>
-                                            <strong>{{ staff.tenure_days }}</strong> days
-                                            <br>
-                                            <small class="text-muted">Since {{ staff.hire_date }}</small>
-                                        </td>
-                                        <td>
-                                            {% if staff.performance_class == 'success' %}
-                                                <span class="performance-badge badge-success-custom">
-                                            {% elif staff.performance_class == 'info' %}
-                                                <span class="performance-badge badge-info-custom">
-                                            {% elif staff.performance_class == 'warning' %}
-                                                <span class="performance-badge badge-warning-custom">
-                                            {% else %}
-                                                <span class="performance-badge badge-danger-custom">
-                                            {% endif %}
-                                                {{ staff.performance_level }}
-                                            </span>
-                                            <br>
-                                            <small class="text-muted">{{ staff.performance_score }}%</small>
-                                        </td>
-                                        <td>
-                                            <div class="d-flex align-items-center">
-                                                <div class="metric-bar">
-                                                    <div class="metric-fill tasks-fill" style="width: {{ staff.task_completion }}%;"></div>
-                                                </div>
-                                                <strong>{{ staff.task_completion }}%</strong>
-                                            </div>
-                                        </td>
-                                        <td>
-                                            <div class="d-flex align-items-center">
-                                                <div class="metric-bar">
-                                                    <div class="metric-fill attendance-fill" style="width: {{ staff.attendance_rate }}%;"></div>
-                                                </div>
-                                                <strong>{{ staff.attendance_rate }}%</strong>
-                                            </div>
                                         </td>
                                     </tr>
                                     {% endfor %}
@@ -484,7 +142,7 @@ h1 {
         <!-- No Data Available -->
         <div class="row">
             <div class="col-12">
-                <div class="card">
+                <div class="inventory-view">
                     <div class="card-body text-center py-5">
                         <i class="fas fa-users fa-4x text-muted mb-3"></i>
                         <h4>No Staff Activity Data Available</h4>

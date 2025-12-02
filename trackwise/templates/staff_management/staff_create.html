@@ -23,13 +23,13 @@
                 <p>Create staff member accounts for your team</p>
             </div>
 
-            {% if messages %}
+            {% comment %} {% if messages %}
                 {% for message in messages %}
                     <div class="alert alert-{{ message.tags }}">
                         {{ message }}
                     </div>
                 {% endfor %}
-            {% endif %}
+            {% endif %} {% endcomment %}
 
             {% if user_form.errors or profile_form.errors %}
                 <div class="alert alert-error">
@@ -55,8 +55,11 @@
                 </div>
             {% endif %}
             
-            <form method="post" id="staff-form">
+            <form method="post" id="staff-form" autocomplete="off">
                 {% csrf_token %}
+                <!-- Hidden fields to reduce browser autofill for saved credentials -->
+                <input type="text" name="prevent_autofill_username" id="prevent_autofill_username" style="position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden;" tabindex="-1" autocomplete="off">
+                <input type="password" name="prevent_autofill_password" id="prevent_autofill_password" style="position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden;" tabindex="-1" autocomplete="new-password">
                 
                 <div class="form-row">
                     <div class="form-group">
@@ -83,7 +86,7 @@
                 <div class="form-row">
                     <div class="form-group">
                         <label class="form-label" for="id_username">Username *</label>
-                        <input type="text" name="username" id="id_username" class="form-control" value="{{ user_form.username.value|default:'' }}" required>
+                        <input type="text" name="username" id="id_username" class="form-control" value="{{ user_form.username.value|default:'' }}" required autocomplete="off" autocapitalize="off" spellcheck="false">
                         {% if user_form.username.errors %}
                             {% for error in user_form.username.errors %}
                                 <span class="error-message show">{{ error }}</span>
@@ -93,7 +96,7 @@
                     
                     <div class="form-group">
                         <label class="form-label" for="id_email">Email *</label>
-                        <input type="email" name="email" id="id_email" class="form-control" value="{{ user_form.email.value|default:'' }}" required>
+                        <input type="email" name="email" id="id_email" class="form-control" value="{{ user_form.email.value|default:'' }}" required autocomplete="off">
                         {% if user_form.email.errors %}
                             {% for error in user_form.email.errors %}
                                 <span class="error-message show">{{ error }}</span>
@@ -105,7 +108,7 @@
                 <div class="form-row">
                     <div class="form-group">
                         <label class="form-label" for="id_password1">Password *</label>
-                        <input type="password" name="password1" id="id_password1" class="form-control" required>
+                        <input type="password" name="password1" id="id_password1" class="form-control" required autocomplete="new-password">
                         {% if user_form.password1.errors %}
                             {% for error in user_form.password1.errors %}
                                 <span class="error-message show">{{ error }}</span>
@@ -115,7 +118,7 @@
                     
                     <div class="form-group">
                         <label class="form-label" for="id_password2">Confirm Password *</label>
-                        <input type="password" name="password2" id="id_password2" class="form-control" required>
+                        <input type="password" name="password2" id="id_password2" class="form-control" required autocomplete="new-password">
                         {% if user_form.password2.errors %}
                             {% for error in user_form.password2.errors %}
                                 <span class="error-message show">{{ error }}</span>
