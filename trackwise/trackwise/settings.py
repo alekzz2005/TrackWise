@@ -21,8 +21,8 @@ SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-l*y9*la5o2t-cx6utb=w9ty9ke
 DEBUG = True
 
 ALLOWED_HOSTS = [
-    "127.0.0.1", 
-    "localhost", 
+    "127.0.0.1",
+    "localhost",
     "trackwise-7hg9.onrender.com",
     ".onrender.com"  # Allow all Render subdomains
 ]
@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'dashboard',
     'staff_management',
     'reports',
+    'staff_issues',
 ]
 
 MIDDLEWARE = [

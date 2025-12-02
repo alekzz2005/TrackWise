@@ -23,10 +23,7 @@
             </div>
             
             <div class="header-actions">
-                <div></div> <!-- Empty div for spacing -->
-                {% comment %} <a href="{% url 'reports:reports_dashboard' %}" class="btn-outline-secondary">
-                    <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
-                </a> {% endcomment %}
+                
             </div>
         </div>
 
@@ -71,9 +68,7 @@
                             <a href="?export=pdf" class="btn btn-danger btn-sm">
                                 <i class="fas fa-file-pdf"></i>PDF
                             </a>
-                            <a href="?export=csv" class="btn btn-info btn-sm">
-                                <i class="fas fa-file-csv"></i>CSV
-                            </a>
+                            <!-- REMOVED CSV BUTTON -->
                         </div>
                     </div>
                     <div class="card-body">
@@ -87,7 +82,6 @@
                                         <th>Position</th>
                                         <th>Department</th>
                                         <th>Status</th>
-                                        <th>Tenure</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -109,11 +103,6 @@
                                             {% else %}
                                                 <span class="badge bg-warning">On Leave</span>
                                             {% endif %}
-                                        </td>
-                                        <td>
-                                            <strong>{{ staff.tenure_days }}</strong> days
-                                            <br>
-                                            <small class="text-muted">Since {{ staff.hire_date }}</small>
                                         </td>
                                     </tr>
                                     {% endfor %}
