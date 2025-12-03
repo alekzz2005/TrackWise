@@ -18,24 +18,28 @@ class BusinessOwnerRegistrationForm(UserCreationForm):
         'placeholder': 'Enter last name'
     }))
     
-    # Company selection
-    company_choice = forms.ChoiceField(
-        choices=[('new', 'New Company'), ('existing', 'Existing Company')],
-        widget=forms.RadioSelect(attrs={'class': 'radio-input'}),
-        initial='new'
-    )
-    existing_company = forms.ModelChoiceField(
-        queryset=Company.objects.all(),
-        required=False,
-        widget=forms.Select(attrs={
-            'class': 'form-control',
-            'placeholder': 'Select a company'
-        }),
-        empty_label="-- Select Existing Company --"
-    )
+    # REMOVE: Company selection choice
+    # company_choice = forms.ChoiceField(
+    #     choices=[('new', 'New Company'), ('existing', 'Existing Company')],
+    #     widget=forms.RadioSelect(attrs={'class': 'radio-input'}),
+    #     initial='new'
+    # )
+    # REMOVE: existing_company field
+    # existing_company = forms.ModelChoiceField(
+    #     queryset=Company.objects.all(),
+    #     required=False,
+    #     widget=forms.Select(attrs={
+    #         'class': 'form-control',
+    #         'placeholder': 'Select a company'
+    #     }),
+    #     empty_label="-- Select Existing Company --"
+    # )
+    
+    # Company fields - ALWAYS CREATE NEW COMPANY
     new_company_name = forms.CharField(
         max_length=200,
-        required=False,
+        required=True,  # Changed from required=False to required=True
+        label="Company Name *",
         widget=forms.TextInput(attrs={
             'class': 'form-control',
             'placeholder': 'E.g., TrackWise Logistics Inc.'
@@ -45,7 +49,7 @@ class BusinessOwnerRegistrationForm(UserCreationForm):
         required=False,
         widget=forms.Textarea(attrs={
             'class': 'form-control form-textarea',
-            'placeholder': 'Street, City, Postal Code',
+            'placeholder': 'Street, City, Postal Code (optional)',
             'rows': 3
         })
     )
@@ -54,7 +58,7 @@ class BusinessOwnerRegistrationForm(UserCreationForm):
         required=False,
         widget=forms.TextInput(attrs={
             'class': 'form-control',
-            'placeholder': 'Phone or primary contact email'
+            'placeholder': 'Phone or primary contact email (optional)'
         })
     )
 
@@ -78,9 +82,6 @@ class BusinessOwnerRegistrationForm(UserCreationForm):
             'class': 'form-control', 
             'placeholder': 'Repeat password'
         })
-        
-        # Style the radio buttons properly
-        self.fields['company_choice'].widget.attrs.update({'class': 'radio-input'})
 
     def clean_email(self):
         email = self.cleaned_data.get('email', '').strip().lower()
@@ -97,14 +98,20 @@ class BusinessOwnerRegistrationForm(UserCreationForm):
 
     def clean(self):
         cleaned_data = super().clean()
-        company_choice = cleaned_data.get('company_choice')
         
-        if company_choice == 'new':
-            if not cleaned_data.get('new_company_name'):
-                self.add_error('new_company_name', 'Company name is required when creating a new company.')
-        else:  # existing
-            if not cleaned_data.get('existing_company'):
-                self.add_error('existing_company', 'Please select an existing company.')
+        # REMOVE: Company choice logic
+        # company_choice = cleaned_data.get('company_choice')
+        # 
+        # if company_choice == 'new':
+        #     if not cleaned_data.get('new_company_name'):
+        #         self.add_error('new_company_name', 'Company name is required when creating a new company.')
+        # else:  # existing
+        #     if not cleaned_data.get('existing_company'):
+        #         self.add_error('existing_company', 'Please select an existing company.')
+        
+        # ALWAYS REQUIRE COMPANY NAME
+        if not cleaned_data.get('new_company_name'):
+            self.add_error('new_company_name', 'Company name is required.')
         
         return cleaned_data
 
@@ -117,16 +124,12 @@ class BusinessOwnerRegistrationForm(UserCreationForm):
         if commit:
             user.save()
             
-            # Handle company creation/selection
-            company_choice = self.cleaned_data['company_choice']
-            if company_choice == 'new':
-                company = Company.objects.create(
-                    name=self.cleaned_data['new_company_name'],
-                    address=self.cleaned_data['company_address'] or '',
-                    contact_info=self.cleaned_data['company_contact'] or ''
-                )
-            else:
-                company = self.cleaned_data['existing_company']
+            # ALWAYS CREATE NEW COMPANY (no choice anymore)
+            company = Company.objects.create(
+                name=self.cleaned_data['new_company_name'],
+                address=self.cleaned_data.get('company_address', ''),
+                contact_info=self.cleaned_data.get('company_contact', '')
+            )
             
             # Create user profile
             UserProfile.objects.create(

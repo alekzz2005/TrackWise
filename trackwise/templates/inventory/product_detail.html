@@ -105,16 +105,33 @@
                 </div>
                 
                 <div class="form-group">
-                    <label class="form-label" for="{{ form.image.id_for_label }}">Product Image</label>
-                    {{ form.image }}
-                    <span class="error-message" id="{{ form.image.id_for_label }}_error"></span>
-                    {% if form.image.errors %}
-                        {% for error in form.image.errors %}
-                            <span class="error-message show" id="server_{{ form.image.id_for_label }}_error">{{ error }}</span>
-                            {% endfor %}
-                    {% endif %}
-                    <div class="form-text">Change product image (optional)</div>
-                </div>
+                <label class="form-label" for="image-upload">Product Image</label>
+                
+                {# Simple file input #}
+                <input type="file" 
+                    name="image" 
+                    id="image-upload" 
+                    accept="image/*"
+                    style="display: block; width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; margin-bottom: 10px;">
+                
+                {# Clear checkbox if there's a current image #}
+                {% if product.image %}
+                    <div style="margin-bottom: 10px;">
+                        <label style="display: flex; align-items: center;">
+                            <input type="checkbox" name="image-clear" id="image-clear-id" style="margin-right: 8px;">
+                            <span style="font-size: 14px;">Remove current image</span>
+                        </label>
+                    </div>
+                {% endif %}
+                
+                <span class="error-message" id="{{ form.image.id_for_label }}_error"></span>
+                {% if form.image.errors %}
+                    {% for error in form.image.errors %}
+                        <span class="error-message show" id="server_{{ form.image.id_for_label }}_error">{{ error }}</span>
+                    {% endfor %}
+                {% endif %}
+                <div class="form-text">Change product image (optional)</div>
+            </div>
                 
                 <div class="button-group">
                     <button type="submit" class="btn btn-success">

@@ -4,49 +4,29 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.urls import reverse
 from .forms import BusinessOwnerRegistrationForm, StaffRegistrationForm, CustomAuthenticationForm, BusinessOwnerProfileForm, CustomPasswordChangeForm, CompanyForm
-from .models import UserProfile, Company, EmailVerification
+from .models import UserProfile, Company
 from django.http import JsonResponse
 from django.contrib.auth.models import User
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 import json
-import random
-import string
-from django.core.mail import send_mail
-from django.conf import settings
-from django.utils import timezone
-from datetime import timedelta
-import secrets
-from django.core.mail import send_mail
-from django.http import HttpResponse
 
-# ADD THIS NEW VIEW
-def email_verification_view(request):
-    """Display email verification page"""
-    if request.user.is_authenticated:
-        return redirect('dashboard:dashboard')
-    
-    email = request.GET.get('email', '')
-    if not email:
-        return redirect('accounts:role_selection')
-    
-    return render(request, 'accounts/email_verification.html', {
-        'email': email
-    })
+# REMOVE: Remove EmailVerification import
+# REMOVE: from .models import UserProfile, Company, EmailVerification
 
-def test_email_config(request):
-    """Test email configuration"""
-    try:
-        send_mail(
-            'TrackWise Email Test',
-            'This is a test email from TrackWise. If you receive this, your email configuration is working!',
-            settings.DEFAULT_FROM_EMAIL,
-            [settings.EMAIL_HOST_USER],  # Send to yourself
-            fail_silently=False,
-        )
-        return HttpResponse("✅ Test email sent successfully! Please check your inbox.")
-    except Exception as e:
-        return HttpResponse(f"❌ Failed to send test email: {str(e)}")
+# REMOVE: Remove email_verification_view function
+# REMOVE: def email_verification_view(request):
+# REMOVE:     """Display email verification page"""
+# REMOVE:     if request.user.is_authenticated:
+# REMOVE:         return redirect('dashboard:dashboard')
+# REMOVE:    
+# REMOVE:     email = request.GET.get('email', '')
+# REMOVE:     if not email:
+# REMOVE:         return redirect('accounts:role_selection')
+# REMOVE:    
+# REMOVE:     return render(request, 'accounts/email_verification.html', {
+# REMOVE:         'email': email
+# REMOVE:     })
 
 def role_selection(request):
     if request.user.is_authenticated:
@@ -58,268 +38,86 @@ def landing_page(request):
         return redirect('dashboard:dashboard')
     return render(request, 'landing.html')
 
-# UPDATED BUSINESS OWNER REGISTRATION
+# UPDATED BUSINESS OWNER REGISTRATION (Simplified - No OTP, No Company Choice)
 def business_owner_register(request):
     if request.user.is_authenticated:
         return redirect('dashboard:dashboard')
     
-    if request.method == 'GET':
-        email = request.GET.get('email', '')
-        if email:
-            # Check if email is verified before showing form
-            is_verified = EmailVerification.objects.filter(
-                email=email.lower(),
-                is_used=True
-            ).exists()
+    if request.method == 'POST':
+        form = BusinessOwnerRegistrationForm(request.POST)
+        if form.is_valid():
+            # Create user directly (no OTP verification)
+            user = form.save()
             
-            if not is_verified:
-                # Not verified, show error and redirect to verification
-                messages.error(request, 'Please verify your email before registering.')
-                return redirect(f'{reverse("accounts:email_verification")}?email={email}')
+            # REMOVE: Company choice logic since we're always creating new company
+            # if form.cleaned_data.get('company_choice') == 'existing':
+            #     return render(request, 'accounts/processing.html', {
+            #         'role': 'business_owner',
+            #         'next_url': 'accounts:login'
+            #     })
             
-            # Email is verified, show pre-filled form
-            form = BusinessOwnerRegistrationForm(initial={'email': email})
+            # Login the user immediately
+            login(request, user)
+            messages.success(request, 'Business Owner account created successfully! Welcome to TrackWise.')
+            return redirect('dashboard:dashboard')
         else:
-            form = BusinessOwnerRegistrationForm()
-        
-        return render(request, 'accounts/business_owner_register.html', {'form': form})
-    
-    # POST request - processing registration form
-    form = BusinessOwnerRegistrationForm(request.POST)
-    if form.is_valid():
-        email = form.cleaned_data.get('email', '').lower()
-        
-        # CHECK IF EMAIL IS VERIFIED
-        is_verified = EmailVerification.objects.filter(
-            email=email,
-            is_used=True
-        ).exists()
-        
-        if not is_verified:
-            messages.error(request, 'Please verify your email before registering.')
-            return redirect(f'{reverse("accounts:email_verification")}?email={email}')
-        
-        # Email is verified, create user
-        user = form.save()
-        
-        # Delete the verification record after successful registration
-        EmailVerification.objects.filter(email=email, is_used=True).delete()
-        
-        # Show processing screen for existing company selection
-        if form.cleaned_data.get('company_choice') == 'existing':
-            return render(request, 'accounts/processing.html', {
-                'role': 'business_owner',
-                'next_url': 'accounts:login'
-            })
-        
-        login(request, user)
-        messages.success(request, 'Business Owner account created successfully! Welcome to TrackWise.')
-        return redirect('dashboard:dashboard')
+            messages.error(request, 'Please correct the errors below.')
     else:
-        messages.error(request, 'Please correct the errors below.')
+        form = BusinessOwnerRegistrationForm()
     
     return render(request, 'accounts/business_owner_register.html', {'form': form})
 
-# UPDATED STAFF REGISTRATION
+# UPDATED STAFF REGISTRATION (Simplified - No OTP)
 def staff_register(request):
     if request.user.is_authenticated:
         return redirect('dashboard:dashboard')
     
-    if request.method == 'GET':
-        email = request.GET.get('email', '')
-        if email:
-            # Check if email is verified before showing form
-            is_verified = EmailVerification.objects.filter(
-                email=email.lower(),
-                is_used=True
-            ).exists()
+    if request.method == 'POST':
+        form = StaffRegistrationForm(request.POST)
+        if form.is_valid():
+            # Create user directly (no OTP verification)
+            user = form.save()
             
-            if not is_verified:
-                # Not verified, show error and redirect to verification
-                messages.error(request, 'Please verify your email before registering.')
-                return redirect(f'{reverse("accounts:email_verification")}?email={email}')
-            
-            # Email is verified, show pre-filled form
-            form = StaffRegistrationForm(initial={'email': email})
+            # Always show processing screen for staff
+            return render(request, 'accounts/processing.html', {
+                'role': 'staff',
+                'next_url': 'accounts:login'
+            })
         else:
-            form = StaffRegistrationForm()
-        
-        return render(request, 'accounts/staff_register.html', {'form': form})
-    
-    # POST request - processing registration form
-    form = StaffRegistrationForm(request.POST)
-    if form.is_valid():
-        email = form.cleaned_data.get('email', '').lower()
-        
-        # CHECK IF EMAIL IS VERIFIED
-        is_verified = EmailVerification.objects.filter(
-            email=email,
-            is_used=True
-        ).exists()
-        
-        if not is_verified:
-            messages.error(request, 'Please verify your email before registering.')
-            return redirect(f'{reverse("accounts:email_verification")}?email={email}')
-        
-        # Email is verified, create user
-        user = form.save()
-        
-        # Delete the verification record after successful registration
-        EmailVerification.objects.filter(email=email, is_used=True).delete()
-        
-        # Always show processing screen for staff
-        return render(request, 'accounts/processing.html', {
-            'role': 'staff',
-            'next_url': 'accounts:login'
-        })
+            messages.error(request, 'Please correct the errors below.')
     else:
-        messages.error(request, 'Please correct the errors below.')
+        form = StaffRegistrationForm()
     
     return render(request, 'accounts/staff_register.html', {'form': form})
 
-# ADD THIS HELPER FUNCTION FOR REDIRECTING TO VERIFICATION
-def check_and_redirect_verification(email):
-    """Check if email is verified, if not redirect to verification page"""
-    is_verified = EmailVerification.objects.filter(
-        email=email.lower(),
-        is_used=True
-    ).exists()
+@require_POST
+@csrf_exempt
+def check_email(request):
+    data = json.loads(request.body)
+    email = data.get('email', '')
     
-    if not is_verified:
-        return redirect(f'{reverse("accounts:email_verification")}?email={email}')
-    return None
+    exists = User.objects.filter(email=email).exists()
+    return JsonResponse({'is_available': not exists})
 
 @require_POST
 @csrf_exempt
-def send_verification_code(request):
-    """Send OTP code to email for verification using Infobip"""
-    try:
-        # Check if it's JSON data
-        if request.content_type == 'application/json':
-            data = json.loads(request.body)
-            email = data.get('email', '').strip().lower()
-        else:
-            # Fallback to form data
-            email = request.POST.get('email', '').strip().lower()
-        
-        # Validate email format
-        if not email or '@' not in email:
-            return JsonResponse({'success': False, 'error': 'Invalid email address'})
-        
-        # Check if email already exists
-        if User.objects.filter(email=email).exists():
-            return JsonResponse({'success': False, 'error': 'This email is already registered'})
-        
-        # Generate secure random OTP (6 digits)
-        otp = ''.join(secrets.choice(string.digits) for _ in range(6))
-        
-        # Delete any existing OTPs for this email
-        EmailVerification.objects.filter(email=email).delete()
-        
-        # Create new OTP record
-        verification = EmailVerification.objects.create(
-            email=email,
-            otp=otp
-        )
-        
-        # Send email using Infobip
-        try:
-            from .utils import send_verification_email_using_infobip
-            
-            success = send_verification_email_using_infobip(email, otp)
-            
-            if success:
-                print(f"✅ Email sent successfully to {email} via Infobip")
-                # In production, don't log OTPs
-                if settings.DEBUG:
-                    print(f"DEBUG OTP for {email}: {otp}")
-            else:
-                print(f"❌ Email sending failed for {email}")
-                # Still save OTP but alert user
-                return JsonResponse({
-                    'success': False, 
-                    'error': 'Failed to send verification email. Please try again.'
-                })
-                
-        except ImportError:
-            # Fallback to Django's email sending
-            print("Infobip utils not available, using Django email")
-            try:
-                from django.core.mail import send_mail
-                send_mail(
-                    f'Your TrackWise Verification Code: {otp}',
-                    f'Your verification code is: {otp}\n\nThis code will expire in 10 minutes.',
-                    settings.DEFAULT_FROM_EMAIL,
-                    [email],
-                    fail_silently=False,
-                )
-                print(f"✅ Fallback email sent to {email}")
-            except Exception as e:
-                print(f"❌ Fallback email sending failed: {e}")
-                return JsonResponse({
-                    'success': False, 
-                    'error': 'Email service is currently unavailable. Please try again later.'
-                })
-        
-        return JsonResponse({'success': True})
-        
-    except json.JSONDecodeError:
-        return JsonResponse({'success': False, 'error': 'Invalid JSON data'})
-    except Exception as e:
-        print(f"Error in send_verification_code: {str(e)}")
-        return JsonResponse({'success': False, 'error': 'An error occurred. Please try again.'})
+def check_username(request):
+    data = json.loads(request.body)
+    username = data.get('username', '')
+    
+    exists = User.objects.filter(username=username).exists()
+    return JsonResponse({'is_available': not exists})
 
-@require_POST
-@csrf_exempt
-def verify_email_code(request):
-    """Verify the OTP code entered by user"""
-    try:
-        # Check if it's JSON data
-        if request.content_type == 'application/json':
-            data = json.loads(request.body)
-        else:
-            data = request.POST
-            
-        email = data.get('email', '').strip().lower()
-        code = data.get('code', '').strip()
-        
-        if not email or not code:
-            return JsonResponse({'success': False, 'error': 'Email and code are required'})
-        
-        # Find the most recent valid OTP for this email
-        try:
-            verification = EmailVerification.objects.filter(
-                email=email,
-                is_used=False
-            ).latest('created_at')
-        except EmailVerification.DoesNotExist:
-            return JsonResponse({'success': False, 'error': 'Verification code not found or expired. Please request a new code.'})
-        
-        # Check if OTP is expired
-        if verification.is_expired():
-            verification.delete()
-            return JsonResponse({'success': False, 'error': 'Verification code has expired. Please request a new code.'})
-        
-        # Verify the code
-        if verification.otp != code:
-            return JsonResponse({'success': False, 'error': 'Invalid verification code'})
-        
-        # Mark OTP as used
-        verification.mark_used()
-        
-        # Clean up old OTPs (keep only the used one)
-        EmailVerification.objects.filter(
-            email=email,
-            is_used=False
-        ).exclude(id=verification.id).delete()
-        
-        return JsonResponse({'success': True})
-        
-    except json.JSONDecodeError:
-        return JsonResponse({'success': False, 'error': 'Invalid JSON data'})
-    except Exception as e:
-        print(f"Error in verify_email_code: {str(e)}")
-        return JsonResponse({'success': False, 'error': 'An error occurred during verification'})
+# REMOVE: Remove OTP-related functions
+# REMOVE: @require_POST
+# REMOVE: @csrf_exempt
+# REMOVE: def send_verification_code(request):
+# REMOVE:     ...
+
+# REMOVE: @require_POST
+# REMOVE: @csrf_exempt
+# REMOVE: def verify_email_code(request):
+# REMOVE:     ...
 
 def login_view(request):
     if request.user.is_authenticated:
@@ -360,24 +158,6 @@ def logout_view(request):
     logout(request)
     messages.info(request, 'You have been logged out successfully.')
     return redirect('accounts:login')
-
-@require_POST
-@csrf_exempt
-def check_email(request):
-    data = json.loads(request.body)
-    email = data.get('email', '')
-    
-    exists = User.objects.filter(email=email).exists()
-    return JsonResponse({'is_available': not exists})
-
-@require_POST
-@csrf_exempt
-def check_username(request):
-    data = json.loads(request.body)
-    username = data.get('username', '')
-    
-    exists = User.objects.filter(username=username).exists()
-    return JsonResponse({'is_available': not exists})
 
 @login_required
 def edit_profile(request):
@@ -465,44 +245,3 @@ def change_password(request):
         form = CustomPasswordChangeForm(request.user)
     
     return render(request, 'accounts/change_password.html', {'form': form})
-
-# Add to accounts/views.py
-@csrf_exempt
-def debug_email_config(request):
-    """Debug email configuration"""
-    import smtplib
-    from django.conf import settings
-    
-    info = {
-        'DEBUG': settings.DEBUG,
-        'EMAIL_BACKEND': settings.EMAIL_BACKEND,
-        'EMAIL_HOST': getattr(settings, 'EMAIL_HOST', 'Not set'),
-        'EMAIL_PORT': getattr(settings, 'EMAIL_PORT', 'Not set'),
-        'EMAIL_HOST_USER': getattr(settings, 'EMAIL_HOST_USER', 'Not set'),
-        'EMAIL_HOST_PASSWORD': '***' if getattr(settings, 'EMAIL_HOST_PASSWORD', None) else 'Not set',
-        'INFOBIP_API_KEY': '***' if getattr(settings, 'INFOBIP_API_KEY', None) else 'Not set',
-        'INFOBIP_BASE_URL': getattr(settings, 'INFOBIP_BASE_URL', 'Not set'),
-        'INFOBIP_SENDER_EMAIL': getattr(settings, 'INFOBIP_SENDER_EMAIL', 'Not set'),
-        'DEFAULT_FROM_EMAIL': getattr(settings, 'DEFAULT_FROM_EMAIL', 'Not set'),
-    }
-    
-    # Test SMTP connection
-    smtp_test = "Not tested"
-    if info['EMAIL_HOST'] != 'Not set' and info['EMAIL_HOST_PASSWORD'] != 'Not set':
-        try:
-            server = smtplib.SMTP(info['EMAIL_HOST'], info['EMAIL_PORT'])
-            server.starttls()
-            server.login(info['EMAIL_HOST_USER'], settings.EMAIL_HOST_PASSWORD)
-            server.quit()
-            smtp_test = "✅ SMTP Connection Successful"
-        except Exception as e:
-            smtp_test = f"❌ SMTP Connection Failed: {str(e)}"
-    
-    html = "<h1>Email Configuration Debug</h1>"
-    html += "<table border='1' cellpadding='10'>"
-    for key, value in info.items():
-        html += f"<tr><td><strong>{key}</strong></td><td>{value}</td></tr>"
-    html += f"<tr><td><strong>SMTP Test</strong></td><td>{smtp_test}</td></tr>"
-    html += "</table>"
-    
-    return HttpResponse(html)
