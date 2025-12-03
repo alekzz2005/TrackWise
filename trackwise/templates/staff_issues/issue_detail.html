@@ -143,34 +143,183 @@
 }
 
 /* Status Dropdown */
+/* Status Dropdown - Fixed Version */
 .status-dropdown {
-  position: relative;
-  z-index: 1000;
+    position: relative;
+    display: inline-block;
 }
 
 .dropdown-menu {
-  background: var(--text-white);
-  border-radius: 12px;
-  border: 2px solid #e2e8f0;
-  box-shadow: var(--shadow-lg);
-  padding: 0.5rem;
-  min-width: 200px;
-  position: absolute !important;
-  margin-top: 0.5rem;
-  transform: translate(0, 0) !important;
-  top: 100% !important;
-  left: 0 !important;
-  right: auto !important;
-  z-index: 1001 !important;
-  max-height: 300px;
-  overflow-y: auto;
+    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+    border-radius: 16px;
+    border: 2px solid var(--accent-light);
+    box-shadow: var(--shadow-lg);
+    padding: 0.5rem;
+    min-width: 180px;
+    margin-top: 0.5rem;
+    z-index: 9999;
+    transform-origin: top left;
+    animation: dropdownFadeIn 0.2s ease-out;
+    max-height: none;
+    overflow: visible;
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
 }
 
 .dropdown-menu.show {
-  display: block !important;
-  z-index: 1001 !important;
-  transform: translate(0, 0) !important;
-  position: absolute !important;
+    display: block !important;
+}
+
+/* Dropdown options styling */
+.status-option {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    width: 100%;
+    padding: 0.75rem 1rem; /* Smaller padding */
+    border: none;
+    background: transparent;
+    border-radius: 10px; /* Slightly smaller radius */
+    font-size: 0.9rem; /* Smaller font */
+    font-weight: 600;
+    color: var(--primary-dark);
+    cursor: pointer;
+    transition: var(--transition);
+    text-align: left;
+    margin-bottom: 0.25rem;
+}
+
+.status-option:last-child {
+    margin-bottom: 0;
+}
+
+.status-option:hover {
+    background: linear-gradient(135deg, var(--bg-light) 0%, var(--accent-light) 100%);
+    transform: translateX(4px);
+    box-shadow: var(--shadow-sm);
+}
+
+/* Status-specific colors */
+.status-option.pending {
+    color: #744210;
+}
+
+.status-option.pending:hover {
+    background: linear-gradient(135deg, #feebcb 0%, #fbd38d 100%);
+}
+
+.status-option.in_progress {
+    color: #2c5282;
+}
+
+.status-option.in_progress:hover {
+    background: linear-gradient(135deg, #bee3f8 0%, #90cdf4 100%);
+}
+
+.status-option.resolved {
+    color: #22543d;
+}
+
+.status-option.resolved:hover {
+    background: linear-gradient(135deg, #c6f6d5 0%, #9ae6b4 100%);
+}
+
+.status-option.closed {
+    color: #4a5568;
+}
+
+.status-option.closed:hover {
+    background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e0 100%);
+}
+
+/* Status icons */
+.status-option i {
+    font-size: 1rem; /* Smaller icon */
+    width: 18px; /* Smaller width */
+    text-align: center;
+}
+
+/* Dropdown animation */
+@keyframes dropdownFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-8px) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* CRITICAL FIX: Allow dropdown to overflow outside header */
+.issue-header-detail {
+    position: relative;
+    overflow: visible !important; /* This allows dropdown to show outside */
+}
+
+.header-actions-container {
+    position: relative;
+    z-index: 10;
+}
+
+/* Make the Update Status button smaller too */
+.btn-status-white {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem; /* Smaller gap */
+    padding: 0.75rem 1.25rem; /* Smaller padding */
+    background: rgba(255, 255, 255, 0.15);
+    color: var(--text-white);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 10px; /* Smaller radius */
+    font-size: 0.9rem; /* Smaller font */
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+    text-decoration: none;
+    box-shadow: var(--shadow-sm);
+    backdrop-filter: blur(10px);
+}
+
+.btn-status-white:hover {
+    background: rgba(255, 255, 255, 0.25);
+    border-color: rgba(255, 255, 255, 0.4);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+    color: var(--text-white);
+}
+
+/* Mobile responsiveness for dropdown */
+@media (max-width: 768px) {
+    .dropdown-menu {
+        min-width: 160px;
+        position: fixed;
+        top: auto;
+        bottom: 1rem;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 85%;
+        max-width: 250px;
+        z-index: 99999;
+    }
+    
+    .dropdown-menu.show {
+        display: block;
+        transform: translateX(-50%) translateY(-0.5rem);
+    }
+    
+    .btn-status-white {
+        padding: 0.75rem 1rem;
+        font-size: 0.85rem;
+    }
+}
+
+
+/* Prevent body scroll when dropdown is open */
+body.dropdown-open {
+    overflow: hidden;
 }
 
 /* Issue Info Cards */
@@ -783,16 +932,17 @@
         <!-- Header Actions -->
         <div class="header-actions-container">
             {% if can_update_status %}
-            <div class="status-dropdown">
+                        <div class="status-dropdown">
                 <button class="btn-status-white dropdown-toggle" type="button" data-bs-toggle="dropdown" 
-                        aria-expanded="false">
+                        aria-expanded="false" id="statusDropdownBtn">
                     <i class="fas fa-sync-alt"></i> Update Status
                 </button>
-                <div class="dropdown-menu">
-                    <form method="post" action="{% url 'staff_issues:update_issue_status' issue.id %}">
+                <div class="dropdown-menu" aria-labelledby="statusDropdownBtn">
+                    <form method="post" action="{% url 'staff_issues:update_issue_status' issue.id %}" class="status-form">
                         {% csrf_token %}
                         {% for status_value, status_label in issue.STATUS_CHOICES %}
-                        <button type="submit" name="status" value="{{ status_value }}" class="status-option {{ status_value }}">
+                        <button type="submit" name="status" value="{{ status_value }}" 
+                                class="status-option {{ status_value }}">
                             <i class="fas 
                                 {% if status_value == 'pending' %}fa-clock
                                 {% elif status_value == 'in_progress' %}fa-spinner
