@@ -398,21 +398,26 @@
                           class="form-textarea" placeholder="{{ field.field.widget.attrs.placeholder|default:field.label }}"
                           {% if field.field.required %}required{% endif %}>{{ field.value|default:'' }}</textarea>
                 
-                {% elif field.name == 'priority' %}
-                <select name="{{ field.name }}" id="{{ field.id_for_label }}" class="form-select" 
+                {% elif field.name == 'issue_type' or field.name == 'priority' %}
+                <!-- SPECIFICALLY HANDLE SELECT FIELDS -->
+                <select name="{{ field.name }}" id="{{ field.id_for_label }}" 
+                        class="form-select" 
                         {% if field.field.required %}required{% endif %}>
                     {% for value, label in field.field.choices %}
-                    <option value="{{ value }}" {% if field.value == value %}selected{% endif %}>
+                    <option value="{{ value }}" {% if field.value|stringformat:"s" == value|stringformat:"s" %}selected{% endif %}>
                         {{ label }}
                     </option>
                     {% endfor %}
                 </select>
+                
+                {% if field.name == 'priority' %}
                 <div class="priority-indicator">
                     <div class="priority-dot low {% if field.value == 'low' %}active{% endif %}"></div>
                     <div class="priority-dot medium {% if field.value == 'medium' %}active{% endif %}"></div>
                     <div class="priority-dot high {% if field.value == 'high' %}active{% endif %}"></div>
                     <div class="priority-dot urgent {% if field.value == 'urgent' %}active{% endif %}"></div>
                 </div>
+                {% endif %}
                 
                 {% elif field.name == 'attachment' or field.name == 'image' %}
                 <div class="file-upload-wrapper">
@@ -435,7 +440,8 @@
                 </div>
                 
                 {% else %}
-                <input type="{% if field.name == 'title' %}text{% else %}{{ field.field.widget.input_type }}{% endif %}" 
+                <!-- For text input fields like title -->
+                <input type="text" 
                        name="{{ field.name }}" id="{{ field.id_for_label }}" 
                        class="form-control" value="{{ field.value|default:'' }}" 
                        placeholder="{{ field.field.widget.attrs.placeholder|default:field.label }}"
@@ -460,7 +466,7 @@
             </div>
             {% endfor %}
             
-            <!-- Form Actions -->
+            <!-- FORM ACTIONS SECTION - This was missing! -->
             <div class="form-actions">
                 <button type="submit" class="btn btn-primary">
                     <i class="fas fa-paper-plane"></i> Submit Issue

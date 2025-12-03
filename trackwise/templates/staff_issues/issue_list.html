@@ -688,8 +688,7 @@
     <section class="issues-grid">
         {% if issues %}
             {% for issue in issues %}
-            <div class="issue-card" onclick="window.location.href='{% url 'staff_issues:issue_detail' issue.id %}'">
-                <div class="issue-card-header">
+                <div class="issue-card" onclick="window.location.href='{% url 'staff_issues:issue_detail' issue.id %}'">                <div class="issue-card-header">
                     <div>
                         <div class="issue-title">{{ issue.title }}</div>
                         <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
