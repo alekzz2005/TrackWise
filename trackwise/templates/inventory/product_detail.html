@@ -107,7 +107,7 @@
                 <div class="form-group">
                     <label class="form-label" for="image-upload">Product Image</label>
                     
-                    {# Simple file input #}
+                    {% comment %} {# Simple file input #}
                     <input type="file" 
                         name="image_upload"
                         id="image-upload" 
@@ -121,6 +121,62 @@
                                 <input type="checkbox" name="image-clear" id="image-clear-id" style="margin-right: 8px;">
                                 <span style="font-size: 14px;">Remove current image</span>
                             </label>
+                        </div>
+                    {% endif %} {% endcomment %}
+
+                    {# File input with proper styling #}
+                    <input type="file" 
+                        name="image_upload"
+                        id="image-upload" 
+                        accept="image/*"
+                        style="
+                            display: block; 
+                            width: 100%; 
+                            padding: 10px; 
+                            background-color: white !important;
+                            color: black !important;
+                            border: 1px solid #ddd; 
+                            border-radius: 4px; 
+                            margin-bottom: 10px;
+                            box-sizing: border-box;
+                        ">
+                        
+                    {# Clear checkbox if there's a current image #}
+                    {% if product.image %}
+                        <div style="
+                            margin-bottom: 10px;
+                            padding: 8px;
+                            background-color: #f8f9fa;
+                            border-radius: 4px;
+                            border: 1px solid #dee2e6;
+                        ">
+                            <label style="
+                                display: flex; 
+                                align-items: center;
+                                color: #212529;
+                                font-weight: 500;
+                                cursor: pointer;
+                            ">
+                                <input type="checkbox" 
+                                    name="image-clear" 
+                                    id="image-clear-id" 
+                                    style="
+                                        margin-right: 8px;
+                                        width: 16px;
+                                        height: 16px;
+                                        cursor: pointer;
+                                    ">
+                                <span style="font-size: 14px;">Remove current image</span>
+                            </label>
+                            <p style="
+                                font-size: 12px;
+                                color: #6c757d;
+                                margin-top: 4px;
+                                margin-bottom: 0;
+                                font-style: italic;
+                            ">
+                                Checking this will delete the current image when you save changes
+                            </p>
                         </div>
                     {% endif %}
                     
