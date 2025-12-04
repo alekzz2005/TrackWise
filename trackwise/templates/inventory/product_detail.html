@@ -141,7 +141,7 @@
                             box-sizing: border-box;
                         ">
                         
-                    {# Clear checkbox if there's a current image #}
+                    {% comment %} {# Clear checkbox if there's a current image #}
                     {% if product.image %}
                         <div style="
                             margin-bottom: 10px;
@@ -178,7 +178,7 @@
                                 Checking this will delete the current image when you save changes
                             </p>
                         </div>
-                    {% endif %}
+                    {% endif %} {% endcomment %}
                     
                     <span class="error-message" id="{{ form.image_upload.id_for_label }}_error"></span> <!-- UPDATE THIS TOO -->
                     {% if form.image_upload.errors %}
