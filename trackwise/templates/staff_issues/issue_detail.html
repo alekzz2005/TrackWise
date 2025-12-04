@@ -1097,7 +1097,7 @@ body.dropdown-open {
         </div>
     </div>
 
-    <!-- Attachments Section -->
+    {% comment %} <!-- Attachments Section -->
     {% if issue.attachment or issue.image %}
     <div class="attachments-section">
         <div class="card-title">
@@ -1129,7 +1129,7 @@ body.dropdown-open {
             {% endif %}
         </div>
     </div>
-    {% endif %}
+    {% endif %} {% endcomment %}
 
     <!-- Forum-style Comments Section -->
     <div class="forum-container">
