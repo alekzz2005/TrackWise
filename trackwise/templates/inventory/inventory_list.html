@@ -701,8 +701,11 @@
                 <i class="stat-icon fas fa-boxes"></i>
             </div>
             
+            {% load number_filters %}  {# Add this at the top of your template #}
             <div class="stat-card">
-                <div id="kpi-total-value" class="stat-number">₱{{ total_inventory_value|floatformat:2 }}</div>
+                <div id="kpi-total-value" class="stat-number">
+                    {{ total_inventory_value|format_currency }}
+                </div>
                 <div class="stat-label">Total Value</div>
                 <i class="stat-icon fas fa-peso-sign"></i>
             </div>
